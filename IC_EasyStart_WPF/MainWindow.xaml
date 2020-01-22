@@ -10,21 +10,35 @@
         Title="MainWindow" Height="450" Width="800"
         Loaded="Window_Loaded">
     <Grid>
-
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        
-        
-        
-        <WindowsFormsHost HorizontalAlignment="Left" Height="399" Margin="354,10,0,0" VerticalAlignment="Top" Width="428" Name="Host" RenderTransformOrigin="0.5,0.5">
 
+        <ScrollViewer Grid.Column="0" Grid.Row="0">
+            <StackPanel>
+                <GroupBox Header="Информация о пациенте" Margin="3">
+                    <StackPanel>
+                        <TextBlock Text="ФИО пациента" Margin="2"/>
+                        <TextBox Margin="2"/>
+                        <TextBlock Text="Дата" Margin="2"/>
+                        <TextBox Margin="2"/>
+                        <TextBlock Text="№ истории болезни:" Margin="2"/>
+                        <TextBox Margin="2"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+
+        <WindowsFormsHost Grid.Row="0" Grid.Column="2" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="428" Name="Host" RenderTransformOrigin="0.5,0.5">
+            
         </WindowsFormsHost>
+
+        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Width="4" Background="DarkBlue"></GridSplitter>
 
     </Grid>
 </Window>
