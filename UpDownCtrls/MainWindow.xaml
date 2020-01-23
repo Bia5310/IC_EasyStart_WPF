@@ -1,0 +1,72 @@
+﻿<Window x:Class="UpDownCtrls.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:UpDownCtrls"
+        Title="MainWindow"
+        Height="300" Width="400">
+    <Window.Resources>
+        <Style x:Key="TimeCtrlStyle" TargetType="{x:Type local:TimeCtrl}">
+            <Setter Property = "Height" Value="28"/>
+            <Setter Property = "TimePattern" Value="H h.m.s t"/>
+            <Setter Property = "UseValidTimes" Value="True"/>
+            <Setter Property = "Foreground" Value="Blue"/>
+            <Setter Property = "Background" Value="LightGreen"/>
+            <Setter Property = "BorderBrush" Value="Purple"/>
+            <Setter Property = "FontSize" Value="14"/>
+            <Setter Property = "VerticalAlignment" Value="Top"/>
+            <Setter Property = "BorderThickness" Value="2"/>
+            <Setter Property = "InvalidTimeTextBrush" Value="#FFFF00E7"/>
+            <Setter Property = "ValidTimesName" Value="Weird Opening Hours"/>
+            <Setter Property = "NoValidTimesString" Value="(Closed)"/>
+            <Setter Property= "TextAlignment" Value="Right"/>     
+        </Style>
+        <Style x:Key="NumericUpDownStyle" TargetType="{x:Type local:NumericUpDown}">
+            <Setter Property = "BorderBrush" Value="Aquamarine"/>
+            <Setter Property = "TextAlignment" Value="Left"/>
+            <Setter Property = "Height" Value="36"/>
+            <Setter Property = "Minimum" Value="-30"/>
+            <Setter Property = "NegativeTextBrush" Value="Red"/>
+            <Setter Property = "Foreground" Value="Blue"/>
+            <Setter Property = "Background" Value="#1E800080"/>
+            <Setter Property = "VerticalAlignment" Value="Top"/>
+            <Setter Property = "BorderThickness" Value="7"/>
+            <Setter Property = "Maximum" Value="210"/>
+            <Setter Property = "Value" Value="430"/>
+            <Setter Property = "OutOfRangeTextBrush" Value="Gray"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <local:TimeCtrl Height="34" HorizontalAlignment="Stretch" Margin="185,12,12,0" x:Name="TimeCtrl_1" VerticalAlignment="Top" 
+                        Background="LightPink" Foreground="Green" FontSize="16" FontWeight="Bold" BorderThickness="3" BorderBrush="Orange"/>
+        <local:TimeCtrl HorizontalAlignment="Stretch" 
+                        Height="23" Margin="185,61,12,0" 
+                        TimePattern="hh:mm:ss tt"                       
+                        x:Name="TimeCtrl_2" VerticalAlignment="Top"
+                        UseValidTimes="True">
+            <local:ValidTimeItem BeginTime="9,0,0" EndTime="12,0,0"/>
+            <local:ValidTimeItem BeginTime="13,30,0" EndTime="18,0,0"/>
+        </local:TimeCtrl>
+        <local:TimeCtrl HorizontalAlignment="Stretch" Margin="185,99,12,0" x:Name="TimeCtrl_3" 
+                        Style="{StaticResource ResourceKey=TimeCtrlStyle}">
+            <local:ValidTimeItem BeginTime="5,0,0" EndTime="6,30,0"/>
+            <local:ValidTimeItem BeginTime="7,30,5" EndTime="9,45,23"/>
+            <local:ValidTimeItem BeginTime="11,55,2" EndTime="13,40,22"/>
+            <local:ValidTimeItem BeginTime="15,11,12" EndTime="18,19,20"/>
+        </local:TimeCtrl>
+        <local:NumericUpDown x:Name="NumericUpDown_1" Style="{StaticResource ResourceKey=NumericUpDownStyle}"
+                             Margin="185,146,12,0" HorizontalAlignment="Stretch"/>
+        <local:NumericUpDown Height="25" HorizontalAlignment="Stretch" HorizontalContentAlignment="Right" IsEnabled="True" 
+                             Step="5" DecimalPlaces="4" Margin="185,188,12,0" Maximum="10000"
+                             x:Name="NumericUpDown_2" 
+                             VerticalAlignment="Top"/>
+        <Button Content="Change Alignment" Height="23" HorizontalAlignment="Right" Margin="0,230,256,0" Name="btChangeAlign" VerticalAlignment="Top" Width="110" Click="btChangeAlign_Click" />
+        <Button Content="Disable all" Height="23" HorizontalAlignment="Right" Margin="0,230,134,0" Name="btDisEnAll" VerticalAlignment="Top" Width="110" Click="btDisEnAll_Click" />
+        <Button Content="Close" Height="23" HorizontalAlignment="Right" Margin="0,230,12,0" Name="btClose" VerticalAlignment="Top" Width="110" Click="btClose_Click"/>
+  
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="12,13,0,0" Text="Just global settings set:" VerticalAlignment="Top" Width="155" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="12,62,0,0" Text="TimeCtrl settings set:" VerticalAlignment="Top" Width="155" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="12,104,0,0" Text="TimeCtrl with strange settings:" VerticalAlignment="Top" Width="167" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="12,156,0,0" Text="UpDown Ctrl with min = -100:" VerticalAlignment="Top" Width="167" />
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="12,188,0,0" Text="Another UpDown Ctrl:" VerticalAlignment="Top" Width="155" />
+    </Grid>
+</Window>

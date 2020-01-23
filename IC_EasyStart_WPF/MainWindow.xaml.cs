@@ -13,7 +13,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TIS.Imaging.VCDHelpers;
 using TIS.Imaging;
-using System.Windows.Forms;
 
 namespace IC_EasyStart_WPF
 {
@@ -24,9 +23,15 @@ namespace IC_EasyStart_WPF
     {
         public MainWindow()
         {
-            
             InitializeComponent();
 
+            Button b = new System.Windows.Controls.Button();
+            
+            Uri uri = new Uri("DarkTheme.xaml", UriKind.Relative);
+
+            ResourceDictionary resourceDictionary = System.Windows.Application.LoadComponent(uri) as ResourceDictionary;
+            System.Windows.Application.Current.Resources.Clear();
+            System.Windows.Application.Current.Resources.MergedDictionaries.Add(resourceDictionary);
         }
 
         ICImagingControl IC_Control = null;
