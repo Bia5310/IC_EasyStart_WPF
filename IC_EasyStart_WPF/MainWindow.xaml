@@ -3,42 +3,228 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xc="clr-namespace:Xceed.Wpf.Toolkit.Core;assembly=Xceed.Wpf.Toolkit"
         xmlns:local="clr-namespace:IC_EasyStart_WPF"
         mc:Ignorable="d"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:tis="clr-namespace:TIS.Imaging;assembly=TIS.Imaging.ICImagingControl34"
-        Title="MainWindow" Height="450" Width="800"
-        Loaded="Window_Loaded">
+        Title="MainWindow"
+        Loaded="Window_Loaded"
+        Width="1280"
+        Height="1015.5"
+        Closing="Form1_FormClosing"
+        KeyDown="Form1_KeyDown"
+        Style="{DynamicResource WindowStyle}">
+
+    <Window.Resources>
+        <Color x:Key="ColorToggleBlue">#FF1A89AA</Color>
+        <Color x:Key="ColorToggleYellow">#FFBF00</Color>
+        <SolidColorBrush x:Key="BrushToggleBlue" Color="{StaticResource ColorToggleBlue}"/>
+        <SolidColorBrush x:Key="BrushToggleYellow" Color="{StaticResource ColorToggleYellow}"/>
+
+        <Image x:Key="folder_img" Source="Folder_img.png" Height="15"/>
+        <Style TargetType="{x:Type ToggleButton}" x:Key="ToggleButtonSwitchStyle">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid x:Name="grid">
+                            <Border x:Name="border" Background="{StaticResource BrushToggleBlue}" Width="50" Height="24" CornerRadius="12 12 12 12" BorderBrush="Gray" BorderThickness="1"/>
+                            <Ellipse Width="22" Height="22" Fill="White" StrokeThickness="1" Stroke="DarkGray" x:Name="ellipse">
+                                <Ellipse.RenderTransform>
+                                    <TranslateTransform x:Name="translate" X="-13"></TranslateTransform>
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <EventTrigger RoutedEvent="Checked">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation To="{StaticResource ColorToggleYellow}" Duration="0:0:0.2" Storyboard.TargetName="border" Storyboard.TargetProperty="Background.Color"/>
+                                        <DoubleAnimation To="13" Duration="0:0:0.2" Storyboard.TargetName="translate" Storyboard.TargetProperty="X"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="Unchecked">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation To="{StaticResource ColorToggleBlue}" Duration="0:0:0.2" Storyboard.TargetName="border" Storyboard.TargetProperty="Background.Color"/>
+                                        <DoubleAnimation To="-13" Duration="0:0:0.2" Storyboard.TargetName="translate" Storyboard.TargetProperty="X"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ScrollViewer Grid.Column="0" Grid.Row="0">
-            <StackPanel>
-                <GroupBox Header="Информация о пациенте" Margin="3">
+        <ScrollViewer Grid.Column="0" Grid.Row="0" VerticalScrollBarVisibility="Auto" Style="{DynamicResource ScrollViewerStyle}">
+            <StackPanel TextElement.FontSize="16">
+                <Expander Header="Информация о пациенте" Margin="3" Padding="3" IsExpanded="True" BorderThickness="0 0 0 3" Style="{DynamicResource ExpanderStyle}">
                     <StackPanel>
                         <TextBlock Text="ФИО пациента" Margin="2"/>
-                        <TextBox Margin="2"/>
+                        <TextBox x:Name="TB_FIO" Margin="5 2 5 2" Padding="2" Style="{DynamicResource TextBoxSytle}"/>
                         <TextBlock Text="Дата" Margin="2"/>
-                        <TextBox Margin="2"/>
+                        <TextBox Margin="5 2 5 2" Padding="2" Style="{DynamicResource TextBoxSytle}" x:Name="TB_CurrentDate"/>
                         <TextBlock Text="№ истории болезни:" Margin="2"/>
-                        <TextBox Margin="2"/>
+                        <TextBox Padding="2" Margin="5 2 5 2" Style="{DynamicResource TextBoxSytle}" x:Name="TB_HistoryNumber"/>
                     </StackPanel>
-                </GroupBox>
+                </Expander>
+                <Expander Header="Режимы" Margin="3 5 3 3" BorderThickness="0 0 0 3" Padding="3" IsExpanded="True" Style="{DynamicResource ExpanderStyle}">
+                    <UniformGrid Columns="3" Margin="1">
+                        <RadioButton Margin="1" Style="{DynamicResource ToggleButtonStyle}" x:Name="ChB_Config_1" Checked="ChB_Config_N_CheckedChanged">
+                            <RadioButton.Content>
+                                <Viewbox>
+                                    <TextBlock Text="Phaco"/>
+                                </Viewbox>
+                            </RadioButton.Content>
+                        </RadioButton>
+                        <RadioButton Margin="1" Style="{DynamicResource ToggleButtonStyle}" x:Name="ChB_Config_2" Checked="ChB_Config_N_CheckedChanged">
+                            <RadioButton.Content>
+                                <Viewbox>
+                                    <TextBlock Text="Vitreo"/>
+                                </Viewbox>
+                            </RadioButton.Content>
+                        </RadioButton>
+                        <RadioButton Margin="1"  Style="{DynamicResource ToggleButtonStyle}" IsChecked="True" x:Name="ChB_Config_0" Checked="ChB_Config_N_CheckedChanged">
+                            <RadioButton.Content>
+                                <Viewbox>
+                                    <TextBlock Text="User 1"/>
+                                </Viewbox>
+                            </RadioButton.Content>
+                        </RadioButton>
+                    </UniformGrid>
+                </Expander>
+
+                <Expander Header="Настройки камеры" Margin="3 5 3 3" BorderThickness="0 0 0 3" Padding="3" IsExpanded="True" Style="{DynamicResource ExpanderStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Экспозиция" Margin="2"/>
+                        <xctk:DoubleUpDown Grid.Row="0" Grid.Column="1" Margin="2" x:Name="NUD_Exposure"/>
+                        <CheckBox Grid.Row="0" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" Style="{DynamicResource CheckBoxSimpleStyle}" x:Name="ChB_ExposureAuto"/>
+                        <Slider Grid.Row="1" Grid.ColumnSpan="3" Margin="3 3 3 10" x:Name="TrB_ExposureVal"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Усиление" Margin="2"/>
+                        <xctk:DoubleUpDown Grid.Row="2" Grid.Column="1" Margin="2" x:Name="NUD_Gain"/>
+                        <CheckBox Grid.Row="2" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" Style="{DynamicResource CheckBoxSimpleStyle}" x:Name="ChB_GainAuto"/>
+                        <Slider Grid.Row="3" Grid.ColumnSpan="3" Margin="3 3 3 10" x:Name="TrB_GainVal"/>
+
+                        <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="Яркость" Margin="2"/>
+                        <xctk:DoubleUpDown Grid.Row="4" Grid.Column="1" Margin="2" x:Name="NUD_Brightness"/>
+                        <CheckBox Grid.Row="4" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" Style="{DynamicResource CheckBoxSimpleStyle}" x:Name="ChB_BrightnessAuto"/>
+                        <Slider Grid.Row="5" Grid.ColumnSpan="3" Margin="3 3 3 10" x:Name="TrB_Brightness"/>
+
+                        <StackPanel Grid.Row="6" Grid.ColumnSpan="4" Margin="0 5 0 0">
+                            <Button MaxHeight="42" Margin="2" Style="{DynamicResource ButtonStyle}" x:Name="B_Properties">
+                                <Button.Content>
+                                    <Viewbox>
+                                        <TextBlock FontSize="16" Text="Дополнительные настройки"/>
+                                    </Viewbox>
+                                </Button.Content>
+                            </Button>
+                            <Button MaxHeight="42" Margin="2" Style="{DynamicResource ButtonStyle}" x:Name="B_Cam_Select">
+                                <Button.Content>
+                                    <Viewbox>
+                                        <TextBlock Text="Настройки разрешения"/>
+                                    </Viewbox>
+                                </Button.Content>
+                            </Button>
+                            <ToggleButton MaxHeight="42" IsChecked="True" Margin="2" Style="{DynamicResource ToggleButtonSimpleStyle}" x:Name="ChB_WhiteBalanceAuto">
+                                <ToggleButton.Content>
+                                    <Viewbox>
+                                        <TextBlock FontSize="16" Text="Автобаланс белого"/>
+                                    </Viewbox>
+                                </ToggleButton.Content>
+                            </ToggleButton>
+                        </StackPanel>
+                    </Grid>
+                </Expander>
+
+                <Expander Header="Видео и фото" Margin="3 5 3 3" BorderThickness="0 0 0 3" Padding="3"  IsExpanded="True" Style="{DynamicResource ExpanderStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition Height="10"/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.ColumnSpan="4" Margin="2" Text="Сохранение фото"/>
+                        <TextBox Grid.Row="1" Grid.ColumnSpan="3" Margin="2" VerticalContentAlignment="Center" Style="{DynamicResource TextBoxSytle}" x:Name="TB_Directory_Photo"/>
+                        <Button Grid.Row="1" Grid.Column="3" Margin="2" Style="{DynamicResource ButtonStyle}" x:Name="B_Browse_Photo">
+                            <Button.Content>
+                                <Image Source="Folder_img.png" Height="16"/>
+                            </Button.Content>
+                        </Button>
+                        <Button Style="{DynamicResource ButtonStyle}" Grid.Row="2" Grid.ColumnSpan="4" Margin="2" Content="Сделать фото" x:Name="B_Snapshot"/>
+
+                        <TextBlock Grid.Row="4" Grid.ColumnSpan="4" Margin="2" Text="Сохранение видео"/>
+                        <TextBox Grid.Row="5" Grid.ColumnSpan="3" Margin="2" VerticalContentAlignment="Center" Style="{DynamicResource TextBoxSytle}" x:Name="TB_Directory_Vid"/>
+                        <Button Content="{StaticResource folder_img}" Grid.Row="5" Grid.Column="3" Margin="2" Style="{DynamicResource ButtonStyle}" x:Name="B_Browse_Vid"/>
+                        <UniformGrid Grid.Row="6" Grid.ColumnSpan="4" Rows="1" Columns="2">
+                            <Button Margin="2" Content="Старт" Style="{DynamicResource ButtonStyle}" x:Name="B_StartCapture"/>
+                            <Button Margin="2" Content="Стоп" Style="{DynamicResource ButtonStyle}" x:Name="B_StopCapture"/>
+                        </UniformGrid>
+                    </Grid>
+                </Expander>
             </StackPanel>
         </ScrollViewer>
 
-        <WindowsFormsHost Grid.Row="0" Grid.Column="2" Margin="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="428" Name="Host" RenderTransformOrigin="0.5,0.5">
-            
-        </WindowsFormsHost>
+        <Canvas Grid.Row="0" Grid.Column="2" Margin="1">
+            <WindowsFormsHost Padding="5" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="Host" RenderTransformOrigin="0.5,0.5">
 
-        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Width="4" Background="DarkBlue"></GridSplitter>
+            </WindowsFormsHost>
+
+            <ToggleButton x:Name="B_FS_Switcher" Canvas.Right="20" Canvas.Bottom="20" Width="65" Height="65" Style="{DynamicResource ToggleButtonFSStyle}"/>
+
+        </Canvas>
+
+        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Width="6" HorizontalAlignment="Center" Margin="0 2 0 2" Style="{DynamicResource SplitterStyle}"></GridSplitter>
+
+        <ToolBarTray Grid.Row="1" Grid.ColumnSpan="3">
+            <ToolBar>
+                <TextBlock Text="Тема" VerticalAlignment="Center" FontSize="16" Margin="10 2 2 2"/>
+                <ToggleButton x:Name="toggleTheme" Margin="2" Style="{StaticResource ToggleButtonSwitchStyle}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Checked"/>
+            </ToolBar>
+            
+        </ToolBarTray>
 
     </Grid>
+
 </Window>

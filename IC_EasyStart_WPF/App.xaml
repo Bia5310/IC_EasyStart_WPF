@@ -4,6 +4,13 @@
              xmlns:local="clr-namespace:IC_EasyStart_WPF"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="LightTheme.xaml"/>
+                <ResourceDictionary Source="DarkTheme.xaml"/>
+                <ResourceDictionary Source="BrushesDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
     </Application.Resources>
 </Application>
