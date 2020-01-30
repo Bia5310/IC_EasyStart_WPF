@@ -3,15 +3,11 @@
                     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                     xmlns:local="clr-namespace:IC_EasyStart_WPF">
     <Color x:Key="YellowDark"></Color>
-    <Color x:Key="DarkBlue1Color">#FF1A89AA</Color>
-    <Color x:Key="DarkBlue2Color">#FF133A46</Color>
-    <SolidColorBrush x:Key="DarkBlue1Brush" Color="{StaticResource DarkBlue1Color}"/>
-    <SolidColorBrush x:Key="DarkBlue2Brush" Color="{StaticResource DarkBlue2Color}"/>
 
     <Style x:Key="WindowStyle" TargetType="Window">
         <Setter Property="Background" Value="#213742"/>
         <Setter Property="BorderThickness" Value="3"/>
-        <Setter Property="BorderBrush" Value="#FF095278"/>
+        <Setter Property="BorderBrush" Value="#FF3C56A4"/>
     </Style>
     <Style x:Key="ExpanderStyle" TargetType="Expander">
         <Setter Property="Background" Value="#305060"/>
@@ -37,7 +33,7 @@
     </Style>
 
     <Style x:Key="ScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
-        <Setter Property="Background" Value="#FF1F2529"/>
+        <Setter Property="Background" Value="DarkBlue"/>
     </Style>
 
     <Style x:Key="ToggleButtonFSStyle" TargetType="{x:Type ToggleButton}">
@@ -68,13 +64,25 @@
             </Setter>
         </Style.Setters>
     </Style>
- 
+    
+    <!--<Style x:Key="DoubleUpDounStyle" TargetType="{x:Type xctk:DoubleUpDown}">
+        <Style.Setters>
+            <Setter Property="Background" Value="#345BBC"/>
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style.Setters>
+        <Style.Triggers>
+            <Trigger Property="IsFocused" Value="True">
+                <Setter Property="Background" Value="#222D47"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>-->
+    
     <Style x:Key="ButtonStyle" TargetType="{x:Type Button}">
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Padding" Value="3"/>
         <Setter Property="Foreground" Value="White"/>
-        <Setter Property="MaxHeight" Value="45"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -89,8 +97,8 @@
                                             <TranslateTransform X="0.02" Y="0.3"/>
                                         </TransformGroup>
                                     </RadialGradientBrush.RelativeTransform>
-                                    <GradientStop Offset="1" Color="{StaticResource DarkBlue1Color}"/>
-                                    <GradientStop Offset="0" Color="{StaticResource DarkBlue2Color}"/>
+                                    <GradientStop Offset="1" Color="#345BBC"/>
+                                    <GradientStop Offset="0" Color="#FF222D47"/>
                                 </RadialGradientBrush>
                             </Border.Background>
                             <ContentPresenter HorizontalAlignment="Center"
@@ -116,7 +124,7 @@
                                                     <TranslateTransform X="0.02" Y="0.3"/>
                                                 </TransformGroup>
                                             </RadialGradientBrush.RelativeTransform>
-                                            <GradientStop Color="{StaticResource DarkBlue1Color}" Offset="1"/>
+                                            <GradientStop Color="#00000000" Offset="1"/>
                                             <GradientStop Color="#FFFFD556" Offset="0.3"/>
                                         </RadialGradientBrush>
                                     </Setter.Value>
@@ -148,7 +156,6 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Padding" Value="3"/>
         <Setter Property="Foreground" Value="White"/>
-        <Setter Property="MaxHeight" Value="45"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
@@ -163,8 +170,8 @@
                                             <TranslateTransform X="0.02" Y="0.3"/>
                                         </TransformGroup>
                                     </RadialGradientBrush.RelativeTransform>
-                                    <GradientStop Offset="1" Color="{StaticResource DarkBlue1Color}"/>
-                                    <GradientStop Offset="0" Color="{StaticResource DarkBlue2Color}"/>
+                                    <GradientStop Offset="1" Color="#345BBC"/>
+                                    <GradientStop Offset="0" Color="#FF222D47"/>
                                 </RadialGradientBrush>
                             </Border.Background>
                             <ContentPresenter HorizontalAlignment="Center"
@@ -191,7 +198,7 @@
                                                     <TranslateTransform X="0.02" Y="0.3"/>
                                                 </TransformGroup>
                                             </RadialGradientBrush.RelativeTransform>
-                                            <GradientStop Color="{StaticResource DarkBlue1Color}" Offset="1"/>
+                                            <GradientStop Color="#00000000" Offset="1"/>
                                             <GradientStop Color="#FFFFD556" Offset="0.3"/>
                                         </RadialGradientBrush>
                                     </Setter.Value>
@@ -231,7 +238,6 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Padding" Value="3"/>
         <Setter Property="Foreground" Value="White"/>
-        <Setter Property="MaxHeight" Value="45"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RadioButton}">
@@ -246,8 +252,8 @@
                                             <TranslateTransform X="0.02" Y="0.3"/>
                                         </TransformGroup>
                                     </RadialGradientBrush.RelativeTransform>
-                                    <GradientStop Offset="1" Color="{StaticResource DarkBlue1Color}"/>
-                                    <GradientStop Offset="0" Color="{StaticResource DarkBlue2Color}"/>
+                                    <GradientStop Offset="1" Color="#345BBC"/>
+                                    <GradientStop Offset="0" Color="#FF222D47"/>
                                 </RadialGradientBrush>
                             </Border.Background>
                             <ContentPresenter HorizontalAlignment="Center"
@@ -273,7 +279,7 @@
                                                     <TranslateTransform X="0.02" Y="0.3"/>
                                                 </TransformGroup>
                                             </RadialGradientBrush.RelativeTransform>
-                                            <GradientStop Color="{StaticResource DarkBlue1Color}" Offset="1"/>
+                                            <GradientStop Color="#00000000" Offset="1"/>
                                             <GradientStop Color="#FFFFD556" Offset="0.3"/>
                                         </RadialGradientBrush>
                                     </Setter.Value>
@@ -322,13 +328,13 @@
 
     <Style x:Key="TextBoxSytle" TargetType="TextBox">
         <Style.Setters>
-            <Setter Property="Background" Value="{StaticResource DarkBlue1Brush}"/>
+            <Setter Property="Background" Value="#345BBC"/>
             <Setter Property="BorderBrush" Value="White"/>
             <Setter Property="Foreground" Value="White"/>
         </Style.Setters>
         <Style.Triggers>
             <Trigger Property="IsFocused" Value="True">
-                <Setter Property="Background" Value="{StaticResource DarkBlue2Brush}"/>
+                <Setter Property="Background" Value="#FF222D47"/>
             </Trigger>
         </Style.Triggers>
     </Style>
