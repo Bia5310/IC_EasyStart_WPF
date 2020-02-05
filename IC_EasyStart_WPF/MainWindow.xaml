@@ -260,7 +260,7 @@
 
         <Canvas Grid.Row="0" Grid.Column="2" Margin="1">
             <DockPanel LastChildFill="True">
-                <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="Host"/>
+                <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="Host" SizeChanged="Host_SizeChanged"/>
             </DockPanel>
             
             <ToggleButton x:Name="B_FS_Switcher" Canvas.Right="20" Canvas.Bottom="20" Width="65" Height="65"

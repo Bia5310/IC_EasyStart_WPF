@@ -130,8 +130,6 @@ namespace IC_EasyStart_WPF
             BGW_CamRestarter.WorkerSupportsCancellation = false;
             BGW_CamRestarter.WorkerReportsProgress = false;
 
-
-
             InitializeComponent();
 
             ChB_Config_0.Checked += ChB_Config_N_Checked;
@@ -1025,6 +1023,17 @@ namespace IC_EasyStart_WPF
         private void B_FS_Switcher_Unchecked(object sender, RoutedEventArgs e)
         {
             MinimizeWindow();
+        }
+
+        private void Host_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            FLog.Log("Resize");
+            if (Everything_loaded)
+            {
+                if (FullScrin) Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 1, 1); // resize
+                else Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1);
+                FormatAdaptation(IMG_W_now, IMG_H_now);
+            }
         }
 
         private void ToggleButton_Checked(object sender, RoutedEventArgs e)
