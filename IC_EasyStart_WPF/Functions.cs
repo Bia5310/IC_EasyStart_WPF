@@ -482,7 +482,7 @@ namespace IC_EasyStart_WPF
             Device_state = IC_Control.SaveDeviceState();
         }
         private void Prepare_encoder(string path, int pFPS, float TimaInterval, int BitsPerSecond)
-        {
+        {/*
             aviPath = path;
             aviFile = System.IO.File.OpenWrite(aviPath);
             int fps = pFPS;
@@ -504,7 +504,7 @@ namespace IC_EasyStart_WPF
             // H264エンコーダーの設定(encoder setup)
             int bps = BitsPerSecond;         // target bitrate. 5Mbps.
             float keyFrameInterval = TimaInterval; // insert key frame interval. unit is second.
-            encoder.Setup(IMG_W_now, IMG_H_now, bps, (int)fps, keyFrameInterval, onEncode);
+            encoder.Setup(IMG_W_now, IMG_H_now, bps, (int)fps, keyFrameInterval, onEncode);*/
 
         }
 
@@ -513,10 +513,10 @@ namespace IC_EasyStart_WPF
         private void Prepare_encoder2(string path, int pFPS, int BitsPerSecond)
         {
             writer_ffmpeg = new VideoFileWriter();
-            writer_ffmpeg.Open(path, IMG_W_now, IMG_H_now,pFPS,VideoCodec.MPEG4, BitsPerSecond);
+            writer_ffmpeg.Open(path, IMG_W_now, IMG_H_now, pFPS, VideoCodec.MPEG4, BitsPerSecond);
             //AVI
             ///////////////////////////////////
-            aviPath = path;
+            /*aviPath = path;
             aviFile = System.IO.File.OpenWrite(aviPath);
             int fps = pFPS;
             // fps = 50; 
@@ -537,7 +537,7 @@ namespace IC_EasyStart_WPF
             // H264エンコーダーの設定(encoder setup)
             int bps = BitsPerSecond;         // target bitrate. 5Mbps.
             float keyFrameInterval = TimaInterval; // insert key frame interval. unit is second.
-            encoder.Setup(IMG_W_now, IMG_H_now, bps, (int)fps, keyFrameInterval, onEncode);
+            encoder.Setup(IMG_W_now, IMG_H_now, bps, (int)fps, keyFrameInterval, onEncode);*/
 
         }
         private int Get_WB_Sum()
@@ -576,7 +576,7 @@ namespace IC_EasyStart_WPF
         }
         private void Font_Adaptation()
         {
-            double CurHeight = this.Height;
+            /*double CurHeight = this.Height;
             int SizeFact = 10;
             if (CurHeight > 1200) SizeFact = 12;
             else if (CurHeight < 720) SizeFact = 8;
@@ -621,7 +621,7 @@ namespace IC_EasyStart_WPF
             L_video_save.Font = Cur_Font;
             B_Snapshot.Font = Cur_Font;
             B_StartCapture.Font = Cur_Font;
-            B_StopCapture.Font = Cur_Font;
+            B_StopCapture.Font = Cur_Font;*/
         }
 
         private void ChangePos_of_FSBut()
@@ -631,8 +631,23 @@ namespace IC_EasyStart_WPF
         }
 
         private void MaximizeWindow()
-        {    
-            Size_was = this.Size;
+        {
+            Size_was = new Size((int) this.Width, (int) this.Height);
+            Location_was = new Point((int)Left, (int)Top);
+
+            this.WindowStyle = System.Windows.WindowStyle.None;
+            this.WindowState = System.Windows.WindowState.Maximized;
+            this.Top = 0;
+            this.Left = 0;
+            this.Width = Screen.PrimaryScreen.Bounds.Width;
+            this.Height = Screen.PrimaryScreen.Bounds.Height;
+            toolBar.Visibility = System.Windows.Visibility.Collapsed;
+            scrollViewver_left.Visibility = System.Windows.Visibility.Collapsed;
+            gridSplitter_left.Visibility = System.Windows.Visibility.Collapsed;
+
+            FullScrin = true;
+
+            /*Size_was = this.Size;
             Location_was = new Point(this.Location.X,this.Location.Y);
 
             this.FormBorderStyle = FormBorderStyle.None;
@@ -650,11 +665,23 @@ namespace IC_EasyStart_WPF
             
 
             Adapt_Size_ofCont((IC_Control as Control), IMG_W_now, IMG_H_now, 1, 1);
-            FormatAdaptation(IMG_W_now, IMG_H_now);
+            FormatAdaptation(IMG_W_now, IMG_H_now);*/
         }
         private void MinimizeWindow()
         {
-            this.FormBorderStyle = FormBorderStyle.Sizable;
+            this.WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
+            this.WindowState = System.Windows.WindowState.Normal;
+            this.Left = Location_was.X;
+            this.Top = Location_was.Y;
+            this.Width = Size_was.Width;
+            this.Height = Size_was.Height;
+            toolBar.Visibility = System.Windows.Visibility.Visible;
+            scrollViewver_left.Visibility = System.Windows.Visibility.Visible;
+            gridSplitter_left.Visibility = System.Windows.Visibility.Visible;
+
+            FullScrin = false;
+
+            /*this.FormBorderStyle = FormBorderStyle.Sizable;
             this.Size = Size_was;
             this.Location = Location_was;
 
@@ -665,7 +692,7 @@ namespace IC_EasyStart_WPF
             FullScrin = false;
 
             Adapt_Size_ofCont((IC_Control as Control), IMG_W_now, IMG_H_now, 0.8, 1); // Minimizing
-            FormatAdaptation(IMG_W_now, IMG_H_now);
+            FormatAdaptation(IMG_W_now, IMG_H_now);*/
         }
     }
 }
