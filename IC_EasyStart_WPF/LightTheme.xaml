@@ -6,6 +6,11 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="#419FD9"/>
     </Style>
+
+    <SolidColorBrush x:Key="Brush_Borders" Color="Yellow">
+
+    </SolidColorBrush>
+
     <Style x:Key="ExpanderStyle" TargetType="Expander">
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="LightGray"/>
@@ -14,6 +19,11 @@
     <Style x:Key="BorderStyle" TargetType="Border">
         <Setter Property="Background" Value="White"/>
     </Style>
+
+    <SolidColorBrush x:Key="BrushNUD_Borders" Color="Gray"/>
+    <SolidColorBrush x:Key="BrushNUD_BackgroundStock" Color="WhiteSmoke"/>
+    <SolidColorBrush x:Key="BrushNUD_BackgroundSelected" Color="LightGray"/>
+    <SolidColorBrush x:Key="BrushNUD_Foreground" Color="Black"/>
 
     <Style x:Key="SplitterStyle" TargetType="GridSplitter">
         <Style.Triggers>

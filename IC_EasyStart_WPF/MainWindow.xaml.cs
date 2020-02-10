@@ -89,11 +89,13 @@ namespace IC_EasyStart_WPF
         BackgroundWorker BGW_LiveVideoRecording = null;
         BackgroundWorker BGW_CamRestarter = null;
 
+        System.Windows.Forms.Button B_FS_Switcher_form = null;
+
         public MainWindow()
         {
             FLog = new ServiceFunctions.UI.Log.FileLogger("Log_" + ServiceFunctions.UI.Get_TimeNow_String() + ".txt");
             FLog.Log("Programm started...");
-            
+
             //Init timers
             TimerForRenew = new DispatcherTimer();
             TimerForRenew.Interval = new TimeSpan(0, 0, 0, 0, 100); //100 ms
@@ -141,12 +143,33 @@ namespace IC_EasyStart_WPF
 
             ChB_WhiteBalanceAuto.Checked += ChB_WhiteBalanceAuto_CheckedChanged;
             ChB_WhiteBalanceAuto.Unchecked += ChB_WhiteBalanceAuto_CheckedChanged;
+
+            FullScreenRoutedCommand.InputGestures.Add(new KeyGesture(Key.F, ModifierKeys.Alt));
+            QuiteRoutedCommand.InputGestures.Add(new KeyGesture(Key.Q, ModifierKeys.Alt));
+            CRoutedCommand.InputGestures.Add(new KeyGesture(Key.C, ModifierKeys.Alt));
+            CommandBindings.Add(new CommandBinding(FullScreenRoutedCommand, FullScreenSwitchKey));
+            CommandBindings.Add(new CommandBinding(QuiteRoutedCommand, QuiteKey));
+            CommandBindings.Add(new CommandBinding(CRoutedCommand, CodecPropKey));
+
+            B_FS_Switcher_form = Host.Child.Controls[0] as System.Windows.Forms.Button;
         }
+
+        public static RoutedCommand FullScreenRoutedCommand = new RoutedCommand();
+        public static RoutedCommand QuiteRoutedCommand = new RoutedCommand();
+        public static RoutedCommand CRoutedCommand = new RoutedCommand();
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             IC_Control = new ICImagingControl();
-            Host.Child = IC_Control;
+            Host.Child.Controls.Add(IC_Control);
+            IC_Control.SendToBack();
+
+            //IC_Control.Anchor = System.Windows.Forms.AnchorStyles.Left|System.Windows.Forms.AnchorStyles.Right| System.Windows.Forms.AnchorStyles.Top| System.Windows.Forms.AnchorStyles.Bottom;
+            B_FS_Switcher_form.UseVisualStyleBackColor = true;
+            B_FS_Switcher_form.BackColor = System.Drawing.Color.FromArgb(0, System.Drawing.Color.White);
+            Refresh_IC_BackColor();
+
+            B_FS_Switcher_form.Image = System.Drawing.Image.FromFile("FS_on.png");
 
             /*IC_Control.ShowDeviceSettingsDialog();
             if (IC_Control.DeviceValid) IC_Control.LiveStart();*/
@@ -264,7 +287,14 @@ namespace IC_EasyStart_WPF
                 MessageBox.Show(ext.Message);
                 Everything_loaded = true;
             }
-            finally { if (IC_Control.DeviceValid) IC_Control.LiveStart(); }
+            finally
+            {
+                if (IC_Control.DeviceValid)
+                {
+                    IC_Control.LiveStart();
+                    Adapt_Size_ofCont(IC_Control as System.Windows.Forms.Control, IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+                }
+            }
         }
 
         //private void ChB_Config_N_CheckedChanged(object sender, RoutedEventArgs e)
@@ -327,7 +357,7 @@ namespace IC_EasyStart_WPF
         {
             FLog.Log("ChB_Config_N_Checked");
             Timer_camera_checker.Stop();
-            Config_num = (int)(sender as RadioButton).Tag; //Вычленяем номер конфигурации
+            Config_num = int.Parse((sender as RadioButton).Tag as string); //Вычленяем номер конфигурации
 
             // IC_Control.SaveDeviceStateToFile(ConfigNames[LastConfig_num]);
 
@@ -422,24 +452,22 @@ namespace IC_EasyStart_WPF
             ServiceFunctions.Files.Write_txt("FlipSettings.xml", Flips);
         }
 
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        private void QuiteKey(object sender, ExecutedRoutedEventArgs e)
         {
-            FLog.Log("Form1_KeyDown");
-            if ((e.Key == Key.Q) && Keyboard.Modifiers == ModifierKeys.Alt)
-            {
-                Form1_FormClosing(null, null);
-                Application.Current.Shutdown();
-                return;
-            }
-            else if ((e.Key == Key.C) && Keyboard.Modifiers == ModifierKeys.Alt)
-            {
-                B_CodecProp_Click(null, null);
-            }
-            else if ((e.Key == Key.F) && Keyboard.Modifiers == ModifierKeys.Alt)
-            {
-                if (FullScrin) { MinimizeWindow(); FullScrin = false; }
-                else { MaximizeWindow(); FullScrin = true; }
-            }
+            Form1_FormClosing(null, null);
+            Application.Current.Shutdown();
+            return;
+        }
+
+        private void CodecPropKey(object sender, ExecutedRoutedEventArgs e)
+        {
+            B_CodecProp_Click(null, null);
+        }
+
+        private void FullScreenSwitchKey(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (FullScrin) { MinimizeWindow(); FullScrin = false; }
+            else { MaximizeWindow(); FullScrin = true; }
         }
 
         private void TrB_ExposureVal_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -1039,7 +1067,8 @@ namespace IC_EasyStart_WPF
         private void ToggleButton_Checked(object sender, RoutedEventArgs e)
         {
             string themePath = "";
-            if(toggleTheme.IsChecked == true)
+
+            if (toggleTheme.IsChecked == true)
             {
                 themePath = "LightTheme.xaml";
             }
@@ -1053,6 +1082,39 @@ namespace IC_EasyStart_WPF
             Application.Current.Resources.Clear();
             // добавляем загруженный словарь ресурсов
             Application.Current.Resources.MergedDictionaries.Add(resourceDict);
+            Refresh_IC_BackColor();
+        }
+
+        private void Host_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void ToggleButton_Checked_1(object sender, RoutedEventArgs e)
+        {
+            MaximizeWindow();
+        }
+
+        private void Button_Click(object sender, EventArgs e)
+        {
+            System.Windows.Forms.Button btn = sender as System.Windows.Forms.Button;
+            if(FullScrin)
+            {
+                B_FS_Switcher_form.Image = System.Drawing.Image.FromFile("FS_on.png");
+                MinimizeWindow();
+            }
+            else
+            {
+                B_FS_Switcher_form.Image = System.Drawing.Image.FromFile("FS_off.png"); 
+                MaximizeWindow();
+            }
+        }
+
+        private void Refresh_IC_BackColor()
+        {
+            System.Windows.Media.Color windowColor = (this.Background as SolidColorBrush).Color;
+            IC_Control.BackColor = System.Drawing.Color.FromArgb(windowColor.A, windowColor.R, windowColor.G, windowColor.B);
+            Host.Background = new SolidColorBrush(windowColor);
         }
     }
 }

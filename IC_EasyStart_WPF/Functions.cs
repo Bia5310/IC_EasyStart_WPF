@@ -550,10 +550,21 @@ namespace IC_EasyStart_WPF
         }
         private void Adapt_Size_ofCont(Control ctrl, int ImgW, int ImgH,double Width_Modifier, double Height_Modifier)
         {
+            //double w = canvas.ActualWidth, h = canvas.ActualHeight;
+
+            //double ratio = 
+
+            //IC_Control.Width = (int) (0.5*w);
+            //IC_Control.Height = (int) (0.5*h);
+
             //Size_for_Resizing = new Size((int)((double)Screen.PrimaryScreen.Bounds.Width * Width_Modifier), (int)(Screen.PrimaryScreen.Bounds.Height * Height_Modifier));
+
+            Width_Modifier = 1;
+            Height_Modifier = 1;
+
             double delta_h = 30;
             if (FullScrin) delta_h = 0;
-            Size_for_Resizing = new Size((int)((double)(this.Width) * Width_Modifier), (int)((this.Height- delta_h) * Height_Modifier));
+            Size_for_Resizing = new Size((int)((double)(Host.ActualWidth) * Width_Modifier), (int)((Host.ActualHeight- delta_h) * Height_Modifier));
             int PanelNewWidth = Size_for_Resizing.Width;
             int PanelNewHeight = Size_for_Resizing.Height;
             ctrl.Dock = DockStyle.None;
@@ -569,7 +580,7 @@ namespace IC_EasyStart_WPF
             {//Horizontal is size limit
                 ctrl.Width = PanelNewWidth;
                 ctrl.Height = (int)((double)ctrl.Width / (double)Img_SizeRelation);
-                ctrl.Location = new Point(0, (PanelNewHeight - ctrl.Height) / 2);
+                ctrl.Location = new Point(0, (PanelNewHeight - ctrl.Height + (int)delta_h) / 2);
             }
             ChangePos_of_FSBut();
             Font_Adaptation();
@@ -627,15 +638,20 @@ namespace IC_EasyStart_WPF
         private void ChangePos_of_FSBut()
         {
             Point NewLocation_onPanel = (new Point(IC_Control.Location.X + IC_Control.Width, IC_Control.Location.Y + IC_Control.Height));
-            //B_FS_Switcher.Location = new Point((int)((double)NewLocation_onPanel.X-100), (int)((double)NewLocation_onPanel.Y-100));
+            B_FS_Switcher_form.Location = new Point((int)((double)NewLocation_onPanel.X-100), (int)((double)NewLocation_onPanel.Y-100));
         }
+
+        System.Windows.GridLength column_width_old;
+        System.Windows.WindowState state_old;
 
         private void MaximizeWindow()
         {
             Size_was = new Size((int) this.Width, (int) this.Height);
             Location_was = new Point((int)Left, (int)Top);
+            state_old = this.WindowState; 
 
             this.WindowStyle = System.Windows.WindowStyle.None;
+            this.WindowState = System.Windows.WindowState.Normal;
             this.WindowState = System.Windows.WindowState.Maximized;
             this.Top = 0;
             this.Left = 0;
@@ -644,9 +660,13 @@ namespace IC_EasyStart_WPF
             toolBar.Visibility = System.Windows.Visibility.Collapsed;
             scrollViewver_left.Visibility = System.Windows.Visibility.Collapsed;
             gridSplitter_left.Visibility = System.Windows.Visibility.Collapsed;
+            column_width_old = grid_main.ColumnDefinitions[0].Width;
+            grid_main.ColumnDefinitions[0].Width = new System.Windows.GridLength(0, System.Windows.GridUnitType.Auto);
 
             FullScrin = true;
-
+            
+            Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+            FormatAdaptation(IMG_W_now, IMG_H_now);
             /*Size_was = this.Size;
             Location_was = new Point(this.Location.X,this.Location.Y);
 
@@ -670,7 +690,7 @@ namespace IC_EasyStart_WPF
         private void MinimizeWindow()
         {
             this.WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
-            this.WindowState = System.Windows.WindowState.Normal;
+            this.WindowState = state_old;
             this.Left = Location_was.X;
             this.Top = Location_was.Y;
             this.Width = Size_was.Width;
@@ -678,9 +698,12 @@ namespace IC_EasyStart_WPF
             toolBar.Visibility = System.Windows.Visibility.Visible;
             scrollViewver_left.Visibility = System.Windows.Visibility.Visible;
             gridSplitter_left.Visibility = System.Windows.Visibility.Visible;
+            grid_main.ColumnDefinitions[0].Width = column_width_old;
 
             FullScrin = false;
 
+            Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+            FormatAdaptation(IMG_W_now, IMG_H_now);
             /*this.FormBorderStyle = FormBorderStyle.Sizable;
             this.Size = Size_was;
             this.Location = Location_was;

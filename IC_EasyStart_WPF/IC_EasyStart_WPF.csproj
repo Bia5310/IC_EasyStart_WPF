@@ -168,8 +168,12 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="FS_off.png" />
-    <Resource Include="FS_on.png" />
+    <Resource Include="FS_off.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="FS_on.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="AForge.Video.FFMPEG.dll">

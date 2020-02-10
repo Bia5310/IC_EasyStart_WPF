@@ -15,9 +15,8 @@
         Width="1280"
         Height="1015"
         Closing="Form1_FormClosing"
-        KeyDown="Form1_KeyDown"
         Style="{DynamicResource WindowStyle}">
-    
+
     <Window.Resources>
         <Color x:Key="ColorToggleBlue">#FF1A89AA</Color>
         <Color x:Key="ColorToggleYellow">#FFBF00</Color>
@@ -59,9 +58,17 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style TargetType="xctk:DoubleUpDown" BasedOn="{StaticResource {x:Type xctk:DoubleUpDown}}">
+            <Style.Setters>
+                <Setter Property="BorderBrush" Value="{DynamicResource BrushNUD_Borders}"/>
+                <Setter Property="Background" Value="{DynamicResource BrushNUD_BackgroundStock}"/>
+                <Setter Property="Foreground" Value="{DynamicResource BrushNUD_Foreground}"/>
+            </Style.Setters>
+        </Style>
     </Window.Resources>
 
-    <Grid>
+    <Grid Name="grid_main">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
             <ColumnDefinition Width="Auto"/>
@@ -72,8 +79,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ScrollViewer Grid.Column="0" Grid.Row="0" 
-                      VerticalScrollBarVisibility="Auto" 
+        <ScrollViewer Grid.Column="0" Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto"
                       Style="{DynamicResource ScrollViewerStyle}"
                       x:Name="scrollViewver_left">
             <StackPanel TextElement.FontSize="16">
@@ -139,7 +146,9 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Экспозиция" Margin="2"/>
-                        <xctk:DoubleUpDown Grid.Row="0" Grid.Column="1" Margin="2" Maximum="10000" Increment="0.001" x:Name="NUD_Exposure" MaxWidth="120" ValueChanged="NUD_Exposure_ValueChanged"/>
+                        <xctk:DoubleUpDown Grid.Row="0" Grid.Column="1" Margin="2" Maximum="10000" Increment="0.001"
+                                           x:Name="NUD_Exposure" MaxWidth="120" ValueChanged="NUD_Exposure_ValueChanged">
+                        </xctk:DoubleUpDown>
                         <CheckBox Grid.Row="0" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" 
                                   Style="{DynamicResource CheckBoxSimpleStyle}"
                                   x:Name="ChB_ExposureAuto" 
@@ -258,17 +267,26 @@
             </StackPanel>
         </ScrollViewer>
 
-        <Canvas Grid.Row="0" Grid.Column="2" Margin="1">
-            <DockPanel LastChildFill="True">
-                <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Name="Host" SizeChanged="Host_SizeChanged"/>
-            </DockPanel>
-            
-            <ToggleButton x:Name="B_FS_Switcher" Canvas.Right="20" Canvas.Bottom="20" Width="65" Height="65"
+        <Grid Name="grid_with_host" Grid.Row="0" Grid.Column="2" Margin="1" SizeChanged="Host_SizeChanged">
+            <Canvas Name="canvas" Margin="1">
+                <ToggleButton x:Name="B_FS_Switcher" Visibility="Hidden" Canvas.Right="20" Canvas.Bottom="20" Width="65" Height="65"
                           Style="{DynamicResource ToggleButtonFSStyle}"
                           Checked="B_FS_Switcher_Checked"
                           Unchecked="B_FS_Switcher_Unchecked"/>
+            </Canvas>
 
-        </Canvas>
+            <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="Host" SizeChanged="Host_SizeChanged">
+                <WindowsFormsHost.Child>
+                    <wf:Panel>
+                        <wf:Panel.Controls>
+                            <wf:Button Width="60" Height="60" BackColor="#FFFFFFFF" Click="Button_Click" Margin="20, 20, 20, 20"/>
+                        </wf:Panel.Controls>
+                    </wf:Panel>
+                </WindowsFormsHost.Child>
+            </WindowsFormsHost>
+
+
+        </Grid>
 
         <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Width="6" HorizontalAlignment="Center" Margin="0 2 0 2" 
                       Style="{DynamicResource SplitterStyle}"
@@ -279,9 +297,7 @@
                 <TextBlock Text="Тема" VerticalAlignment="Center" FontSize="16" Margin="10 2 2 2"/>
                 <ToggleButton x:Name="toggleTheme" Margin="2" Style="{StaticResource ToggleButtonSwitchStyle}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Checked"/>
             </ToolBar>
-
         </ToolBarTray>
 
     </Grid>
-
 </Window>

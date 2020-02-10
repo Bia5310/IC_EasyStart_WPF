@@ -13,6 +13,12 @@
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="#FF095278"/>
     </Style>
+
+    <SolidColorBrush x:Key="BrushNUD_Borders" Color="White"/>
+    <SolidColorBrush x:Key="BrushNUD_BackgroundStock" Color="{StaticResource DarkBlue1Color}"/>
+    <SolidColorBrush x:Key="BrushNUD_BackgroundSelected" Color="{StaticResource DarkBlue2Color}"/>
+    <SolidColorBrush x:Key="BrushNUD_Foreground" Color="White"/>
+
     <Style x:Key="ExpanderStyle" TargetType="Expander">
         <Setter Property="Background" Value="#305060"/>
         <Setter Property="BorderBrush" Value="#FF557585"/>
