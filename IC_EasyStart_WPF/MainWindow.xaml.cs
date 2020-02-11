@@ -165,11 +165,10 @@ namespace IC_EasyStart_WPF
             IC_Control.SendToBack();
 
             //IC_Control.Anchor = System.Windows.Forms.AnchorStyles.Left|System.Windows.Forms.AnchorStyles.Right| System.Windows.Forms.AnchorStyles.Top| System.Windows.Forms.AnchorStyles.Bottom;
-            B_FS_Switcher_form.UseVisualStyleBackColor = true;
-            B_FS_Switcher_form.BackColor = System.Drawing.Color.FromArgb(0, System.Drawing.Color.White);
+            //B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("B_FS_");//System.Drawing.Color.FromArgb(0, System.Drawing.Color.White);
             Refresh_IC_BackColor();
 
-            B_FS_Switcher_form.Image = System.Drawing.Image.FromFile("FS_on.png");
+            B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
 
             /*IC_Control.ShowDeviceSettingsDialog();
             if (IC_Control.DeviceValid) IC_Control.LiveStart();*/
@@ -1100,12 +1099,12 @@ namespace IC_EasyStart_WPF
             System.Windows.Forms.Button btn = sender as System.Windows.Forms.Button;
             if(FullScrin)
             {
-                B_FS_Switcher_form.Image = System.Drawing.Image.FromFile("FS_on.png");
+                B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
                 MinimizeWindow();
             }
             else
             {
-                B_FS_Switcher_form.Image = System.Drawing.Image.FromFile("FS_off.png"); 
+                B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_off_form.png"); 
                 MaximizeWindow();
             }
         }
