@@ -91,6 +91,8 @@ namespace IC_EasyStart_WPF
 
         System.Windows.Forms.Button B_FS_Switcher_form = null;
 
+        System.Windows.Forms.Panel Panel = null;
+
         public MainWindow()
         {
             FLog = new ServiceFunctions.UI.Log.FileLogger("Log_" + ServiceFunctions.UI.Get_TimeNow_String() + ".txt");
@@ -152,24 +154,42 @@ namespace IC_EasyStart_WPF
             CommandBindings.Add(new CommandBinding(CRoutedCommand, CodecPropKey));
 
             B_FS_Switcher_form = Host.Child.Controls[0] as System.Windows.Forms.Button;
+
+            bmpFS_on = Bitmap.FromFile("FS_on_form.png");
+            bmpFS_off = Bitmap.FromFile("FS_off_form.png");
         }
 
         public static RoutedCommand FullScreenRoutedCommand = new RoutedCommand();
         public static RoutedCommand QuiteRoutedCommand = new RoutedCommand();
         public static RoutedCommand CRoutedCommand = new RoutedCommand();
 
+        System.Drawing.Image bmpFS_on = null;
+        System.Drawing.Image bmpFS_off = null;
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            IC_Control = new ICImagingControl();
+            IC_Control = new ICImagingControlExt();
             Host.Child.Controls.Add(IC_Control);
             IC_Control.SendToBack();
+            IC_Control.Paint += IC_Control_Paint;
+            //IC_Control.OverlayBitmapPosition = PathPositions.Display;
+            IC_Control.OverlayBitmapAtPath[PathPositions.Display].Enable = true;
+            //IC_Control.OverlayBitmap.Enable = true;
+            IC_Control.LiveCaptureContinuous = true;
+            IC_Control.ImageAvailable += IC_Control_ImageAvailable1;
+            IC_Control.Invalidated += IC_Control_Invalidated;
+
+
+            Panel = Host.Child as System.Windows.Forms.Panel;
 
             //IC_Control.Anchor = System.Windows.Forms.AnchorStyles.Left|System.Windows.Forms.AnchorStyles.Right| System.Windows.Forms.AnchorStyles.Top| System.Windows.Forms.AnchorStyles.Bottom;
             //B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("B_FS_");//System.Drawing.Color.FromArgb(0, System.Drawing.Color.White);
             Refresh_IC_BackColor();
 
+            B_FS_Switcher_form.UseVisualStyleBackColor = true;
             B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
 
+            
             /*IC_Control.ShowDeviceSettingsDialog();
             if (IC_Control.DeviceValid) IC_Control.LiveStart();*/
 
@@ -294,6 +314,45 @@ namespace IC_EasyStart_WPF
                     Adapt_Size_ofCont(IC_Control as System.Windows.Forms.Control, IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
                 }
             }
+
+            var ov = IC_Control.OverlayBitmapAtPath[PathPositions.Display];
+            ov.Enable = true;
+            ov.ColorMode = OverlayColorModes.Color;
+            ov.DropOutColor = System.Drawing.Color.Magenta;
+            ov.Fill(IC_Control.OverlayBitmap.DropOutColor);
+            ov.FontTransparent = true;
+            ov.DrawText(System.Drawing.Color.Red, 10, 10, "IC Imaging Control 2.0");
+            ov.DrawSolidRect(System.Drawing.Color.FromArgb(187, 100, 0, 0), 10, 10, 100, 100);
+        }
+
+        private void IC_Control_Invalidated(object sender, System.Windows.Forms.InvalidateEventArgs e)
+        {
+            
+        }
+
+        private void IC_Control_ImageAvailable1(object sender, ICImagingControl.ImageAvailableEventArgs e)
+        {
+            /*int width = IC_Control.ImageWidth;
+            int height = IC_Control.ImageHeight;
+
+            Bitmap overlay = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Graphics g = Graphics.FromImage(overlay);
+
+            g.DrawImage(bmpFS_on, 10, 10, bmpFS_on.Width, bmpFS_on.Height);*/
+
+            //IC_Control.OverlayBitmap.D
+        }
+
+        private void IC_Control_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
+        {
+            /*int width = IC_Control.Width;
+            int height = IC_Control.Height;
+
+            System.Drawing.Color colorBack = System.Drawing.Color.FromArgb(128, 128, 0, 0);
+            
+            System.Drawing.Pen pBack = new System.Drawing.Pen(colorBack);
+            e.Graphics.DrawRectangle(pBack, width - 120, height - 120, 80, 80);
+            e.Graphics.FillRectangle(System.Drawing.Brushes.Red, 0, 0, width, height);*/
         }
 
         //private void ChB_Config_N_CheckedChanged(object sender, RoutedEventArgs e)
@@ -305,7 +364,7 @@ namespace IC_EasyStart_WPF
         //    Config_num = (int) (sender as RadioButton).Tag;
 
         //    // IC_Control.SaveDeviceStateToFile(ConfigNames[LastConfig_num]);
-            
+
         //    if (ctrl.IsChecked ?? false)
         //    {
         //        for (int i = 0; i < ConfigNames.Count(); i++)

@@ -110,6 +110,9 @@
     <Compile Include="AVI\AviWriter.cs" />
     <Compile Include="AVI\H264Writer.cs" />
     <Compile Include="AVI\RiffFile.cs" />
+    <Compile Include="ExtendedControls.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="SpeciallClasses.cs" />
     <Resource Include="DarkTheme.xaml">
       <SubType>Designer</SubType>
