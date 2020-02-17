@@ -38,6 +38,8 @@ namespace IC_EasyStart_WPF
         // H264エンコーダーを作成(create H264 encoder)
         //OpenH264Lib.Encoder encoder = new OpenH264Lib.Encoder("openh264-1.7.0-win32.dll");
 
+        
+
         private void Init_Sliders(ICImagingControl ic) //функция инициализации ползунка для регулировки отдельных свойст камеры
         {
             vcdProp = new TIS.Imaging.VCDHelpers.VCDSimpleProperty(IC_Control.VCDPropertyItems);

@@ -128,11 +128,11 @@
                                         <TextBlock Text="Phaco" Margin="2"/>
                                     </Viewbox>
                                 </TabItem.Header>
-                                <StackPanel>
-                                    <local:RenameableToggleButton Text="Config Phaco 0" 
+                                <StackPanel Name="stackPanelPhacoButtons">
+                                    <local:RenameableToggleButton Text="Config Phaco 0"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
-                                                                  Tag="0_0"/>
+                                                                  Tag="0_0" IsChecked="True"/>
                                     <local:RenameableToggleButton Text="Config Phaco 1" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
@@ -153,10 +153,11 @@
                                         <TextBlock Text="Vitreo" Margin="2"/>
                                     </Viewbox>
                                 </TabItem.Header>
-                                <StackPanel>
+                                <StackPanel Name="stackPanelVitreoButtons">
                                     <local:RenameableToggleButton Text="Config Vitreo 0" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  
                                                                   Tag="1_0"/>
                                     <local:RenameableToggleButton Text="Config Vitreo 1" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
@@ -178,7 +179,7 @@
                                         <TextBlock Text=" User " Margin="2"/>
                                     </Viewbox>
                                 </TabItem.Header>
-                                <StackPanel>
+                                <StackPanel Name="stackPanelUserConfigs">
                                     <local:RenameableToggleButton Text="Config User 0" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
@@ -199,7 +200,7 @@
                             </TabItem>
                         </TabControl>
 
-                        <UniformGrid Visibility="Visible" Columns="3" Margin="1" x:Name="GB_Configs">
+                        <UniformGrid Visibility="Collapsed" Columns="3" Margin="1" x:Name="GB_Configs">
                             <RadioButton Margin="1" Tag="1" Style="{DynamicResource ToggleButtonStyle}" x:Name="ChB_Config_1">
                                 <RadioButton.Content>
                                     <Viewbox>

@@ -90,8 +90,18 @@ namespace IC_EasyStart_WPF
         BackgroundWorker BGW_CamRestarter = null;
 
         System.Windows.Forms.Button B_FS_Switcher_form = null;
-
         System.Windows.Forms.Panel Panel = null;
+
+        public static RoutedCommand FullScreenRoutedCommand = new RoutedCommand();
+        public static RoutedCommand QuiteRoutedCommand = new RoutedCommand();
+        public static RoutedCommand CRoutedCommand = new RoutedCommand();
+
+        System.Drawing.Image bmpFS_on = null;
+        System.Drawing.Image bmpFS_off = null;
+
+        private List<RenameableToggleButton> renameableButtonsConfigs = new List<RenameableToggleButton>();
+
+        private Dictionary<string, string> NamesConfigsDictionary = new Dictionary<string, string>();
 
         public MainWindow()
         {
@@ -159,16 +169,9 @@ namespace IC_EasyStart_WPF
             bmpFS_off = Bitmap.FromFile("FS_off_form.png");
         }
 
-        public static RoutedCommand FullScreenRoutedCommand = new RoutedCommand();
-        public static RoutedCommand QuiteRoutedCommand = new RoutedCommand();
-        public static RoutedCommand CRoutedCommand = new RoutedCommand();
-
-        System.Drawing.Image bmpFS_on = null;
-        System.Drawing.Image bmpFS_off = null;
-
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            IC_Control = new ICImagingControlExt();
+            IC_Control = new ICImagingControl();
             Host.Child.Controls.Add(IC_Control);
             IC_Control.SendToBack();
             IC_Control.Paint += IC_Control_Paint;
@@ -179,7 +182,6 @@ namespace IC_EasyStart_WPF
             IC_Control.ImageAvailable += IC_Control_ImageAvailable1;
             IC_Control.Invalidated += IC_Control_Invalidated;
 
-
             Panel = Host.Child as System.Windows.Forms.Panel;
 
             //IC_Control.Anchor = System.Windows.Forms.AnchorStyles.Left|System.Windows.Forms.AnchorStyles.Right| System.Windows.Forms.AnchorStyles.Top| System.Windows.Forms.AnchorStyles.Bottom;
@@ -189,7 +191,19 @@ namespace IC_EasyStart_WPF
             B_FS_Switcher_form.UseVisualStyleBackColor = true;
             B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
 
-            
+            for(int i = 0; i < stackPanelVitreoButtons.Children.Count; i++)
+            {
+                renameableButtonsConfigs.Add(stackPanelVitreoButtons.Children[i] as RenameableToggleButton);
+            }
+            for (int i = 0; i < stackPanelUserConfigs.Children.Count; i++)
+            {
+                renameableButtonsConfigs.Add(stackPanelUserConfigs.Children[i] as RenameableToggleButton);
+            }
+            for (int i = 0; i < stackPanelPhacoButtons.Children.Count; i++)
+            {
+                renameableButtonsConfigs.Add(stackPanelPhacoButtons.Children[i] as RenameableToggleButton);
+            }
+
             /*IC_Control.ShowDeviceSettingsDialog();
             if (IC_Control.DeviceValid) IC_Control.LiveStart();*/
 
@@ -1170,7 +1184,19 @@ namespace IC_EasyStart_WPF
 
         private void RenameableToggleButton_Checked(object sender, RoutedEventArgs e)
         {
-            
+            RenameableToggleButton toggleButton = sender as RenameableToggleButton;
+
+            //Обработка переключения до цикла!
+
+            //
+
+            for(int i = 0; i < renameableButtonsConfigs.Count; i++)
+            {
+                if(renameableButtonsConfigs[i] != toggleButton && renameableButtonsConfigs[i].toggleButon.IsChecked == true)
+                {
+                    renameableButtonsConfigs[i].toggleButon.IsChecked = false;
+                }
+            }
         }
 
         private void RenameableToggleButton_Unchecked(object sender, RoutedEventArgs e)

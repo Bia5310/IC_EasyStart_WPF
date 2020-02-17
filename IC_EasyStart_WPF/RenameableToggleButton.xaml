@@ -7,9 +7,9 @@
              mc:Ignorable="d" d:DesignWidth="200"
              x:Name="MyControl">
 
-    <ToggleButton x:Name="toggleButon" HorizontalContentAlignment="Left" Style="{DynamicResource ToggleButtonSimpleStyle}">
+    <RadioButton x:Name="toggleButon" HorizontalContentAlignment="Left" Style="{DynamicResource ToggleButtonSimpleStyle}" IsChecked="{Binding ElementName=MyControl, Path=IsChecked}">
         <Viewbox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MaxHeight="60">
-            <TextBox x:Name="textBox" IsEnabled="False" Background="Transparent" BorderBrush="Transparent"
+            <TextBox ContextMenu="{x:Null}" x:Name="textBox" IsEnabled="False" Background="Transparent" BorderBrush="Transparent"
                      Text="{Binding ElementName=MyControl, Path=Text}"
                      Foreground="{Binding ElementName=toggleButon, Path=Foreground}">
                 <TextBox.Template>
@@ -21,5 +21,5 @@
                 </TextBox.Template>
             </TextBox>
         </Viewbox>
-    </ToggleButton>
+    </RadioButton>
 </UserControl>
