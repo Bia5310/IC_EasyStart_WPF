@@ -23,6 +23,29 @@
         <SolidColorBrush x:Key="BrushToggleBlue" Color="{StaticResource ColorToggleBlue}"/>
         <SolidColorBrush x:Key="BrushToggleYellow" Color="{StaticResource ColorToggleYellow}"/>
 
+        <Style TargetType="{x:Type local:TextBoxWatermark}" BasedOn="{StaticResource TextBoxSytle}"
+               x:Key="TextBoxWatermarkStyle">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="local:TextBoxWatermark">
+                        <Grid>
+                            <Border Background="{TemplateBinding Background}" 
+                                    x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="4">
+                                <ScrollViewer x:Name="PART_ContentHost"/>
+                            </Border>
+                            <TextBlock Text="{TemplateBinding Watermark}" VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"
+                                       Margin="5 1 1 5"
+                                       Opacity="0.5"
+                                       Visibility="{TemplateBinding WatermarkVisibility}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Image x:Key="folder_img" Source="Folder_img.png" Height="15"/>
         <Style TargetType="{x:Type ToggleButton}" x:Key="ToggleButtonSwitchStyle">
             <Setter Property="Template">
@@ -64,10 +87,20 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource BrushNUD_Borders}"/>
                 <Setter Property="Background" Value="{DynamicResource BrushNUD_BackgroundStock}"/>
                 <Setter Property="Foreground" Value="{DynamicResource BrushNUD_Foreground}"/>
+                <!--<Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type xctk:DoubleUpDown}">
+                            <Border x:Name="Border" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="4"/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>-->
             </Style.Setters>
         </Style>
 
-        <Style TargetType="{x:Type local:ToggleButtonRenameable}" BasedOn="{StaticResource ToggleButtonSimpleStyle}"
+        <!--<Style TargetType="{x:Type local:RenameableToggleButton}" BasedOn="{StaticResource ToggleButtonSimpleStyle}"
                x:Key="ToggleButtonRenameableStyle">
             <Style.Triggers>
                 <Trigger Property="IsFocused" Value="True">
@@ -81,7 +114,7 @@
                 </Trigger>
             </Style.Triggers>
             
-        </Style>
+        </Style>-->
 
     </Window.Resources>
 
@@ -104,17 +137,17 @@
                 <Expander Header="Информация о пациенте" Margin="3" Padding="3" IsExpanded="True" BorderThickness="0 0 0 3" Style="{DynamicResource ExpanderStyle}">
                     <StackPanel>
                         <TextBlock Text="ФИО пациента" Margin="2"/>
-                        <TextBox x:Name="TB_FIO" Margin="5 2 5 2" Padding="2" 
-                                 Style="{DynamicResource TextBoxSytle}" 
+                        <local:TextBoxWatermark Watermark="Введите ФИО пациента" x:Name="TB_FIO" Margin="5 2 5 2" Padding="2" 
+                                 Style="{DynamicResource TextBoxWatermarkStyle}"
                                  TextChanged="TB_FIO_TextChanged"
                                  PreviewTextInput="TB_FIO_PreviewTextInput"/>
                         <TextBlock Text="Дата" Margin="2"/>
-                        <TextBox Margin="5 2 5 2" Padding="2" 
-                                 Style="{DynamicResource TextBoxSytle}" x:Name="TB_CurrentDate" 
+                        <local:TextBoxWatermark Margin="5 2 5 2" Padding="2" 
+                                 Style="{DynamicResource TextBoxWatermarkStyle}" x:Name="TB_CurrentDate" 
                                  TextChanged="TB_CurrentDate_TextChanged"
                                  PreviewTextInput="TB_CurrentDate_PreviewTextInput"/>
                         <TextBlock Text="№ истории болезни:" Margin="2"/>
-                        <TextBox Padding="2" Margin="5 2 5 2" Style="{DynamicResource TextBoxSytle}" x:Name="TB_HistoryNumber" 
+                        <local:TextBoxWatermark Padding="2" Margin="5 2 5 2" Style="{DynamicResource TextBoxWatermarkStyle}" x:Name="TB_HistoryNumber" 
                                  TextChanged="TB_HistoryNumber_TextChanged"
                                  PreviewTextInput="TB_HistoryNumber_PreviewTextInput"/>
                     </StackPanel>
@@ -267,21 +300,21 @@
 
                         <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="Яркость" Margin="2"/>
                         <xctk:DoubleUpDown Grid.Row="4" Grid.Column="1" Margin="2" Maximum="500" Minimum="-500" Increment="0.001" x:Name="NUD_Brightness" MaxWidth="120" ValueChanged="NUD_Brightness_ValueChanged"/>
-                        <CheckBox Grid.Row="4" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" 
-                                  Style="{DynamicResource CheckBoxSimpleStyle}" 
+                        <CheckBox Grid.Row="4" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" IsEnabled="False"
+                                  Style="{DynamicResource CheckBoxSimpleStyle}"
                                   x:Name="ChB_BrightnessAuto"
                                   Checked="ChB_BrightnessAuto_CheckedChanged"
                                   Unchecked="ChB_BrightnessAuto_CheckedChanged"/>
                         <Slider Grid.Row="5" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="500" Minimum="-500" x:Name="TrB_Brightness" ValueChanged="TrB_Brightness_Scroll"/>
 
-                        <StackPanel Grid.Row="6" Grid.ColumnSpan="4" Margin="0 5 0 0">
+                        <UniformGrid Rows="3" Grid.Row="6" Grid.ColumnSpan="4" Margin="0 5 0 0">
                             <Button MaxHeight="42" Margin="2" 
                                     Style="{DynamicResource ButtonStyle}" 
                                     x:Name="B_Properties"
                                     Click="B_Properties_Click">
                                 <Button.Content>
-                                    <Viewbox>
-                                        <TextBlock FontSize="16" Text="Дополнительные настройки"/>
+                                    <Viewbox Height="24">
+                                        <TextBlock Text="Дополнительные настройки"/>
                                     </Viewbox>
                                 </Button.Content>
                             </Button>
@@ -291,7 +324,7 @@
                                     Click="B_Cam_Select_Click">
                                 <Button.Content>
                                     <Viewbox>
-                                        <TextBlock Text="Настройки разрешения"/>
+                                        <TextBlock MaxHeight="42" Height="22" Text="Настройки разрешения"/>
                                     </Viewbox>
                                 </Button.Content>
                             </Button>
@@ -299,12 +332,12 @@
                                           Style="{DynamicResource ToggleButtonSimpleStyle}" 
                                           x:Name="ChB_WhiteBalanceAuto">
                                 <ToggleButton.Content>
-                                    <Viewbox>
-                                        <TextBlock FontSize="16" Text="Автобаланс белого"/>
+                                    <Viewbox MaxHeight="30">
+                                        <TextBlock Height="22" Text="Автобаланс белого"/>
                                     </Viewbox>
                                 </ToggleButton.Content>
                             </ToggleButton>
-                        </StackPanel>
+                        </UniformGrid>
                     </Grid>
                 </Expander>
 

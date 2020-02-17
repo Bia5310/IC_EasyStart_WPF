@@ -9,7 +9,7 @@
 
     <RadioButton x:Name="toggleButon" HorizontalContentAlignment="Left" Style="{DynamicResource ToggleButtonSimpleStyle}" IsChecked="{Binding ElementName=MyControl, Path=IsChecked}">
         <Viewbox HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MaxHeight="60">
-            <TextBox ContextMenu="{x:Null}" x:Name="textBox" IsEnabled="False" Background="Transparent" BorderBrush="Transparent"
+            <TextBox ContextMenu="{x:Null}" x:Name="textBox" IsEnabled="False" Background="Transparent"
                      Text="{Binding ElementName=MyControl, Path=Text}"
                      Foreground="{Binding ElementName=toggleButon, Path=Foreground}">
                 <TextBox.Template>
@@ -19,6 +19,19 @@
                         </Border>
                     </ControlTemplate>
                 </TextBox.Template>
+                <TextBox.Style>
+                    <Style TargetType="TextBox">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="#BF2FBDFF"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBox.Style>
             </TextBox>
         </Viewbox>
     </RadioButton>

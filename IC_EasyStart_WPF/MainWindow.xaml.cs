@@ -207,6 +207,8 @@ namespace IC_EasyStart_WPF
             /*IC_Control.ShowDeviceSettingsDialog();
             if (IC_Control.DeviceValid) IC_Control.LiveStart();*/
 
+            //SetDecimalPlaces(NUD_Exposure, 4);
+
             TB_CurrentDate.Text = ServiceFunctions.UI.GetDateString();
             TIS.Imaging.LibrarySetup.SetLocalizationLanguage("ru");
             //this.KeyPreview = true;

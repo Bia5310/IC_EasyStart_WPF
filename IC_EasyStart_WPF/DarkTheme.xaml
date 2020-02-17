@@ -348,6 +348,9 @@
             <Trigger Property="IsChecked" Value="True">
                 <Setter Property="Foreground" Value="#FFFFD350"/>
             </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5"/>
+            </Trigger>
         </Style.Triggers>
     </Style>
 
@@ -356,6 +359,20 @@
             <Setter Property="Background" Value="{StaticResource DarkBlue1Brush}"/>
             <Setter Property="BorderBrush" Value="White"/>
             <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBoxBase}">
+                        <Grid>
+                            <Border Background="{TemplateBinding Background}" 
+                                    x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="4">
+                                <ScrollViewer x:Name="PART_ContentHost"/>
+                            </Border>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style.Setters>
         <Style.Triggers>
             <Trigger Property="IsFocused" Value="True">
@@ -508,11 +525,11 @@
                                 Columns="3"/>
                         <Border x:Name="Border"
                                 Grid.Row="1"
-                                BorderThickness="2"
+                                BorderThickness="0"
                                 Background="White"
                                 BorderBrush="White"
                                 CornerRadius="0 0 3 3"
-                                Margin="-1"
+                                Margin="0"
                                 ClipToBounds="True"
                                 KeyboardNavigation.TabNavigation="Local"
                                 KeyboardNavigation.DirectionalNavigation="Contained"
@@ -533,8 +550,8 @@
                 <ControlTemplate TargetType="{x:Type TabItem}">
                     <Grid x:Name="Root">
                         <Border x:Name="Border"
-                                Margin="-1 0 -1 0"
-                                BorderThickness="1,1,1,1"
+                                Margin="0 0 0 0"
+                                BorderThickness="1"
                                 CornerRadius="4 4 0 0">
                             <Border.BorderBrush>
                                 <SolidColorBrush Color="White" />

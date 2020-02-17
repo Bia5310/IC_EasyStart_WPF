@@ -114,7 +114,7 @@
       <DependentUpon>RenameableToggleButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpeciallClasses.cs" />
-    <Compile Include="ToggleButtonRenameable.cs" />
+    <Compile Include="TextBoxWatermark.cs" />
     <Page Include="RenameableToggleButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -483,6 +483,17 @@ namespace IC_EasyStart_WPF
             IC_Control.SaveDeviceStateToFile(CFG_name);
             Device_state = IC_Control.SaveDeviceState();
         }
+
+        private static void SetDecimalPlaces(Xceed.Wpf.Toolkit.DoubleUpDown doubleUpDown, int decimalPlaces)
+        {
+            if (doubleUpDown == null)
+                throw new NullReferenceException("DoubleUpDoun is NULL");
+            if (decimalPlaces == 0)
+                throw new Exception("decimal places must be > 0");
+
+            doubleUpDown.FormatString = "F" + decimalPlaces.ToString();
+        }
+
         private void Prepare_encoder(string path, int pFPS, float TimaInterval, int BitsPerSecond)
         {/*
             aviPath = path;
