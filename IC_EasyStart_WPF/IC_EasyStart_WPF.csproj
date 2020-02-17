@@ -110,10 +110,15 @@
     <Compile Include="AVI\AviWriter.cs" />
     <Compile Include="AVI\H264Writer.cs" />
     <Compile Include="AVI\RiffFile.cs" />
-    <Compile Include="ExtendedControls.cs">
-      <SubType>Component</SubType>
+    <Compile Include="RenameableToggleButton.xaml.cs">
+      <DependentUpon>RenameableToggleButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="SpeciallClasses.cs" />
+    <Compile Include="ToggleButtonRenameable.cs" />
+    <Page Include="RenameableToggleButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Resource Include="DarkTheme.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

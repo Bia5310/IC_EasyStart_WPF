@@ -66,6 +66,23 @@
                 <Setter Property="Foreground" Value="{DynamicResource BrushNUD_Foreground}"/>
             </Style.Setters>
         </Style>
+
+        <Style TargetType="{x:Type local:ToggleButtonRenameable}" BasedOn="{StaticResource ToggleButtonSimpleStyle}"
+               x:Key="ToggleButtonRenameableStyle">
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="TextBox.Foreground" Value="{DynamicResource BrushTextBoxFocused_Foreground}"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="TextBox.Foreground" Value="{DynamicResource BrushTextBoxDisabled_Foreground}"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="TextBox.Foreground" Value="{DynamicResource BrushTextBoxChecked_Foreground}"/>
+                </Trigger>
+            </Style.Triggers>
+            
+        </Style>
+
     </Window.Resources>
 
     <Grid Name="grid_main">
@@ -104,7 +121,34 @@
                 </Expander>
                 <Expander Header="Режимы" Margin="3 5 3 3" BorderThickness="0 0 0 3" Padding="3" IsExpanded="True" Style="{DynamicResource ExpanderStyle}">
                     <StackPanel>
-                        <UniformGrid Columns="3" Margin="1 1 1 0" x:Name="GB_Configs">
+                        <TabControl Style="{DynamicResource TabControlStyle}">
+                            <TabItem Header="Phaco">
+                                <StackPanel>
+                                    <local:RenameableToggleButton/>
+                                    <local:RenameableToggleButton/>
+                                    <local:RenameableToggleButton/>
+                                    <local:RenameableToggleButton/>
+                                </StackPanel>
+                            </TabItem>
+                            <TabItem Header="Vitreo">
+                                <StackPanel>
+                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
+                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
+                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
+                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
+                                </StackPanel>
+                            </TabItem>
+                            <TabItem Header="User">
+                                <StackPanel>
+                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
+                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
+                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
+                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
+                                </StackPanel>
+                            </TabItem>
+                        </TabControl>
+
+                        <UniformGrid Columns="3" Margin="1" x:Name="GB_Configs">
                             <RadioButton Margin="1" Tag="1" Style="{DynamicResource ToggleButtonStyle}" x:Name="ChB_Config_1">
                                 <RadioButton.Content>
                                     <Viewbox>
@@ -127,11 +171,9 @@
                                 </RadioButton.Content>
                             </RadioButton>
                         </UniformGrid>
-
-                        <UniformGrid Columns="1" Rows="4" Margin="1 0 1 1">
-
-                        </UniformGrid>
                     </StackPanel>
+
+                    <!---->
                 </Expander>
 
                 <Expander Header="Настройки камеры" Margin="3 5 3 3" BorderThickness="0 0 0 3" Padding="3" IsExpanded="True" Style="{DynamicResource ExpanderStyle}">

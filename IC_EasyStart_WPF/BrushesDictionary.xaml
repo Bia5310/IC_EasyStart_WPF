@@ -2,5 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:IC_EasyStart_WPF">
     <Color x:Key="MyColor">#FF98B9FF</Color>
+    <Color x:Key="DarkYellow">#FFBF00</Color>
     <SolidColorBrush x:Key="MyBrush" Color="{StaticResource MyColor}"/>
+    <SolidColorBrush x:Key="DarkYellowBrush" Color="{StaticResource DarkYellow}"/>
 </ResourceDictionary>
