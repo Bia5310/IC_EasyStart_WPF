@@ -30,6 +30,26 @@ namespace IC_EasyStart_WPF
             MouseDown += TextBox_MouseDown;
         }
 
+        static RenameableToggleButton()
+        {
+            TextProperty = DependencyProperty.Register("Text", typeof(string), typeof(RenameableToggleButton), new FrameworkPropertyMetadata(""));
+            IsCheckedProperty = DependencyProperty.Register("IsChecked", typeof(bool?), typeof(RenameableToggleButton), new FrameworkPropertyMetadata(false));
+        }
+
+        public string Text
+        {
+            get { return (string)GetValue(TextProperty); }
+            set { SetValue(TextProperty, value); }
+        }
+
+        public bool IsChecked
+        {
+            get { return (bool)GetValue(IsCheckedProperty); }
+            set { SetValue(IsCheckedProperty, value); }
+        }
+
+        public static readonly DependencyProperty TextProperty;
+        public static readonly DependencyProperty IsCheckedProperty;
 
         private void TextBox_KeyDown1(object sender, KeyEventArgs e)
         {

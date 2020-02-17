@@ -122,33 +122,84 @@
                 <Expander Header="Режимы" Margin="3 5 3 3" BorderThickness="0 0 0 3" Padding="3" IsExpanded="True" Style="{DynamicResource ExpanderStyle}">
                     <StackPanel>
                         <TabControl Style="{DynamicResource TabControlStyle}">
-                            <TabItem Header="Phaco">
+                            <TabItem>
+                                <TabItem.Header>
+                                    <Viewbox MaxHeight="42">
+                                        <TextBlock Text="Phaco" Margin="2"/>
+                                    </Viewbox>
+                                </TabItem.Header>
                                 <StackPanel>
-                                    <local:RenameableToggleButton/>
-                                    <local:RenameableToggleButton/>
-                                    <local:RenameableToggleButton/>
-                                    <local:RenameableToggleButton/>
+                                    <local:RenameableToggleButton Text="Config Phaco 0" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="0_0"/>
+                                    <local:RenameableToggleButton Text="Config Phaco 1" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="0_1"/>
+                                    <local:RenameableToggleButton Text="Config Phaco 2" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="0_2"/>
+                                    <local:RenameableToggleButton Text="Config Phaco 3" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="0_3"/>
                                 </StackPanel>
                             </TabItem>
-                            <TabItem Header="Vitreo">
+                            <TabItem>
+                                <TabItem.Header>
+                                    <Viewbox MaxHeight="42">
+                                        <TextBlock Text="Vitreo" Margin="2"/>
+                                    </Viewbox>
+                                </TabItem.Header>
                                 <StackPanel>
-                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
-                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
-                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
-                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
+                                    <local:RenameableToggleButton Text="Config Vitreo 0" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="1_0"/>
+                                    <local:RenameableToggleButton Text="Config Vitreo 1" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="1_1"/>
+                                    <local:RenameableToggleButton Text="Config Vitreo 2" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="1_2"/>
+                                    <local:RenameableToggleButton Text="Config Vitreo 3" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="1_3"/>
                                 </StackPanel>
                             </TabItem>
-                            <TabItem Header="User">
+                            <TabItem>
+                                <TabItem.Header>
+                                    <Viewbox MaxHeight="42">
+                                        <TextBlock Text=" User " Margin="2"/>
+                                    </Viewbox>
+                                </TabItem.Header>
                                 <StackPanel>
-                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
-                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
-                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
-                                    <ToggleButton Style="{DynamicResource ToggleButtonSimpleStyle}"/>
+                                    <local:RenameableToggleButton Text="Config User 0" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="2_0"/>
+                                    <local:RenameableToggleButton Text="Config User 1" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="2_1"/>
+                                    <local:RenameableToggleButton Text="Config User 2" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="2_2"/>
+                                    <local:RenameableToggleButton Text="Config User 3" 
+                                                                  ToggleButton.Checked="RenameableToggleButton_Checked" 
+                                                                  ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  Tag="2_3"/>
                                 </StackPanel>
                             </TabItem>
                         </TabControl>
 
-                        <UniformGrid Columns="3" Margin="1" x:Name="GB_Configs">
+                        <UniformGrid Visibility="Visible" Columns="3" Margin="1" x:Name="GB_Configs">
                             <RadioButton Margin="1" Tag="1" Style="{DynamicResource ToggleButtonStyle}" x:Name="ChB_Config_1">
                                 <RadioButton.Content>
                                     <Viewbox>

@@ -1168,6 +1168,16 @@ namespace IC_EasyStart_WPF
             }
         }
 
+        private void RenameableToggleButton_Checked(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void RenameableToggleButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
         private void Refresh_IC_BackColor()
         {
             System.Windows.Media.Color windowColor = (this.Background as SolidColorBrush).Color;
