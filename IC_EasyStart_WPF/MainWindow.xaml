@@ -23,6 +23,13 @@
         <SolidColorBrush x:Key="BrushToggleBlue" Color="{StaticResource ColorToggleBlue}"/>
         <SolidColorBrush x:Key="BrushToggleYellow" Color="{StaticResource ColorToggleYellow}"/>
 
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="10"/>
+            <Setter Property="MinWidth" Value="5"/>
+            <Setter Property="Margin" Value="0 2 3 0"/>
+            <Setter Property="Opacity" Value="0.7"/>
+        </Style>
+
         <Style TargetType="{x:Type local:TextBoxWatermark}" BasedOn="{StaticResource TextBoxSytle}"
                x:Key="TextBoxWatermarkStyle">
             <Setter Property="Template">
@@ -37,6 +44,7 @@
                             </Border>
                             <TextBlock Text="{TemplateBinding Watermark}" VerticalAlignment="Center"
                                        HorizontalAlignment="Center"
+                                       Background="Transparent"
                                        Margin="5 1 1 5"
                                        Opacity="0.5"
                                        Visibility="{TemplateBinding WatermarkVisibility}"/>
@@ -137,18 +145,19 @@
                 <Expander Header="Информация о пациенте" Margin="3" Padding="3" IsExpanded="True" BorderThickness="0 0 0 3" Style="{DynamicResource ExpanderStyle}">
                     <StackPanel>
                         <TextBlock Text="ФИО пациента" Margin="2"/>
-                        <local:TextBoxWatermark Watermark="Введите ФИО пациента" x:Name="TB_FIO" Margin="5 2 5 2" Padding="2" 
-                                 Style="{DynamicResource TextBoxWatermarkStyle}"
+                        <TextBox Tag="Введите ФИО пациента" x:Name="TB_FIO" Margin="5 2 5 2" Padding="2" 
+                                 Style="{DynamicResource TextBoxSytle}"
                                  TextChanged="TB_FIO_TextChanged"
                                  PreviewTextInput="TB_FIO_PreviewTextInput"/>
                         <TextBlock Text="Дата" Margin="2"/>
-                        <local:TextBoxWatermark Margin="5 2 5 2" Padding="2" 
-                                 Style="{DynamicResource TextBoxWatermarkStyle}" x:Name="TB_CurrentDate" 
+                        <TextBox Tag="Введите дату" Margin="5 2 5 2" Padding="2" 
+                                 Style="{DynamicResource TextBoxSytle}" x:Name="TB_CurrentDate" 
                                  TextChanged="TB_CurrentDate_TextChanged"
                                  PreviewTextInput="TB_CurrentDate_PreviewTextInput"/>
                         <TextBlock Text="№ истории болезни:" Margin="2"/>
-                        <local:TextBoxWatermark Padding="2" Margin="5 2 5 2" Style="{DynamicResource TextBoxWatermarkStyle}" x:Name="TB_HistoryNumber" 
+                        <TextBox Padding="2" Margin="5 2 5 2" Style="{DynamicResource TextBoxSytle}" x:Name="TB_HistoryNumber" 
                                  TextChanged="TB_HistoryNumber_TextChanged"
+                                 Tag="Введите № истории болезни"
                                  PreviewTextInput="TB_HistoryNumber_PreviewTextInput"/>
                     </StackPanel>
                 </Expander>
@@ -287,7 +296,9 @@
                                   x:Name="ChB_ExposureAuto" 
                                   Checked="ChB_ExposureAuto_CheckedChanged"
                                   Unchecked="ChB_ExposureAuto_CheckedChanged"/>
-                        <Slider Grid.Row="1" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="10000" ValueChanged="TrB_ExposureVal_Scroll" x:Name="TrB_ExposureVal"/>
+                        <Slider Grid.Row="1" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="10000" 
+                                ValueChanged="TrB_ExposureVal_Scroll" x:Name="TrB_ExposureVal"
+                                Style="{DynamicResource SliderStyle}"/>
 
                         <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Усиление" Margin="2"/>
                         <xctk:DoubleUpDown Grid.Row="2" Grid.Column="1" Margin="2" Maximum="10000" Increment="0.001" x:Name="NUD_Gain" MaxWidth="120" ValueChanged="NUD_Gain_ValueChanged"/>
@@ -296,7 +307,8 @@
                                   x:Name="ChB_GainAuto"
                                   Checked="ChB_GainAuto_CheckedChanged"
                                   Unchecked="ChB_GainAuto_CheckedChanged"/>
-                        <Slider Grid.Row="3" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="10000" x:Name="TrB_GainVal" ValueChanged="TrB_GainVal_Scroll"/>
+                        <Slider Grid.Row="3" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="10000" x:Name="TrB_GainVal" ValueChanged="TrB_GainVal_Scroll"
+                                Style="{DynamicResource SliderStyle}"/>
 
                         <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="Яркость" Margin="2"/>
                         <xctk:DoubleUpDown Grid.Row="4" Grid.Column="1" Margin="2" Maximum="500" Minimum="-500" Increment="0.001" x:Name="NUD_Brightness" MaxWidth="120" ValueChanged="NUD_Brightness_ValueChanged"/>
@@ -305,7 +317,8 @@
                                   x:Name="ChB_BrightnessAuto"
                                   Checked="ChB_BrightnessAuto_CheckedChanged"
                                   Unchecked="ChB_BrightnessAuto_CheckedChanged"/>
-                        <Slider Grid.Row="5" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="500" Minimum="-500" x:Name="TrB_Brightness" ValueChanged="TrB_Brightness_Scroll"/>
+                        <Slider Grid.Row="5" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="500" Minimum="-500" x:Name="TrB_Brightness" ValueChanged="TrB_Brightness_Scroll"
+                                Style="{DynamicResource SliderStyle}"/>
 
                         <UniformGrid Rows="3" Grid.Row="6" Grid.ColumnSpan="4" Margin="0 5 0 0">
                             <Button MaxHeight="42" Margin="2" 
@@ -428,12 +441,17 @@
                       Style="{DynamicResource SplitterStyle}"
                       x:Name="gridSplitter_left"/>
 
-        <ToolBarTray Grid.Row="1" Grid.ColumnSpan="3" x:Name="toolBar">
-            <ToolBar>
-                <TextBlock Text="Тема" VerticalAlignment="Center" FontSize="16" Margin="10 2 2 2"/>
-                <ToggleButton x:Name="toggleTheme" Margin="2" Style="{StaticResource ToggleButtonSwitchStyle}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Checked"/>
-            </ToolBar>
-        </ToolBarTray>
+        <Border x:Name="toolBar" Grid.Row="1" Grid.ColumnSpan="3" Style="{DynamicResource BorderDownStyle}" BorderThickness="0 2 0 0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Тема" VerticalAlignment="Center" FontSize="16" Margin="10 2 2 2"/>
+                <ToggleButton ToolBar.OverflowMode="Never" x:Name="toggleTheme" Margin="2" Style="{StaticResource ToggleButtonSwitchStyle}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Checked"/>
+            </StackPanel>
+        </Border>
+
+        <!--<ToolBarTray Grid.Row="1" Grid.ColumnSpan="3" x:Name="toolBar" Style="{DynamicResource ToolBarStyle}">
+            <ToolBar Background="Transparent" ToolBarTray.IsLocked="True">
+                </ToolBar>
+        </ToolBarTray>-->
 
     </Grid>
 </Window>

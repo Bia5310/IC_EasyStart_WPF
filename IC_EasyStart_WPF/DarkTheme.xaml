@@ -2,8 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                     xmlns:local="clr-namespace:IC_EasyStart_WPF">
-                    
-    <Color x:Key="YellowDark"></Color>
+
+    <Color x:Key="YellowDark">#FFFFD556</Color>
     <Color x:Key="DarkBlue1Color">#FF1A89AA</Color>
     <Color x:Key="DarkBlue2Color">#FF133A46</Color>
     <SolidColorBrush x:Key="DarkBlue1Brush" Color="{StaticResource DarkBlue1Color}"/>
@@ -23,6 +23,10 @@
     <SolidColorBrush x:Key="BrushTextBoxDisabled_Foreground" Color="White"/>
     <SolidColorBrush x:Key="BrushTextBoxFocused_Foreground" Color="White"/>
     <SolidColorBrush x:Key="BrushTextBoxChecked_Foreground" Color="#345BBC"/>
+    <SolidColorBrush x:Key="SliderBrushInner" Color="{StaticResource DarkBlue2Color}"/>
+    <SolidColorBrush x:Key="SliderBrushBorder" Color="{StaticResource DarkBlue1Color}"/>
+    <SolidColorBrush x:Key="SliderBrushFill" Color="{StaticResource YellowDark}"/>
+    <SolidColorBrush x:Key="BrushButtonBorderStock" Color="White"/>
 
     <Style x:Key="ExpanderStyle" TargetType="Expander">
         <Setter Property="Background" Value="#305060"/>
@@ -33,7 +37,12 @@
         <Setter Property="Background" Value="#6984D3"/>
         <Setter Property="BorderBrush" Value="#345BBC"/>
     </Style>
-    
+
+    <Style x:Key="BorderDownStyle" TargetType="Border">
+        <Setter Property="Background" Value="#305060"/>
+        <Setter Property="BorderBrush" Value="#FF557585"/>
+    </Style>
+
     <Style x:Key="SplitterStyle" TargetType="GridSplitter">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
@@ -86,73 +95,68 @@
         <Setter Property="Padding" Value="3"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="MaxHeight" Value="45"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type Button}">
-                    <Grid x:Name="grid">
-                        <Border x:Name="border" CornerRadius="3" BorderBrush="White" BorderThickness="1">
-                            <Border.Background>
-                                <RadialGradientBrush GradientOrigin="0.5,1.5">
-                                    <RadialGradientBrush.RelativeTransform>
-                                        <TransformGroup>
-                                            <ScaleTransform CenterX="0.5" CenterY="0.5" 
-                                                        ScaleX="1.5" ScaleY="1.5"/>
-                                            <TranslateTransform X="0.02" Y="0.3"/>
-                                        </TransformGroup>
-                                    </RadialGradientBrush.RelativeTransform>
-                                    <GradientStop Offset="1" Color="{StaticResource DarkBlue1Color}"/>
-                                    <GradientStop Offset="0" Color="{StaticResource DarkBlue2Color}"/>
-                                </RadialGradientBrush>
-                            </Border.Background>
-                            <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"
-                                          TextElement.Foreground="White"
-                                          TextElement.FontSize="14"
-                                          Margin="10 7 10 7"
-                                          x:Name="content">
-                            </ContentPresenter>
-                        </Border>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Trigger.Setters>
-                                <Setter Property="BorderBrush" TargetName="border" Value="#FFBF00"/>
-                                <Setter Property="BorderThickness" TargetName="border" Value="1"/>
-                                <Setter Property="Background" TargetName="border">
-                                    <Setter.Value>
-                                        <RadialGradientBrush GradientOrigin="0.5,1.5">
-                                            <RadialGradientBrush.RelativeTransform>
-                                                <TransformGroup>
-                                                    <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.5" ScaleY="1.5"/>
-                                                    <TranslateTransform X="0.02" Y="0.3"/>
-                                                </TransformGroup>
-                                            </RadialGradientBrush.RelativeTransform>
-                                            <GradientStop Color="{StaticResource DarkBlue1Color}" Offset="1"/>
-                                            <GradientStop Color="#FFFFD556" Offset="0.3"/>
-                                        </RadialGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger.Setters>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="BorderBrush" TargetName="border" Value="#FFBF00"/>
-                            <Setter Property="Background" TargetName="border" Value="#FFFFD556"/>
-                            <Setter Property="TextElement.Foreground" TargetName="content" Value="#345BBC"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Opacity" TargetName="grid" Value="0.35"/>
-                        </Trigger>
-
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="Template" Value="{DynamicResource DarkButtonTemplate}"/>
         <Style.Triggers>
             <Trigger Property="IsPressed" Value="True">
                 <Setter Property="Foreground" Value="#345BBC"/>
             </Trigger>
         </Style.Triggers>
     </Style>
+
+    <ControlTemplate x:Key="DarkButtonTemplate" TargetType="{x:Type Button}">
+        <Grid x:Name="grid">
+            <Border x:Name="border" CornerRadius="3" BorderBrush="{DynamicResource BrushButtonBorderStock}" BorderThickness="1" Background="{DynamicResource GradientStockBrushButton}">
+                <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextElement.Foreground="White"
+                                          TextElement.FontSize="14"
+                                          Margin="10 7 10 7"
+                                          x:Name="content">
+                </ContentPresenter>
+            </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Trigger.Setters>
+                    <Setter Property="BorderBrush" TargetName="border" Value="#FFBF00"/>
+                    <Setter Property="BorderThickness" TargetName="border" Value="1"/>
+                    <Setter Property="Background" TargetName="border" Value="{DynamicResource GradientMouseOverBrushButton}"/>
+                </Trigger.Setters>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="BorderBrush" TargetName="border" Value="#FFBF00"/>
+                <Setter Property="Background" TargetName="border" Value="#FFFFD556"/>
+                <Setter Property="TextElement.Foreground" TargetName="content" Value="#345BBC"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" TargetName="grid" Value="0.35"/>
+            </Trigger>
+
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <RadialGradientBrush GradientOrigin="0.5,1.5" x:Key="GradientStockBrushButton">
+        <RadialGradientBrush.RelativeTransform>
+            <TransformGroup>
+                <ScaleTransform CenterX="0.5" CenterY="0.5" 
+                                                        ScaleX="1.5" ScaleY="1.5"/>
+                <TranslateTransform X="0.02" Y="0.3"/>
+            </TransformGroup>
+        </RadialGradientBrush.RelativeTransform>
+        <GradientStop Offset="1" Color="{StaticResource DarkBlue1Color}"/>
+        <GradientStop Offset="0" Color="{StaticResource DarkBlue2Color}"/>
+    </RadialGradientBrush>
+
+    <RadialGradientBrush GradientOrigin="0.5,1.5" x:Key="GradientMouseOverBrushButton">
+        <RadialGradientBrush.RelativeTransform>
+            <TransformGroup>
+                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.5" ScaleY="1.5"/>
+                <TranslateTransform X="0.02" Y="0.3"/>
+            </TransformGroup>
+        </RadialGradientBrush.RelativeTransform>
+        <GradientStop Color="{StaticResource DarkBlue1Color}" Offset="1"/>
+        <GradientStop Color="#FFFFD556" Offset="0.3"/>
+    </RadialGradientBrush>
 
     <Style x:Key="ToggleButtonSimpleStyle" TargetType="{x:Type ToggleButton}">
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -354,6 +358,90 @@
         </Style.Triggers>
     </Style>
 
+    <!--Slider-->
+    <Style TargetType="{x:Type Slider}" x:Key="SliderStyle">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Slider}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Track Grid.Row="1" x:Name="PART_Track"   >
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Style="{DynamicResource SliderRepeatButtonLeft}"  Command="Slider.DecreaseLarge" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{DynamicResource SliderThumbStyle}"/>
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Style="{DynamicResource SliderRepeatButtonRight}" Command="Slider.IncreaseLarge" />
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ToolBarTray" x:Key="ToolBarStyle">
+        <Setter Property="Background" Value="#FF557585"/>
+    </Style>
+
+    <Style x:Key="SliderRepeatButtonLeft" TargetType="RepeatButton">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="IsTabStop" Value="false" />
+        <Setter Property="Focusable" Value="false" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RepeatButton">
+                    <Border  BorderThickness="1 1 0 1" BorderBrush="{DynamicResource DarkBlue1Brush}" CornerRadius="6 0 0 2"
+                             Background="{DynamicResource SliderBrushFill}" Height="8" VerticalAlignment="Center"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SliderRepeatButtonRight" TargetType="RepeatButton">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RepeatButton">
+                    <Border  BorderThickness="0 1 1 1" CornerRadius="0 2 6 0" BorderBrush="{DynamicResource SliderBrushBorder}" 
+                             Background="{DynamicResource  SliderBrushInner}" Height="8" VerticalAlignment="Center"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="SliderThumbStyle" TargetType="Thumb">
+        <Setter Property="SnapsToDevicePixels" Value="true" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Border x:Name="Border" Height="20" Width="12" 
+                            BorderBrush="{DynamicResource BrushButtonBorderStock}" CornerRadius="2" 
+                            BorderThickness="1" Background="{DynamicResource GradientStockBrushButton}">
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource GradientMouseOverBrushButton}" TargetName="Border"/>
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource DarkYellowBrush}" TargetName="Border"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>    
+    <!--End Slider-->
+
     <Style x:Key="TextBoxSytle" TargetType="TextBox">
         <Style.Setters>
             <Setter Property="Background" Value="{StaticResource DarkBlue1Brush}"/>
@@ -361,7 +449,7 @@
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type TextBoxBase}">
+                    <ControlTemplate TargetType="{x:Type TextBox}">
                         <Grid>
                             <Border Background="{TemplateBinding Background}" 
                                     x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}"
@@ -369,7 +457,16 @@
                                     CornerRadius="4">
                                 <ScrollViewer x:Name="PART_ContentHost"/>
                             </Border>
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.5" x:Name="WatermarkTextBlock" Text="{TemplateBinding Tag}" Visibility="Collapsed"/>
                         </Grid>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Text" Value=""/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="WatermarkTextBlock" Property="Visibility" Value="Visible"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

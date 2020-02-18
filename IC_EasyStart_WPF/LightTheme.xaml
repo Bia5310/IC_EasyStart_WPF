@@ -7,24 +7,35 @@
         <Setter Property="BorderBrush" Value="#419FD9"/>
     </Style>
 
-    <SolidColorBrush x:Key="Brush_Borders" Color="Yellow">
-
-    </SolidColorBrush>
+    <SolidColorBrush x:Key="Brush_Borders" Color="Yellow"/>
+    
 
     <Style x:Key="ExpanderStyle" TargetType="Expander">
         <Setter Property="Background" Value="White"/>
         <Setter Property="BorderBrush" Value="LightGray"/>
         <Setter Property="Foreground" Value="Black"/>
     </Style>
+    
+    <Style x:Key="BorderDownStyle" TargetType="Border">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="BorderBrush" Value="LightGray"/>
+    </Style>
+    
     <Style x:Key="BorderStyle" TargetType="Border">
         <Setter Property="Background" Value="White"/>
     </Style>
 
+    <Color x:Key="DarkBlue1Color">#FF4FA7DE</Color>
+    <Color x:Key="DarkBlue2Color">#FF0077C1</Color>
     <SolidColorBrush x:Key="BrushNUD_Borders" Color="Gray"/>
     <SolidColorBrush x:Key="BrushNUD_BackgroundStock" Color="WhiteSmoke"/>
     <SolidColorBrush x:Key="BrushNUD_BackgroundSelected" Color="LightGray"/>
     <SolidColorBrush x:Key="BrushNUD_Foreground" Color="Black"/>
-
+    <SolidColorBrush x:Key="SliderBrushInner" Color="Gray"/>
+    <SolidColorBrush x:Key="SliderBrushBorder" Color="{StaticResource DarkBlue1Color}"/>
+    <SolidColorBrush x:Key="SliderBrushFill" Color="{StaticResource DarkBlue2Color}"/>
+    <SolidColorBrush x:Key="BrushButtonBorderStock" Color="Gray"/>
+    
     <Style x:Key="SplitterStyle" TargetType="GridSplitter">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
@@ -50,6 +61,7 @@
     </Style>
 
 
+    
     <Style x:Key="TextBoxSytle" TargetType="TextBox">
         <Style.Setters>
             <Setter Property="Background" Value="WhiteSmoke"/>
@@ -57,7 +69,7 @@
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type TextBoxBase}">
+                    <ControlTemplate TargetType="{x:Type TextBox}">
                         <Grid>
                             <Border Background="{TemplateBinding Background}" 
                                     x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}"
@@ -65,7 +77,16 @@
                                     CornerRadius="4">
                                 <ScrollViewer x:Name="PART_ContentHost"/>
                             </Border>
+                            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.5" x:Name="WatermarkTextBlock" Text="{TemplateBinding Tag}" Visibility="Collapsed"/>
                         </Grid>
+                        <ControlTemplate.Triggers>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="Text" Value=""/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="WatermarkTextBlock" Property="Visibility" Value="Visible"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -269,6 +290,29 @@
         </Style.Triggers>
     </Style>
 
+    <RadialGradientBrush GradientOrigin="0.5,1.5" x:Key="GradientStockBrushButton">
+        <RadialGradientBrush.RelativeTransform>
+            <TransformGroup>
+                <ScaleTransform CenterX="0.5" CenterY="0.5" 
+                                                        ScaleX="1.5" ScaleY="1.5"/>
+                <TranslateTransform X="0.02" Y="0.3"/>
+            </TransformGroup>
+        </RadialGradientBrush.RelativeTransform>
+        <GradientStop Offset="1" Color="#FFEEEEEE"/>
+        <GradientStop Offset="0" Color="#FFA4A4A4"/>
+    </RadialGradientBrush>
+
+    <RadialGradientBrush GradientOrigin="0.5,1.5" x:Key="GradientMouseOverBrushButton">
+        <RadialGradientBrush.RelativeTransform>
+            <TransformGroup>
+                <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.5" ScaleY="1.5"/>
+                <TranslateTransform X="0.02" Y="0.3"/>
+            </TransformGroup>
+        </RadialGradientBrush.RelativeTransform>
+        <GradientStop Offset="1" Color="#FFE5F5FF"/>
+        <GradientStop Offset="0" Color="#FF74A1BD"/>
+    </RadialGradientBrush>
+
     <Style x:Key="ToggleButtonStyle" TargetType="{x:Type RadioButton}">
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -279,20 +323,8 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
                     <Grid x:Name="grid">
-                        <Border x:Name="border" CornerRadius="3" BorderBrush="Gray" BorderThickness="1">
-                            <Border.Background>
-                                <RadialGradientBrush GradientOrigin="0.5,1.5">
-                                    <RadialGradientBrush.RelativeTransform>
-                                        <TransformGroup>
-                                            <ScaleTransform CenterX="0.5" CenterY="0.5" 
-                                                        ScaleX="1.5" ScaleY="1.5"/>
-                                            <TranslateTransform X="0.02" Y="0.3"/>
-                                        </TransformGroup>
-                                    </RadialGradientBrush.RelativeTransform>
-                                    <GradientStop Offset="1" Color="#FFEEEEEE"/>
-                                    <GradientStop Offset="0" Color="#FFA4A4A4"/>
-                                </RadialGradientBrush>
-                            </Border.Background>
+                        <Border x:Name="border" CornerRadius="3" BorderBrush="Gray" BorderThickness="1"
+                                Background="{DynamicResource GradientStockBrushButton}">
                             <ContentPresenter HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
                                           TextElement.Foreground="Black"
@@ -307,19 +339,7 @@
                             <Trigger.Setters>
                                 <!--<Setter Property="BorderBrush" TargetName="border" Value="#FFBF00"/>-->
                                 <Setter Property="BorderThickness" TargetName="border" Value="1"/>
-                                <Setter Property="Background" TargetName="border">
-                                    <Setter.Value>
-                                        <RadialGradientBrush GradientOrigin="0.5,1.5">
-                                            <RadialGradientBrush.RelativeTransform>
-                                                <TransformGroup>
-                                                    <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.5" ScaleY="1.5"/>
-                                                    <TranslateTransform X="0.02" Y="0.3"/>
-                                                </TransformGroup>
-                                            </RadialGradientBrush.RelativeTransform>
-                                            <GradientStop Offset="1" Color="#FFE5F5FF"/>
-                                            <GradientStop Offset="0" Color="#FF74A1BD"/>
-                                        </RadialGradientBrush>
-                                    </Setter.Value>
+                                <Setter Property="Background" TargetName="border" Value="{DynamicResource GradientMouseOverBrushButton}">
                                 </Setter>
                                 <Setter Property="TextElement.Foreground" Value="Black"/>
                             </Trigger.Setters>
@@ -352,4 +372,130 @@
         </Style.Triggers>
     </Style>
 
+    <Style x:Key="TabControlStyle" TargetType="{x:Type TabControl}">
+        <Setter Property="OverridesDefaultStyle"
+          Value="True" />
+        <Setter Property="SnapsToDevicePixels"
+          Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabControl}">
+                    <Grid KeyboardNavigation.TabNavigation="Local">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Disabled">
+                                    <Storyboard>
+                                        <ColorAnimationUsingKeyFrames Storyboard.TargetName="Border"
+                                            Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)">
+                                            <EasingColorKeyFrame KeyTime="0"
+                                                Value="#FFAAAAAA"/>
+                                        </ColorAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <UniformGrid x:Name="HeaderPanel"
+                                Grid.Row="0"
+                                Panel.ZIndex="1"
+                                IsItemsHost="True"
+                                KeyboardNavigation.TabIndex="1"
+                                Background="Transparent"
+                                Columns="3"/>
+                        <Border x:Name="Border"
+                                Grid.Row="1"
+                                BorderThickness="0"
+                                Background="White"
+                                BorderBrush="White"
+                                CornerRadius="0 0 3 3"
+                                Margin="0"
+                                ClipToBounds="True"
+                                KeyboardNavigation.TabNavigation="Local"
+                                KeyboardNavigation.DirectionalNavigation="Contained"
+                                KeyboardNavigation.TabIndex="2">
+                            <ContentPresenter x:Name="PART_SelectedContentHost"
+                            ContentSource="SelectedContent" />
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type TabItem}">
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabItem}">
+                    <Grid x:Name="Root">
+                        <Border x:Name="Border"
+                                Margin="0 0 0 0"
+                                BorderThickness="1"
+                                CornerRadius="4 4 0 0">
+                            <Border.BorderBrush>
+                                <SolidColorBrush Color="Gray" />
+                            </Border.BorderBrush>
+                            <Border.Background>
+                                <RadialGradientBrush GradientOrigin="0.5,1.5">
+                                    <RadialGradientBrush.RelativeTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform CenterX="0.5" CenterY="0.5"
+                                                        ScaleX="1.5" ScaleY="1.5"/>
+                                            <TranslateTransform X="0.02" Y="0.3"/>
+                                        </TransformGroup>
+                                    </RadialGradientBrush.RelativeTransform>
+                                    <GradientStop Color="#FFEEEEEE" Offset="1"/>
+                                    <GradientStop Color="#FFA4A4A4" Offset="0.3"/>
+                                </RadialGradientBrush>
+                            </Border.Background>
+                            <ContentPresenter x:Name="ContentSite"
+                              VerticalAlignment="Center"
+                              HorizontalAlignment="Center"
+                              ContentSource="Header"
+                              Margin="12,2,12,2"
+                              RecognizesAccessKey="True"
+                              TextElement.Foreground="Black"/>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.Setters>
+                                <Setter Property="BorderBrush" TargetName="Border" Value="Gray"/>
+                                <Setter Property="BorderThickness" TargetName="Border" Value="1"/>
+                                <Setter Property="Background" TargetName="Border">
+                                    <Setter.Value>
+                                        <RadialGradientBrush GradientOrigin="0.5,1.5">
+                                            <RadialGradientBrush.RelativeTransform>
+                                                <TransformGroup>
+                                                    <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.5" ScaleY="1.5"/>
+                                                    <TranslateTransform X="0.02" Y="0.3"/>
+                                                </TransformGroup>
+                                            </RadialGradientBrush.RelativeTransform>
+                                            <GradientStop Offset="1" Color="#FFE5F5FF"/>
+                                            <GradientStop Offset="0" Color="#FF74A1BD"/>
+                                        </RadialGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger.Setters>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="BorderBrush" TargetName="Border" Value="#FF0041B4"/>
+                            <Setter Property="Background" TargetName="Border" Value="#FF419FD9"/>
+                            <Setter Property="TextElement.Foreground" TargetName="ContentSite" Value="#345BBC"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="Panel.ZIndex" Value="100"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" TargetName="Root" Value="0.35"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
 </ResourceDictionary>

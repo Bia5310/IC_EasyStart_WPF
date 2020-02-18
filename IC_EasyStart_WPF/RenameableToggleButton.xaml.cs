@@ -28,6 +28,7 @@ namespace IC_EasyStart_WPF
             textBox.LostFocus += TextBox_LostFocus;
             textBox.MouseDown += TextBox_MouseDown;
             MouseDown += TextBox_MouseDown;
+            MouseDoubleClick += RenameableToggleButton_MouseDoubleClick;
         }
 
         static RenameableToggleButton()
@@ -63,9 +64,19 @@ namespace IC_EasyStart_WPF
         {
             if (e.ChangedButton == MouseButton.Right)
             {
-                textBox.IsEnabled = true;
-                textBox.Focus();
+                ActivateEditMode();
             }
+        }
+
+        private void RenameableToggleButton_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            ActivateEditMode();
+        }
+
+        private void ActivateEditMode()
+        {
+            textBox.IsEnabled = true;
+            textBox.Focus();
         }
 
         private void TextBox_LostFocus(object sender, System.Windows.RoutedEventArgs e)
