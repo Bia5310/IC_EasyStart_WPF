@@ -81,7 +81,8 @@ namespace IC_EasyStart_WPF
 
         private void TextBox_LostFocus(object sender, System.Windows.RoutedEventArgs e)
         {
-            ApplyChanges();
+            if(textBox.IsEnabled)
+                ApplyChanges();
         }
 
         private void ApplyChanges()

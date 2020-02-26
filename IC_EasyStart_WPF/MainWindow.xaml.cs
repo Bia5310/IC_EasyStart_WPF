@@ -1207,6 +1207,11 @@ namespace IC_EasyStart_WPF
             
         }
 
+        private void RenameableToggleButton_OnApplyChanges(object sender, RoutedEventArgs eventArgs)
+        {
+            MessageBox.Show((sender as RenameableToggleButton).textBox.Text);
+        }
+
         private void Refresh_IC_BackColor()
         {
             System.Windows.Media.Color windowColor = (this.Background as SolidColorBrush).Color;
