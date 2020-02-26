@@ -433,8 +433,6 @@
                     </wf:Panel>
                 </WindowsFormsHost.Child>
             </WindowsFormsHost>
-
-
         </Grid>
 
         <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Width="6" HorizontalAlignment="Center" Margin="0 2 0 2" 

@@ -631,6 +631,7 @@ namespace IC_EasyStart_WPF
 
         private void TrB_Brightness_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            int a = 0;
             FLog.Log("TrB_Brightness_Scroll");
             vcdProp.RangeValue[VCDIDs.VCDID_Brightness] = (int)TrB_Brightness.Value;
             NUD_Brightness.Value = TrB_Brightness.Value;
