@@ -33,11 +33,8 @@ namespace IC_EasyStart_WPF
         //videowriting new
         string aviPath;
         System.IO.FileStream aviFile;
-        //H264Writer writer;
 
-        // H264エンコーダーを作成(create H264 encoder)
-        //OpenH264Lib.Encoder encoder = new OpenH264Lib.Encoder("openh264-1.7.0-win32.dll");
-
+        
         
 
         private void Init_Sliders(ICImagingControl ic) //функция инициализации ползунка для регулировки отдельных свойст камеры
@@ -249,7 +246,9 @@ namespace IC_EasyStart_WPF
                                     else
                                     {
                                         string data_path = System.IO.Path.Combine(Application.StartupPath, "Video");
-                                        try { System.IO.Directory.CreateDirectory(data_path); SaveVid_dir = data_path; }
+                                        try { System.IO.Directory.CreateDirectory(data_path);
+                                            //this.GetType().GetProperty("SaveVid_dir").SetValue(this, data_path);//let's try this
+                                            SaveVid_dir = data_path; }
                                         catch { SaveVid_dir = ""; }
                                     }
                                     break;
@@ -291,6 +290,72 @@ namespace IC_EasyStart_WPF
             }
             TB_Directory_Vid.Text = SaveVid_dir;
             TB_Directory_Photo.Text = SavePhoto_dir;
+        }
+        private void Dictionary_Load()
+        {
+            try
+            {
+                Dictionary_Load_fromFile();
+            }
+            catch
+            {
+                Dictionary_Load_Default();
+                Dictionary_Save();
+            }
+        }
+
+        private void Dictionary_Load_Default()
+        {
+            int Max_modes = 4;
+            ConfigsNamesDictionary = new Dictionary<string, string>();
+            for (int i =0;i< Max_modes;i++)
+                ConfigsNamesDictionary.Add("0_"+i.ToString(), "Config Phaco " + i.ToString());
+
+            for (int i = 0; i < Max_modes; i++)
+                ConfigsNamesDictionary.Add("1_" + i.ToString(), "Config Vitreo " + i.ToString());
+
+            for (int i = 0; i < Max_modes; i++)
+                ConfigsNamesDictionary.Add("2_" + i.ToString(), "Config User " + i.ToString());
+        }
+        private void Dictionary_Save()
+        {
+            List<string> List_2_file = new List<string>();
+            for(int i = 0;i< ConfigsNamesDictionary.Count;i++)
+            {
+                string local_key = (i / 4).ToString() + "_" + (i % 4).ToString();
+                List_2_file.Add(String.Format("<{0}>{1}</{0}>", local_key, ConfigsNamesDictionary[local_key]));
+            }
+            Files.Write_txt(ConfigNames_filename, List_2_file);
+        }
+        private void Dictionary_Load_fromFile()
+        {
+            var alpha = "beta";
+            var gamma = nameof(alpha);
+
+            ConfigsNamesDictionary = new Dictionary<string, string>();
+
+            if (System.IO.File.Exists(ConfigNames_filename))
+            {
+                string[] AllLines = System.IO.File.ReadAllLines(ConfigNames_filename);
+                for (int i = 0; i < AllLines.Count(); i++)
+                {
+                    int startind2 = AllLines[i].IndexOf('<');
+                    int finishind2 = AllLines[i].IndexOf('>');
+                    string data_tag = AllLines[i].Substring(startind2 + 1, finishind2 - startind2 - 1);
+                    string text_on_but = CutFromEdges(AllLines[i]);
+                    ConfigsNamesDictionary.Add(data_tag, text_on_but);
+                    var modenum = data_tag.Substring(0,1);
+                    var conf_num = data_tag.Substring(2, 1);
+                    int local_index = Convert.ToInt32(modenum) * 4 + Convert.ToInt32(conf_num);
+                    renameableButtonsConfigs[local_index].Text = text_on_but;
+                }
+            }
+            else
+            {
+                throw new Exception("Файл не существует");
+            }
+            
+            
         }
         private void Create_Directs_forPhotoVideo()
         {
@@ -494,64 +559,12 @@ namespace IC_EasyStart_WPF
             doubleUpDown.FormatString = "F" + decimalPlaces.ToString();
         }
 
-        private void Prepare_encoder(string path, int pFPS, float TimaInterval, int BitsPerSecond)
-        {/*
-            aviPath = path;
-            aviFile = System.IO.File.OpenWrite(aviPath);
-            int fps = pFPS;
-            // fps = 50; 
-            writer = new H264Writer(aviFile, IMG_W_now, IMG_H_now, fps);
-
-            // H264エンコーダーを作成(create H264 encoder)
-            encoder = new OpenH264Lib.Encoder("openh264-1.7.0-win32.dll");
-
-
-            // 1フレームエンコードするごとにライターに書き込み(write frame data for each frame encoded)
-            OpenH264Lib.Encoder.OnEncodeCallback onEncode = (data, length, frameType) =>
-            {
-                var keyFrame = (frameType == OpenH264Lib.Encoder.FrameType.IDR) || (frameType == OpenH264Lib.Encoder.FrameType.I);
-                writer.AddImage(data, keyFrame);
-                System.Diagnostics.Debug.WriteLine("Encord {0} bytes, KeyFrame:{1}", length, keyFrame);
-            };
-
-            // H264エンコーダーの設定(encoder setup)
-            int bps = BitsPerSecond;         // target bitrate. 5Mbps.
-            float keyFrameInterval = TimaInterval; // insert key frame interval. unit is second.
-            encoder.Setup(IMG_W_now, IMG_H_now, bps, (int)fps, keyFrameInterval, onEncode);*/
-
-        }
-
         VideoFileWriter writer_ffmpeg;
 
         private void Prepare_encoder2(string path, int pFPS, int BitsPerSecond)
         {
             writer_ffmpeg = new VideoFileWriter();
             writer_ffmpeg.Open(path, IMG_W_now, IMG_H_now, pFPS, VideoCodec.MPEG4, BitsPerSecond);
-            //AVI
-            ///////////////////////////////////
-            /*aviPath = path;
-            aviFile = System.IO.File.OpenWrite(aviPath);
-            int fps = pFPS;
-            // fps = 50; 
-            writer = new H264Writer(aviFile, IMG_W_now, IMG_H_now, fps);
-
-            // H264エンコーダーを作成(create H264 encoder)
-            encoder = new OpenH264Lib.Encoder("openh264-1.7.0-win32.dll");
-
-
-            // 1フレームエンコードするごとにライターに書き込み(write frame data for each frame encoded)
-            OpenH264Lib.Encoder.OnEncodeCallback onEncode = (data, length, frameType) =>
-            {
-                var keyFrame = (frameType == OpenH264Lib.Encoder.FrameType.IDR) || (frameType == OpenH264Lib.Encoder.FrameType.I);
-                writer.AddImage(data, keyFrame);
-                System.Diagnostics.Debug.WriteLine("Encord {0} bytes, KeyFrame:{1}", length, keyFrame);
-            };
-
-            // H264エンコーダーの設定(encoder setup)
-            int bps = BitsPerSecond;         // target bitrate. 5Mbps.
-            float keyFrameInterval = TimaInterval; // insert key frame interval. unit is second.
-            encoder.Setup(IMG_W_now, IMG_H_now, bps, (int)fps, keyFrameInterval, onEncode);*/
-
         }
         private int Get_WB_Sum()
         {
@@ -559,7 +572,6 @@ namespace IC_EasyStart_WPF
             var G = vcdProp.RangeValue[VCDIDs.VCDElement_WhiteBalanceGreen];
             var B = vcdProp.RangeValue[VCDIDs.VCDElement_WhiteBalanceBlue];
             return (R + G + B);
-
         }
         private void Adapt_Size_ofCont(Control ctrl, int ImgW, int ImgH,double Width_Modifier, double Height_Modifier)
         {

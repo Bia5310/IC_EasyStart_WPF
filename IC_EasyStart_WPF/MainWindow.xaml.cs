@@ -40,6 +40,7 @@ namespace IC_EasyStart_WPF
         string SavePhoto_dir = "Photo";
 
         string App_cfg_name = "App_prop.cfg";
+        string ConfigNames_filename = "ConfigNames.xml";
 
         int IMG_W_now = 0;
         int IMG_H_now = 0;
@@ -101,7 +102,7 @@ namespace IC_EasyStart_WPF
 
         private List<RenameableToggleButton> renameableButtonsConfigs = new List<RenameableToggleButton>();
 
-        private Dictionary<string, string> NamesConfigsDictionary = new Dictionary<string, string>();
+        private Dictionary<string, string> ConfigsNamesDictionary = new Dictionary<string, string>();
 
         public MainWindow()
         {
@@ -212,7 +213,10 @@ namespace IC_EasyStart_WPF
             TB_CurrentDate.Text = ServiceFunctions.UI.GetDateString();
             TIS.Imaging.LibrarySetup.SetLocalizationLanguage("ru");
             //this.KeyPreview = true;
-            if (File.Exists(ConfigNames[0]))
+
+            Dictionary_Load();
+
+           /* if (File.Exists(ConfigNames[0]))
             {
                 try
                 {
@@ -224,7 +228,7 @@ namespace IC_EasyStart_WPF
                     //  MessageBox.Show(exc.Message);
                     FLog.Log("ERROR - Load_cfg(). ORIGINAL:" + exc.Message);
                 }
-            }
+            }*/
 
             try
             {
@@ -482,7 +486,9 @@ namespace IC_EasyStart_WPF
             {
                 IC_Control.LiveStop();
             }
+
             try { Save_AppSettings(); } catch { }
+            try { Dictionary_Save(); } catch { }
             try { Save_Flipstate(); } catch { }
             try { Save_cfg(ConfigNames[LastConfig_num]); } catch { }
         }
@@ -1204,6 +1210,14 @@ namespace IC_EasyStart_WPF
         private void RenameableToggleButton_Unchecked(object sender, RoutedEventArgs e)
         {
             
+        }
+
+        private void RenameableToggleButton_OnApplyChanges(object sender, RoutedEventArgs eventArgs)
+        {
+            string local_tag = (sender as RenameableToggleButton).Tag as string;
+            string local_text = (sender as RenameableToggleButton).Text;
+            ConfigsNamesDictionary[local_tag] = local_text;
+            Dictionary_Save();
         }
 
         private void Refresh_IC_BackColor()

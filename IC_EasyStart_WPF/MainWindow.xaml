@@ -174,18 +174,22 @@
                                     <local:RenameableToggleButton Text="Config Phaco 0"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="0_0" IsChecked="True"/>
                                     <local:RenameableToggleButton Text="Config Phaco 1" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="0_1"/>
                                     <local:RenameableToggleButton Text="Config Phaco 2" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="0_2"/>
                                     <local:RenameableToggleButton Text="Config Phaco 3" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="0_3"/>
                                 </StackPanel>
                             </TabItem>
@@ -199,19 +203,22 @@
                                     <local:RenameableToggleButton Text="Config Vitreo 0" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
-                                                                  
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="1_0"/>
                                     <local:RenameableToggleButton Text="Config Vitreo 1" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="1_1"/>
                                     <local:RenameableToggleButton Text="Config Vitreo 2" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="1_2"/>
                                     <local:RenameableToggleButton Text="Config Vitreo 3" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="1_3"/>
                                 </StackPanel>
                             </TabItem>
@@ -225,18 +232,22 @@
                                     <local:RenameableToggleButton Text="Config User 0" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="2_0"/>
                                     <local:RenameableToggleButton Text="Config User 1" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="2_1"/>
                                     <local:RenameableToggleButton Text="Config User 2" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="2_2"/>
                                     <local:RenameableToggleButton Text="Config User 3" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="2_3"/>
                                 </StackPanel>
                             </TabItem>
