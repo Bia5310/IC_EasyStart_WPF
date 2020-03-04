@@ -347,6 +347,7 @@ namespace IC_EasyStart_WPF
                     var modenum = data_tag.Substring(0,1);
                     var conf_num = data_tag.Substring(2, 1);
                     int local_index = Convert.ToInt32(modenum) * 4 + Convert.ToInt32(conf_num);
+
                     renameableButtonsConfigs[local_index].Text = text_on_but;
                 }
             }

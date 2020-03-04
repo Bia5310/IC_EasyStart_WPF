@@ -192,17 +192,19 @@ namespace IC_EasyStart_WPF
             B_FS_Switcher_form.UseVisualStyleBackColor = true;
             B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
 
-            for(int i = 0; i < stackPanelVitreoButtons.Children.Count; i++)
-            {
-                renameableButtonsConfigs.Add(stackPanelVitreoButtons.Children[i] as RenameableToggleButton);
-            }
-            for (int i = 0; i < stackPanelUserConfigs.Children.Count; i++)
-            {
-                renameableButtonsConfigs.Add(stackPanelUserConfigs.Children[i] as RenameableToggleButton);
-            }
             for (int i = 0; i < stackPanelPhacoButtons.Children.Count; i++)
             {
                 renameableButtonsConfigs.Add(stackPanelPhacoButtons.Children[i] as RenameableToggleButton);
+            }
+
+            for (int i = 0; i < stackPanelVitreoButtons.Children.Count; i++)
+            {
+                renameableButtonsConfigs.Add(stackPanelVitreoButtons.Children[i] as RenameableToggleButton);
+            }
+           
+            for (int i = 0; i < stackPanelUserConfigs.Children.Count; i++)
+            {
+                renameableButtonsConfigs.Add(stackPanelUserConfigs.Children[i] as RenameableToggleButton);
             }
 
             /*IC_Control.ShowDeviceSettingsDialog();
@@ -1218,6 +1220,11 @@ namespace IC_EasyStart_WPF
             string local_text = (sender as RenameableToggleButton).Text;
             ConfigsNamesDictionary[local_tag] = local_text;
             Dictionary_Save();
+        }
+
+        private void RenameableToggleButton_Loaded(object sender, RoutedEventArgs e)
+        {
+
         }
 
         private void Refresh_IC_BackColor()

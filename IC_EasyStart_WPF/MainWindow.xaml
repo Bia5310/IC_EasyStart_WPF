@@ -175,7 +175,7 @@
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="0_0" IsChecked="True"/>
+                                                                  Tag="0_0" IsChecked="True" Loaded="RenameableToggleButton_Loaded"/>
                                     <local:RenameableToggleButton Text="Config Phaco 1" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
