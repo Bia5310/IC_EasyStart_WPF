@@ -180,7 +180,7 @@ namespace IC_EasyStart_WPF
             IC_Control.OverlayBitmapAtPath[PathPositions.Display].Enable = true;
             //IC_Control.OverlayBitmap.Enable = true;
             IC_Control.LiveCaptureContinuous = true;
-            IC_Control.ImageAvailable += IC_Control_ImageAvailable1;
+            IC_Control.ImageAvailable += IC_Control_ImageAvailable;
             IC_Control.Invalidated += IC_Control_Invalidated;
 
             Panel = Host.Child as System.Windows.Forms.Panel;

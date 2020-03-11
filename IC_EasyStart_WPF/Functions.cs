@@ -448,7 +448,9 @@ namespace IC_EasyStart_WPF
             {
                 try
                 {
-                    string dataName = FindLast_Video(SaveVid_dir, TB_FIO.Text + " " + TB_HistoryNumber.Text + " " + TB_CurrentDate.Text);
+                    string FIO = !string.IsNullOrEmpty(TB_FIO.Text) ? TB_FIO.Text + " " : "";
+                    string H_num = !string.IsNullOrEmpty(TB_HistoryNumber.Text) ? TB_HistoryNumber.Text + " " : "";
+                    string dataName = FindLast_Video(SaveVid_dir, FIO + H_num + TB_CurrentDate.Text);
                     string FullPathAndName = dataName;
 
                     Prepare_encoder2(FullPathAndName, (int)IC_Control.DeviceFrameRate, 25000 * 1000);
@@ -460,9 +462,9 @@ namespace IC_EasyStart_WPF
 
                     Switch_state_of_ctrls();
                 }
-                catch
+                catch(Exception e)
                 {
-                    MessageBox.Show("Ошибка при подготовке к записи. Проверьте настойки. ");
+                    MessageBox.Show("Ошибка при подготовке к записи. Проверьте настройки. ");
                     //noErrors = false;
                 }
              }   
@@ -473,7 +475,7 @@ namespace IC_EasyStart_WPF
             RecordingNeeded = false;
             isRecording = false;
             System.Threading.Thread.Sleep((int)(2 * NUD_Exposure.Value*1000)+100);
-            if (writer_ffmpeg.IsOpen)
+            if (writer_ffmpeg.IsOpen) //запись закрывается в ImageAvalible, но если вдруг не закрылась, то тут
                 try { writer_ffmpeg.Close(); } catch { }
             //enabling all the staff
             Switch_state_of_ctrls();
@@ -564,6 +566,8 @@ namespace IC_EasyStart_WPF
 
         private void Prepare_encoder2(string path, int pFPS, int BitsPerSecond)
         {
+            int a = 0;
+            int b = a + 3;
             writer_ffmpeg = new VideoFileWriter();
             writer_ffmpeg.Open(path, IMG_W_now, IMG_H_now, pFPS, VideoCodec.MPEG4, BitsPerSecond);
         }
