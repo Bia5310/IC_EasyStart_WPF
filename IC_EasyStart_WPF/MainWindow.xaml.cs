@@ -33,7 +33,7 @@ namespace IC_EasyStart_WPF
         private VCDSimpleProperty vcdProp = null;
         private VCDAbsoluteValueProperty AbsValExp = null;// специально для времени экспонирования [c]
 
-        string[] ConfigNames = new string[3] { "Default_config.xml", "Config_1.xml", "Config_2.xml" };
+        
         int Config_num = 0; //0 - default
         int LastConfig_num = 0;
         string SaveVid_dir = "Video";
@@ -106,7 +106,8 @@ namespace IC_EasyStart_WPF
 
         public MainWindow()
         {
-            FLog = new ServiceFunctions.UI.Log.FileLogger("Log_" + ServiceFunctions.UI.Get_TimeNow_String() + ".txt");
+            Directory.CreateDirectory("Logs");
+            FLog = new ServiceFunctions.UI.Log.FileLogger("Logs\\Log_" + ServiceFunctions.UI.Get_TimeNow_String() + ".txt");
             FLog.Log("Programm started...");
 
             //Init timers
@@ -147,12 +148,6 @@ namespace IC_EasyStart_WPF
 
             InitializeComponent();
 
-            ChB_Config_0.Checked += ChB_Config_N_Checked;
-            ChB_Config_0.Unchecked += ChB_Config_N_Unchecked;
-            ChB_Config_1.Checked += ChB_Config_N_Checked;
-            ChB_Config_1.Unchecked += ChB_Config_N_Unchecked;
-            ChB_Config_2.Checked += ChB_Config_N_Checked;
-            ChB_Config_2.Unchecked += ChB_Config_N_Unchecked;
 
             ChB_WhiteBalanceAuto.Checked += ChB_WhiteBalanceAuto_CheckedChanged;
             ChB_WhiteBalanceAuto.Unchecked += ChB_WhiteBalanceAuto_CheckedChanged;
@@ -443,7 +438,7 @@ namespace IC_EasyStart_WPF
 
             IC_Control.LiveStop();
 
-            Load_cfg(ConfigNames[Config_num]);
+           // Load_cfg(ConfigNames[Config_num]);
             // Refresh_Values_on_Trackbars();
 
             /*NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
@@ -459,12 +454,7 @@ namespace IC_EasyStart_WPF
             LastConfig_num = Config_num;
             Refresh_Values_on_Trackbars();
             Timer_camera_checker.Start();
-        }
-
-        private void ChB_Config_N_Unchecked(object sender, RoutedEventArgs e)
-        {
-            Save_cfg(ConfigNames[LastConfig_num]);
-        }
+        }       
 
         private void B_Browse_Vid_Click(object sender, RoutedEventArgs e)
         {
@@ -492,7 +482,7 @@ namespace IC_EasyStart_WPF
             try { Save_AppSettings(); } catch { }
             try { Dictionary_Save(); } catch { }
             try { Save_Flipstate(); } catch { }
-            try { Save_cfg(ConfigNames[LastConfig_num]); } catch { }
+          //  try { Save_cfg(ConfigNames[LastConfig_num]); } catch { }
         }
 
         private void Load_FlipState()
@@ -755,7 +745,7 @@ namespace IC_EasyStart_WPF
                 vcdProp.OnePush(VCDIDs.VCDID_WhiteBalance);
                 WhiteBalanceTimer.Start();
                 WB_FinalSum = 0;
-                Save_cfg(ConfigNames[LastConfig_num]);
+               // Save_cfg(ConfigNames[LastConfig_num]);
             }
         }
 
