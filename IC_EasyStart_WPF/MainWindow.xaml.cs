@@ -34,8 +34,8 @@ namespace IC_EasyStart_WPF
         private VCDAbsoluteValueProperty AbsValExp = null;// специально для времени экспонирования [c]
 
         
-        int Config_num = 0; //0 - default
-        int LastConfig_num = 0;
+        string Config_tag = "0_0"; //0_0 - default
+        string LastConfig_tag = "0_0";
         string SaveVid_dir = "Video";
         string SavePhoto_dir = "Photo";
 
@@ -210,35 +210,20 @@ namespace IC_EasyStart_WPF
             TB_CurrentDate.Text = ServiceFunctions.UI.GetDateString();
             TIS.Imaging.LibrarySetup.SetLocalizationLanguage("ru");
             //this.KeyPreview = true;
-
-            Dictionary_Load();
-
-           /* if (File.Exists(ConfigNames[0]))
+           
+           
+            try
             {
                 try
                 {
-                    Load_cfg(ConfigNames[0], true);
-                    FLog.Log("Load_cfg() call finished succesfully");
+                    Dictionary_Load();
+                    FLog.Log("Dictionary loading is successful");
                 }
-                catch (Exception exc)
+                catch
                 {
-                    //  MessageBox.Show(exc.Message);
-                    FLog.Log("ERROR - Load_cfg(). ORIGINAL:" + exc.Message);
+                    FLog.Log("Dictionary loading fault");
                 }
-            }*/
-
-            try
-            {
-                if (!IC_Control.DeviceValid)
-                {
-                    IC_Control.ShowDeviceSettingsDialog();
-                    if (!IC_Control.DeviceValid)
-                    {
-                        MessageBox.Show("Не было выбрано ни одного устройства", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information);
-                        FLog.Log("No devices selected by user or loaded");
-                        //Application.Exit();
-                    }
-                }
+             
                 try
                 {
                     MainConfigPath = System.AppDomain.CurrentDomain.BaseDirectory + "\\" + App_cfg_name;
@@ -246,6 +231,41 @@ namespace IC_EasyStart_WPF
                     FLog.Log("Load_AppSettings() call finished succesfully");
                 }
                 catch { FLog.Log("ERROR - Load_AppSettings() error"); }
+
+                try //Комплексная проверка. Если конфиг не дефолт, то пытаемся его загрузить. В противном случае просим у юзера
+                {
+                    if (Config_tag == "default")
+                    {
+                        if (!IC_Control.DeviceValid)
+                        {
+                            IC_Control.ShowDeviceSettingsDialog();
+                            if (!IC_Control.DeviceValid)
+                            {
+                                MessageBox.Show("Не было выбрано ни одного устройства", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information);
+                                FLog.Log("No devices selected by user or loaded");
+                                Application.Current.Shutdown();
+                            }    
+                        }
+                    }
+                   
+
+                    if(Config_tag == "default")
+                    {
+                        Set_appropriate_params();
+                        Save_AllTheConfigs();
+                    }
+
+                    try { Find_RenameableBut_byTag(Config_tag).IsChecked = true; }
+                    catch { Config_tag = "0_0"; renameableButtonsConfigs[0].IsChecked = true; }
+                    FLog.Log("Check configs function call finished succesfully");
+                    
+                }
+                catch
+                {
+                    FLog.Log("ERROR - Check configs error");
+                }
+
+
                 try
                 {
                     Init_Sliders(IC_Control);
@@ -254,6 +274,7 @@ namespace IC_EasyStart_WPF
                     FLog.Log("Load_ic_cam_easy() call finished succesfully");
                 }
                 catch { FLog.Log("ERROR - Init_Sliders or Load_ic_cam_easy  error"); }
+
 
                 try
                 {
@@ -278,20 +299,7 @@ namespace IC_EasyStart_WPF
                 catch (Exception exc)
                 { FLog.Log("ERROR - Load_flipstate error "); }
 
-                try
-                {
-                    object sender_f = null;
-                    if (Config_num == 1) sender_f = ChB_Config_1;
-                    else if (Config_num == 2) sender_f = ChB_Config_2;
-                    else sender_f = ChB_Config_0;
-
-                    (sender_f as CheckBox).IsChecked = true;
-                    FLog.Log("Check configs function call finished succesfully");
-                }
-                catch
-                {
-                    FLog.Log("ERROR - Check configs error");
-                }
+                
 
                 if (vcdProp.AutoAvailable(VCDIDs.VCDID_WhiteBalance))
                     vcdProp.Automation[VCDIDs.VCDID_WhiteBalance] = false;
@@ -372,89 +380,6 @@ namespace IC_EasyStart_WPF
             e.Graphics.FillRectangle(System.Drawing.Brushes.Red, 0, 0, width, height);*/
         }
 
-        //private void ChB_Config_N_CheckedChanged(object sender, RoutedEventArgs e)
-        //{
-        //    FLog.Log("ChB_Config_N_CheckedChanged");
-        //    Timer_camera_checker.Stop();
-        //    var ctrl = sender as CheckBox;
-        //    //Config_num = Convert.ToInt32(ctrl.Name.Last().ToString());
-        //    Config_num = (int) (sender as RadioButton).Tag;
-
-        //    // IC_Control.SaveDeviceStateToFile(ConfigNames[LastConfig_num]);
-
-        //    if (ctrl.IsChecked ?? false)
-        //    {
-        //        for (int i = 0; i < ConfigNames.Count(); i++)
-        //        {
-        //            /*var Current_ChB = (TLP_Configs.Controls.Find("ChB_Config_" + (i).ToString(), false)[0]);
-        //            (Current_ChB as CheckBox).CheckedChanged -= ChB_Config_N_CheckedChanged;
-        //            if (Convert.ToInt32((Current_ChB as CheckBox).Name.Last().ToString()) != Config_num)
-        //                (Current_ChB as CheckBox).Checked = false;
-        //            (Current_ChB as CheckBox).CheckedChanged += ChB_Config_N_CheckedChanged;*/
-        //        }
-        //        IC_Control.LiveStop();
-        //        Save_cfg(ConfigNames[LastConfig_num]);
-        //        Load_cfg(ConfigNames[Config_num]);
-        //        // Refresh_Values_on_Trackbars();
-
-        //        /*NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
-        //        TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];*/
-
-        //        Load_ic_cam_easy(IC_Control);
-        //        IMG_H_now = IC_Control.ImageHeight;
-        //        IMG_W_now = IC_Control.ImageWidth;
-        //        Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
-        //        FormatAdaptation(IMG_W_now, IMG_H_now);
-        //        IC_Control.LiveStart();
-
-        //    }
-        //    else
-        //    {
-        //        /*var Current_ChB = ChB_Config_0;
-        //        if (ctrl.Name != "ChB_Config_0")
-        //        {
-        //            Config_num = 0;
-        //            (Current_ChB as CheckBox).Checked = true;
-        //        }
-        //        else
-        //        {
-        //            (Current_ChB as CheckBox).CheckedChanged -= ChB_Config_N_CheckedChanged;
-        //            (Current_ChB as CheckBox).Checked = true;
-        //            (Current_ChB as CheckBox).CheckedChanged += ChB_Config_N_CheckedChanged;
-        //        }*/
-        //    }
-        //    LastConfig_num = Config_num;
-        //    Refresh_Values_on_Trackbars();
-        //    Timer_camera_checker.Start();
-        //}
-
-        private void ChB_Config_N_Checked(object sender, RoutedEventArgs e)
-        {
-            FLog.Log("ChB_Config_N_Checked");
-            Timer_camera_checker.Stop();
-            Config_num = int.Parse((sender as RadioButton).Tag as string); //Вычленяем номер конфигурации
-
-            // IC_Control.SaveDeviceStateToFile(ConfigNames[LastConfig_num]);
-
-            IC_Control.LiveStop();
-
-           // Load_cfg(ConfigNames[Config_num]);
-            // Refresh_Values_on_Trackbars();
-
-            /*NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
-            TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];*/
-
-            Load_ic_cam_easy(IC_Control);
-            IMG_H_now = IC_Control.ImageHeight;
-            IMG_W_now = IC_Control.ImageWidth;
-            Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
-            FormatAdaptation(IMG_W_now, IMG_H_now);
-            IC_Control.LiveStart();
-
-            LastConfig_num = Config_num;
-            Refresh_Values_on_Trackbars();
-            Timer_camera_checker.Start();
-        }       
 
         private void B_Browse_Vid_Click(object sender, RoutedEventArgs e)
         {
@@ -557,7 +482,15 @@ namespace IC_EasyStart_WPF
             }
             catch (Exception ex) { }
         }
+        private void Set_appropriate_params()
+        {
+            var local_vcdprop = new TIS.Imaging.VCDHelpers.VCDSimpleProperty(IC_Control.VCDPropertyItems);
+            var local_AbsValExp = (VCDAbsoluteValueProperty)IC_Control.VCDPropertyItems.FindInterface(VCDIDs.VCDID_Exposure +
+                    ":" + VCDIDs.VCDElement_Value + ":" + VCDIDs.VCDInterface_AbsoluteValue); 
+            LoadExposure_ToCam(ref local_AbsValExp, 0.016f);
+            local_vcdprop.RangeValue[VCDIDs.VCDID_Gain] = local_vcdprop.RangeMin(VCDIDs.VCDID_Gain);
 
+        }
         private void NUD_Exposure_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             FLog.Log("NUD_Exposure_ValueChanged");
@@ -1188,9 +1121,42 @@ namespace IC_EasyStart_WPF
 
             //Обработка переключения до цикла!
 
-            //
+            //FLog.Log("ChB_Config_N_Checked");
+            try
+            {
+                Timer_camera_checker.Stop();
+                Config_tag = ((sender as RenameableToggleButton).Tag as string); //Вычленяем номер конфигурации
 
-            for(int i = 0; i < renameableButtonsConfigs.Count; i++)
+                //IC_Control.SaveDeviceStateToFile(ConfigNames[LastConfig_num]);
+
+                IC_Control.LiveStop();
+                try { Save_cfg(LastConfig_tag); } catch { }
+                Load_cfg(Config_tag);
+
+                /*NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
+                TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];*/
+
+                Load_ic_cam_easy(IC_Control);
+                IMG_H_now = IC_Control.ImageHeight;
+                IMG_W_now = IC_Control.ImageWidth;
+                Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
+                FormatAdaptation(IMG_W_now, IMG_H_now);
+                IC_Control.LiveStart();
+
+                LastConfig_tag = Config_tag;
+                try { Refresh_Values_on_Trackbars(); }
+                catch
+                {
+                    FLog.Log("На удалось обновить значения на ползунках");
+                }
+                Timer_camera_checker.Start();
+
+            }
+            catch
+            {
+                FLog.Log("Ошибка при переключении конфигураций");
+            }
+            for (int i = 0; i < renameableButtonsConfigs.Count; i++)
             {
                 if(renameableButtonsConfigs[i] != toggleButton && renameableButtonsConfigs[i].toggleButon.IsChecked == true)
                 {
@@ -1213,6 +1179,11 @@ namespace IC_EasyStart_WPF
         }
 
         private void RenameableToggleButton_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RenameableToggleButton_Loaded_1(object sender, RoutedEventArgs e)
         {
 
         }

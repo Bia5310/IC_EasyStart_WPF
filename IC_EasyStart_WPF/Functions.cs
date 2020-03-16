@@ -104,7 +104,8 @@ namespace IC_EasyStart_WPF
                     else if (TrB_ExposureVal.Value > TrB_ExposureVal.Maximum) TrB_ExposureVal.Value = TrB_ExposureVal.Maximum;
                 }
                 TrB_ExposureVal.TickFrequency = (TrB_ExposureVal.Maximum - TrB_ExposureVal.Minimum) / 10;
-               // ChangingActivatedTextBoxExp = false;
+                // ChangingActivatedTextBoxExp = false;
+                NUD_Exposure.FormatString = "F" + DetectTheNumberOfDecimalPositions(AbsValExp.RangeMin);
                 NUD_Exposure.Value = ServiceFunctions.Math.PerfectRounding(Exposure_Slide2real(TrB_ExposureVal.Value), 4);
                 //ChangingActivatedTextBoxExp = true;
             }
@@ -126,7 +127,7 @@ namespace IC_EasyStart_WPF
                 // ChangingActivatedTextBoxGain = false;
                 NUD_Gain.Minimum = vcdProp.RangeMin(VCDID_Gain);
                 NUD_Gain.Maximum = vcdProp.RangeMax(VCDID_Gain);
-                NUD_Gain.Value = TrB_GainVal.Value;;
+                NUD_Gain.Value = TrB_GainVal.Value;
                 // ChangingActivatedTextBoxGain = true;
             }
 
@@ -152,7 +153,15 @@ namespace IC_EasyStart_WPF
                 // ChangingActivatedTextBoxGain = true;
             }
         }
-
+        private int DetectTheNumberOfDecimalPositions(double value)
+        {
+            double half = value; int decplaces = 1;
+            while((half*10-(int)(half*10))!=0)
+            {
+                half *= 10; decplaces++;
+            }
+            return decplaces;
+        }
         private double Exposure_Slide2real(double arg)
         {           
             double a = Math.Pow(xenta, arg / zF);
@@ -220,7 +229,7 @@ namespace IC_EasyStart_WPF
             if (SavePhoto_dir == "") SaveVid_dir = "Photo";
             Str_2_write.Add("<SaveVideo_dir>" + SaveVid_dir + "</SaveVideo_dir>");
             Str_2_write.Add("<SavePhoto_dir>" + SavePhoto_dir + "</SavePhoto_dir>");
-            Str_2_write.Add("<ConfigNumber>" + Config_num + "</ConfigNumber>");
+            Str_2_write.Add("<LastConfig_tag>" + Config_tag + "</LastConfig_tag>");
             
             ServiceFunctions.Files.Write_txt(MainConfigPath, Str_2_write);
             
@@ -266,12 +275,12 @@ namespace IC_EasyStart_WPF
                                     break;
                                 }
 
-                            case "ConfigNumber":
+                            case "LastConfig_tag":
                                 {
                                     string toObject = CutFromEdges(AllLines[i]);
-                                    if (toObject != "-1") Config_num = Convert.ToInt32(toObject);
-                                    else Config_num = 0;
-                                    LastConfig_num = Config_num;
+                                    if (!string.IsNullOrEmpty(toObject)) Config_tag = toObject;
+                                    else Config_tag = "default";
+                                    LastConfig_tag = Config_tag;
                                     break;
                                 }
                         }
@@ -344,11 +353,11 @@ namespace IC_EasyStart_WPF
                     string data_tag = AllLines[i].Substring(startind2 + 1, finishind2 - startind2 - 1);
                     string text_on_but = CutFromEdges(AllLines[i]);
                     ConfigsNamesDictionary.Add(data_tag, text_on_but);
-                    var modenum = data_tag.Substring(0,1);
+                    /*var modenum = data_tag.Substring(0,1);
                     var conf_num = data_tag.Substring(2, 1);
                     int local_index = Convert.ToInt32(modenum) * 4 + Convert.ToInt32(conf_num);
-
-                    renameableButtonsConfigs[local_index].Text = text_on_but;
+                    renameableButtonsConfigs[local_index].Text = text_on_but;*/
+                    Find_RenameableBut_byTag(data_tag).Text = text_on_but;
                 }
             }
             else
@@ -357,6 +366,49 @@ namespace IC_EasyStart_WPF
             }
             
             
+        }
+        private RenameableToggleButton Find_RenameableBut_byTag(string Tag)
+        {
+            var modenum = Tag.Substring(0, 1);
+            var conf_num = Tag.Substring(2, 1);
+            int local_index = Convert.ToInt32(modenum) * 4 + Convert.ToInt32(conf_num);
+            try
+            {
+                if ((renameableButtonsConfigs.Count > local_index))
+                {
+                    if ((string)renameableButtonsConfigs[local_index].Tag == Tag)
+                    {
+                        var reference = renameableButtonsConfigs[local_index];
+                        return reference;
+                    }
+                    else
+                    {
+                        var list = FindVisualChildren<RenameableToggleButton>(this).Where(x => x.Tag != null && x.Tag.ToString() == Tag);
+                        return list.First();
+                    }
+                }
+                else return null;
+            }
+            catch { return null; }
+        }
+        public static IEnumerable<T> FindVisualChildren<T>(System.Windows.DependencyObject depObj) where T : System.Windows.DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    System.Windows.DependencyObject child = System.Windows.Media.VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
+            }
         }
         private void Create_Directs_forPhotoVideo()
         {
@@ -374,7 +426,9 @@ namespace IC_EasyStart_WPF
         private void Load_Default_Settings()
         {
             SaveVid_dir = System.IO.Path.Combine(Application.StartupPath,"Video"); 
-            SavePhoto_dir = System.IO.Path.Combine(Application.StartupPath, "Photo"); 
+            SavePhoto_dir = System.IO.Path.Combine(Application.StartupPath, "Photo");
+            Config_tag = "default";
+            LastConfig_tag = "default";
         }
         private string CutFromEdges(string target)
         {
@@ -522,8 +576,9 @@ namespace IC_EasyStart_WPF
             B_Browse_Vid.IsEnabled = !isRecording;
         }
        
-        private void Load_cfg(string CFG_name, bool Open_dev = true)
+        private void Load_cfg(string CFG_tag, bool Open_dev = true)
         {
+            string CFG_name = "Config_" + CFG_tag + ".xml";
             bool isDataSaved = true;
             try { IC_Control.SaveDeviceStateToFile("data.xml"); } catch { isDataSaved = false; }
             if (System.IO.File.Exists(CFG_name))
@@ -546,12 +601,20 @@ namespace IC_EasyStart_WPF
             }
             System.IO.File.Delete("data.xml");
         }
-        private void Save_cfg(string CFG_name)
+        private void Save_cfg(string CFG_tag)
         {
+            string CFG_name = "Config_" + CFG_tag + ".xml";
             IC_Control.SaveDeviceStateToFile(CFG_name);
             Device_state = IC_Control.SaveDeviceState();
         }
-
+        private void Save_AllTheConfigs()
+        {
+            for(int i=0;i<3;i++)
+                for(int j=0;j<4;j++)
+                {
+                    Save_cfg(i.ToString() + "_" + j.ToString());
+                }
+        }
         private static void SetDecimalPlaces(Xceed.Wpf.Toolkit.DoubleUpDown doubleUpDown, int decimalPlaces)
         {
             if (doubleUpDown == null)

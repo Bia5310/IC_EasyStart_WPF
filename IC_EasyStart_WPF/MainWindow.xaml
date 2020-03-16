@@ -175,7 +175,7 @@
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="0_0" IsChecked="True" Loaded="RenameableToggleButton_Loaded"/>
+                                                                  Tag="0_0" IsChecked="False" Loaded="RenameableToggleButton_Loaded"/>
                                     <local:RenameableToggleButton Text="Config Phaco 1" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
@@ -307,9 +307,9 @@
                                   x:Name="ChB_ExposureAuto" 
                                   Checked="ChB_ExposureAuto_CheckedChanged"
                                   Unchecked="ChB_ExposureAuto_CheckedChanged"/>
-                        <Slider Grid.Row="1" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="10000" 
+                        <Slider Grid.Row="1" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="1000000" 
                                 ValueChanged="TrB_ExposureVal_Scroll" x:Name="TrB_ExposureVal"
-                                Style="{DynamicResource SliderStyle}"/>
+                                Style="{DynamicResource SliderStyle}" Minimum="10" Value="500000" LargeChange="100000" SmallChange="10000"/>
 
                         <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Усиление" Margin="2"/>
                         <xctk:DoubleUpDown Grid.Row="2" Grid.Column="1" Margin="2" Maximum="10000" Increment="0.001" x:Name="NUD_Gain" MaxWidth="120" ValueChanged="NUD_Gain_ValueChanged"/>
