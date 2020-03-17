@@ -1007,7 +1007,7 @@ namespace IC_EasyStart_WPF
         {
             if (!Camera_restart_need)
             {
-                if ((STW_fps.Elapsed.TotalMilliseconds > 1000) && (STW_fps.Elapsed.TotalMilliseconds > 20 * (double)NUD_Exposure.Value))
+                if ((STW_fps.Elapsed.TotalMilliseconds > 1000) && (STW_fps.Elapsed.TotalMilliseconds > 20 * (double)(NUD_Exposure.Value??0)))
                 {
                     // Timer_camera_checker.Dispose(); 
                     Camera_restart_need = true;
