@@ -234,6 +234,14 @@ namespace IC_EasyStart_WPF
 
                 try //Комплексная проверка. Если конфиг не дефолт, то пытаемся его загрузить. В противном случае просим у юзера
                 {
+                    if(Config_tag!= "default")
+                    {
+                        /* for(int i=0;i<12;i++)
+                         {
+                             var local_tag = ((i / 4)).ToString() + "_" + ((i % 4)).ToString();
+                         }*/
+                        if (!File.Exists("Config_" + Config_tag + ".xml")) Config_tag = "default";
+                    }
                     if (Config_tag == "default")
                     {
                         if (!IC_Control.DeviceValid)
@@ -312,10 +320,13 @@ namespace IC_EasyStart_WPF
                 try
                 {
                     Prepare_encoder2("D:\\video.avi", (int)IC_Control.DeviceFrameRate, 25000 * 1000);
+                    B_StopCapture.IsEnabled = false;
                     FLog.Log("Encoder preparing is succesful");
                 }
                 catch (Exception exc)
                 {
+                    B_StartCapture.IsEnabled = false;
+                    B_StopCapture.IsEnabled = false;
                     FLog.Log("ERROR - Encoder preparing finished this error: " + exc.Message);
                 }
                 Device_name = IC_Control.Device;
@@ -474,6 +485,7 @@ namespace IC_EasyStart_WPF
             {
                 double value = Exposure_Slide2real(TrB_ExposureVal.Value);
                 LoadExposure_ToCam(ref AbsValExp, value);
+                Device_state = IC_Control.SaveDeviceState();
                 double promval = (Exposure_Slide2real(TrB_ExposureVal.Value));
                 if (promval > 1) NUD_Exposure.Value = promval;
                 else NUD_Exposure.Value = promval;
@@ -481,15 +493,6 @@ namespace IC_EasyStart_WPF
 
             }
             catch (Exception ex) { }
-        }
-        private void Set_appropriate_params()
-        {
-            var local_vcdprop = new TIS.Imaging.VCDHelpers.VCDSimpleProperty(IC_Control.VCDPropertyItems);
-            var local_AbsValExp = (VCDAbsoluteValueProperty)IC_Control.VCDPropertyItems.FindInterface(VCDIDs.VCDID_Exposure +
-                    ":" + VCDIDs.VCDElement_Value + ":" + VCDIDs.VCDInterface_AbsoluteValue); 
-            LoadExposure_ToCam(ref local_AbsValExp, 0.016f);
-            local_vcdprop.RangeValue[VCDIDs.VCDID_Gain] = local_vcdprop.RangeMin(VCDIDs.VCDID_Gain);
-
         }
         private void NUD_Exposure_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
@@ -502,6 +505,8 @@ namespace IC_EasyStart_WPF
                     TrB_ExposureVal.Value = toslide;
                 else
                     TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Default);
+
+                Device_state = IC_Control.SaveDeviceState();
             }
         }
 
@@ -520,6 +525,7 @@ namespace IC_EasyStart_WPF
                 TimerForRenew.IsEnabled = true;
                 TimerForRenew.Start();
             }
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void TrB_GainVal_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -527,6 +533,7 @@ namespace IC_EasyStart_WPF
             FLog.Log("TrB_GainVal_Scroll");
             vcdProp.RangeValue[VCDIDs.VCDID_Gain] = (int)TrB_GainVal.Value;
             NUD_Gain.Value = TrB_GainVal.Value;
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void NUD_Gain_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -540,6 +547,7 @@ namespace IC_EasyStart_WPF
                     TrB_GainVal.Value = toslide;
                 else
                     TrB_GainVal.Value = vcdProp.DefaultValue(VCDIDs.VCDID_Gain);
+                Device_state = IC_Control.SaveDeviceState();
             }
         }
 
@@ -558,6 +566,7 @@ namespace IC_EasyStart_WPF
                 TimerForRenew.IsEnabled = true;
                 TimerForRenew.Start();
             }
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void TrB_Brightness_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -565,6 +574,7 @@ namespace IC_EasyStart_WPF
             FLog.Log("TrB_Brightness_Scroll");
             vcdProp.RangeValue[VCDIDs.VCDID_Brightness] = (int)TrB_Brightness.Value;
             NUD_Brightness.Value = TrB_Brightness.Value;
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void NUD_Brightness_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -593,6 +603,7 @@ namespace IC_EasyStart_WPF
                     TrB_Brightness.Value = vcdProp.DefaultValue(VCDIDs.VCDID_Brightness);
 
             }
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void ChB_BrightnessAuto_CheckedChanged(object sender, RoutedEventArgs e)
@@ -610,6 +621,8 @@ namespace IC_EasyStart_WPF
                 TimerForRenew.IsEnabled = true;
                 TimerForRenew.Start();
             }
+            Device_state = IC_Control.SaveDeviceState();
+
         }
 
         private void TimerForRenew_Tick(object sender, EventArgs e)
@@ -668,6 +681,7 @@ namespace IC_EasyStart_WPF
             FLog.Log("B_Properties_Click");
             IC_Control.ShowPropertyDialog();
             Refresh_Values_on_Trackbars();
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void ChB_WhiteBalanceAuto_CheckedChanged(object sender, RoutedEventArgs e)
@@ -935,9 +949,9 @@ namespace IC_EasyStart_WPF
         bool Camera_restart_need = false;
         private void Timer_camera_checker_Tick(object sender, EventArgs e)
         {
-            if (!Camera_restart_need)
+            if (!Camera_restart_need)//даже если рестарт не нужен
             {
-                if ((STW_fps.Elapsed.TotalMilliseconds > 1000) && (STW_fps.Elapsed.TotalMilliseconds > 20 * (double)(NUD_Exposure.Value??0)))
+                if ((STW_fps.Elapsed.TotalMilliseconds > 1000) && (STW_fps.Elapsed.TotalMilliseconds > 20 * (double)(NUD_Exposure.Value??0)))//но камера по непонятной причине отвалилась
                 {
                     // Timer_camera_checker.Dispose(); 
                     Camera_restart_need = true;
@@ -1147,7 +1161,7 @@ namespace IC_EasyStart_WPF
                 try { Refresh_Values_on_Trackbars(); }
                 catch
                 {
-                    FLog.Log("На удалось обновить значения на ползунках");
+                    FLog.Log("Не удалось обновить значения на ползунках");
                 }
                 Timer_camera_checker.Start();
 

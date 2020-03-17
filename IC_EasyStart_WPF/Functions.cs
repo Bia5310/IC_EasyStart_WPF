@@ -34,9 +34,18 @@ namespace IC_EasyStart_WPF
         string aviPath;
         System.IO.FileStream aviFile;
 
-        
-        
 
+
+
+        private void Set_appropriate_params()
+        {
+            var local_vcdprop = new TIS.Imaging.VCDHelpers.VCDSimpleProperty(IC_Control.VCDPropertyItems);
+            var local_AbsValExp = (VCDAbsoluteValueProperty)IC_Control.VCDPropertyItems.FindInterface(VCDIDs.VCDID_Exposure +
+                    ":" + VCDIDs.VCDElement_Value + ":" + VCDIDs.VCDInterface_AbsoluteValue);
+            LoadExposure_ToCam(ref local_AbsValExp, 0.016f);
+            local_vcdprop.RangeValue[VCDIDs.VCDID_Gain] = local_vcdprop.RangeMin(VCDIDs.VCDID_Gain);
+
+        }
         private void Init_Sliders(ICImagingControl ic) //функция инициализации ползунка для регулировки отдельных свойст камеры
         {
             vcdProp = new TIS.Imaging.VCDHelpers.VCDSimpleProperty(IC_Control.VCDPropertyItems);
@@ -529,7 +538,8 @@ namespace IC_EasyStart_WPF
             RecordingNeeded = false;
             isRecording = false;
             System.Threading.Thread.Sleep((int)(2 * NUD_Exposure.Value*1000)+100);
-            if (writer_ffmpeg.IsOpen) //запись закрывается в ImageAvalible, но если вдруг не закрылась, то тут
+            if(writer_ffmpeg!=null)
+                if (writer_ffmpeg.IsOpen) //запись закрывается в ImageAvalible, но если вдруг не закрылась, то тут
                 try { writer_ffmpeg.Close(); } catch { }
             //enabling all the staff
             Switch_state_of_ctrls();
