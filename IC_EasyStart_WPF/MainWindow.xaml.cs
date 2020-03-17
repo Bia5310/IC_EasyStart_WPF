@@ -409,6 +409,7 @@ namespace IC_EasyStart_WPF
         private void Form1_FormClosing(object sender, CancelEventArgs e)
         {
             FLog.Log("Form1_FormClosing");
+            try { Save_cfg(Config_tag); } catch { }
             try { if (isRecording) B_StopCapture_Click(null, null); } catch { }
             if (IC_Control.LiveVideoRunning)
             {
@@ -692,7 +693,7 @@ namespace IC_EasyStart_WPF
                 vcdProp.OnePush(VCDIDs.VCDID_WhiteBalance);
                 WhiteBalanceTimer.Start();
                 WB_FinalSum = 0;
-               // Save_cfg(ConfigNames[LastConfig_num]);
+                Save_cfg(Config_tag);
             }
         }
 
@@ -1146,14 +1147,18 @@ namespace IC_EasyStart_WPF
                 IC_Control.LiveStop();
                 try { Save_cfg(LastConfig_tag); } catch { }
                 Load_cfg(Config_tag);
-
-                /*NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
-                TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];*/
+                var a_exp_v = AbsValExp.Value;
+               /* NUD_Gain.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
+                TrB_GainVal.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain];*/
 
                 Load_ic_cam_easy(IC_Control);
+                a_exp_v = AbsValExp.Value;
                 IMG_H_now = IC_Control.ImageHeight;
+                a_exp_v = AbsValExp.Value;
                 IMG_W_now = IC_Control.ImageWidth;
+                a_exp_v = AbsValExp.Value;
                 Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
+                a_exp_v = AbsValExp.Value;
                 FormatAdaptation(IMG_W_now, IMG_H_now);
                 IC_Control.LiveStart();
 
@@ -1166,7 +1171,7 @@ namespace IC_EasyStart_WPF
                 Timer_camera_checker.Start();
 
             }
-            catch
+            catch(Exception exc)
             {
                 FLog.Log("Ошибка при переключении конфигураций");
             }

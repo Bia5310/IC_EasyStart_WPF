@@ -46,9 +46,15 @@ namespace IC_EasyStart_WPF
             local_vcdprop.RangeValue[VCDIDs.VCDID_Gain] = local_vcdprop.RangeMin(VCDIDs.VCDID_Gain);
 
         }
+        private void Init_Properties(ICImagingControl ic)
+        {
+            vcdProp = new TIS.Imaging.VCDHelpers.VCDSimpleProperty(ic.VCDPropertyItems);
+            AbsValExp = (VCDAbsoluteValueProperty)ic.VCDPropertyItems.FindInterface(VCDIDs.VCDID_Exposure +
+                    ":" + VCDIDs.VCDElement_Value + ":" + VCDIDs.VCDInterface_AbsoluteValue);
+        }
         private void Init_Sliders(ICImagingControl ic) //функция инициализации ползунка для регулировки отдельных свойст камеры
         {
-            vcdProp = new TIS.Imaging.VCDHelpers.VCDSimpleProperty(IC_Control.VCDPropertyItems);
+            Init_Properties(ic);
             string VCDID_Exp = VCDIDs.VCDID_Exposure;
             string VCDID_Gain = VCDIDs.VCDID_Gain;
             string VCDID_Brightness = VCDIDs.VCDID_Brightness;
@@ -95,8 +101,7 @@ namespace IC_EasyStart_WPF
             }
             else
             {
-                AbsValExp = (VCDAbsoluteValueProperty)ic.VCDPropertyItems.FindInterface(VCDID_Exp +
-                    ":" + VCDIDs.VCDElement_Value + ":" + VCDIDs.VCDInterface_AbsoluteValue);
+                
                 TrB_ExposureVal.IsEnabled = true;
                 NUD_Exposure.IsEnabled = true;
 
@@ -126,11 +131,12 @@ namespace IC_EasyStart_WPF
             }
             else
             {
+
+                var a = vcdProp.RangeValue[VCDID_Gain];
                 TrB_GainVal.IsEnabled = true;
                 NUD_Gain.IsEnabled = true;
                 TrB_GainVal.Minimum = vcdProp.RangeMin(VCDID_Gain);
                 TrB_GainVal.Maximum = vcdProp.RangeMax(VCDID_Gain);
-                var a = vcdProp.RangeValue[VCDID_Gain];
                 TrB_GainVal.Value = a;
                 TrB_GainVal.TickFrequency = (TrB_GainVal.Maximum - TrB_GainVal.Minimum) / 10;
                 // ChangingActivatedTextBoxGain = false;
@@ -219,16 +225,23 @@ namespace IC_EasyStart_WPF
 
         private void Refresh_Values_on_Trackbars()
         {
-            NUD_Exposure.Value = AbsValExp.Value;
-            TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value);
-            ChB_ExposureAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Exposure];
-
-            NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
-            TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
-            ChB_GainAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Gain];
-
-            NUD_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
-            TrB_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
+            if (NUD_Exposure.Value != null)
+            {
+                NUD_Exposure.Value = AbsValExp.Value;
+                TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value);
+                ChB_ExposureAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Exposure];
+            }
+            if (NUD_Gain.Value != null)
+            {
+                NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
+                TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
+                ChB_GainAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Gain];
+            }
+            if (NUD_Brightness.Value != null)
+            {
+                NUD_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
+                TrB_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
+            }
         }
 
         private void Save_AppSettings()
@@ -596,11 +609,13 @@ namespace IC_EasyStart_WPF
                 try
                 {
                     IC_Control.LoadDeviceStateFromFile(CFG_name, Open_dev);
+                    Init_Properties(IC_Control);
                     Device_state = IC_Control.SaveDeviceState();
                 }
                 catch(Exception e)
                 {
                     IC_Control.ShowDeviceSettingsDialog();
+                    Init_Properties(IC_Control);
                     Device_state = IC_Control.SaveDeviceState();
                     if(isDataSaved) IC_Control.LoadDeviceStateFromFile("data.xml", Open_dev);
                 }
