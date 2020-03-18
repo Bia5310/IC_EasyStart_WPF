@@ -281,7 +281,10 @@ namespace IC_EasyStart_WPF
                     Load_ic_cam_easy(IC_Control);
                     FLog.Log("Load_ic_cam_easy() call finished succesfully");
                 }
-                catch { FLog.Log("ERROR - Init_Sliders or Load_ic_cam_easy  error"); }
+                catch(Exception exc)
+                {
+                    FLog.Log("ERROR - Init_Sliders or Load_ic_cam_easy  error");
+                }
 
 
                 try
@@ -1147,18 +1150,13 @@ namespace IC_EasyStart_WPF
                 IC_Control.LiveStop();
                 try { Save_cfg(LastConfig_tag); } catch { }
                 Load_cfg(Config_tag);
-                var a_exp_v = AbsValExp.Value;
                /* NUD_Gain.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
                 TrB_GainVal.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain];*/
 
                 Load_ic_cam_easy(IC_Control);
-                a_exp_v = AbsValExp.Value;
                 IMG_H_now = IC_Control.ImageHeight;
-                a_exp_v = AbsValExp.Value;
                 IMG_W_now = IC_Control.ImageWidth;
-                a_exp_v = AbsValExp.Value;
                 Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
-                a_exp_v = AbsValExp.Value;
                 FormatAdaptation(IMG_W_now, IMG_H_now);
                 IC_Control.LiveStart();
 

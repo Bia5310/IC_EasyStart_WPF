@@ -49,8 +49,13 @@ namespace IC_EasyStart_WPF
         private void Init_Properties(ICImagingControl ic)
         {
             vcdProp = new TIS.Imaging.VCDHelpers.VCDSimpleProperty(ic.VCDPropertyItems);
+            var a = ic.VCDPropertyItems.CategoryMap;
+            var b = ic.VCDPropertyItems.Count;
+            var c = ic.VCDPropertyItems.get_Item(0);
+            
             AbsValExp = (VCDAbsoluteValueProperty)ic.VCDPropertyItems.FindInterface(VCDIDs.VCDID_Exposure +
                     ":" + VCDIDs.VCDElement_Value + ":" + VCDIDs.VCDInterface_AbsoluteValue);
+            
         }
         private void Init_Sliders(ICImagingControl ic) //функция инициализации ползунка для регулировки отдельных свойст камеры
         {
@@ -68,6 +73,9 @@ namespace IC_EasyStart_WPF
                 ChB_ExposureAuto.IsEnabled = true;
                 ChB_ExposureAuto.IsChecked = false;
                 vcdProp.Automation[VCDID_Exp] = false;
+                var a = vcdProp.RangeValue[VCDID_Exp] = 5;
+                var b = AbsValExp.Value;
+
             }
 
             if (!vcdProp.AutoAvailable(VCDID_Gain))//если невозможна автоматическая регулировка,отключить возможность ее включения
@@ -170,8 +178,9 @@ namespace IC_EasyStart_WPF
         }
         private int DetectTheNumberOfDecimalPositions(double value)
         {
-            double half = value; int decplaces = 1;
-            while((half*10-(int)(half*10))!=0)
+           // if ((int)(value + (10e-6)) - (int)(value) != 0) value = value + (10e-6);
+            double half = value; int decplaces =0;
+            while((int)(half)==0)
             {
                 half *= 10; decplaces++;
             }
