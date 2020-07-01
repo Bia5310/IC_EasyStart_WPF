@@ -43,7 +43,7 @@ namespace IC_EasyStart_WPF
             var local_AbsValExp = (VCDAbsoluteValueProperty)IC_Control.VCDPropertyItems.FindInterface(VCDIDs.VCDID_Exposure +
                     ":" + VCDIDs.VCDElement_Value + ":" + VCDIDs.VCDInterface_AbsoluteValue);
             LoadExposure_ToCam(ref local_AbsValExp, 0.016f);
-            local_vcdprop.RangeValue[VCDIDs.VCDID_Gain] = local_vcdprop.RangeMin(VCDIDs.VCDID_Gain);
+            local_vcdprop.RangeValue[VCDIDs.VCDID_Gain] = (local_vcdprop.RangeMin(VCDIDs.VCDID_Gain)  + local_vcdprop.RangeMax(VCDIDs.VCDID_Gain))/2;
 
         }
         private void Init_Properties(ICImagingControl ic)
@@ -691,7 +691,8 @@ namespace IC_EasyStart_WPF
 
             double delta_h = 30;
             if (FullScrin) delta_h = 0;
-            Size_for_Resizing = new Size((int)((double)(Host.ActualWidth) * Width_Modifier), (int)((Host.ActualHeight- delta_h) * Height_Modifier));
+            Size_for_Resizing = new Size((int)((Host.ActualWidth) * Width_Modifier * Scaling_of_monitor), 
+                                         (int)((Host.ActualHeight- delta_h) * Height_Modifier * Scaling_of_monitor));
             int PanelNewWidth = Size_for_Resizing.Width;
             int PanelNewHeight = Size_for_Resizing.Height;
             ctrl.Dock = DockStyle.None;

@@ -68,6 +68,7 @@ namespace IC_EasyStart_WPF
         Bitmap GplusR_res = new Bitmap(1920, 1080, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
         static double coeff = 0.1;
         int coeff256 = (int)(coeff * 256);
+        double Scaling_of_monitor = 1;
 
         BitmapData bd_res_r;
         Bitmap pRes_r;
@@ -167,41 +168,35 @@ namespace IC_EasyStart_WPF
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            FLog.Log("Stage 0 of loading is completed");
             IC_Control = new ICImagingControl();
             Host.Child.Controls.Add(IC_Control);
+
+            FLog.Log("Stage 0.2 of loading is completed");
             IC_Control.SendToBack();
             IC_Control.Paint += IC_Control_Paint;
+            FLog.Log("Stage 0.4 of loading is completed");
             //IC_Control.OverlayBitmapPosition = PathPositions.Display;
             IC_Control.OverlayBitmapAtPath[PathPositions.Display].Enable = true;
             //IC_Control.OverlayBitmap.Enable = true;
             IC_Control.LiveCaptureContinuous = true;
+
+            FLog.Log("Stage 0.6 of loading is completed");
             IC_Control.ImageAvailable += IC_Control_ImageAvailable;
             IC_Control.Invalidated += IC_Control_Invalidated;
-
+            FLog.Log("Stage 0.8 of loading is completed");
             Panel = Host.Child as System.Windows.Forms.Panel;
-
+            FLog.Log("Stage 1 of loading is completed");
             //IC_Control.Anchor = System.Windows.Forms.AnchorStyles.Left|System.Windows.Forms.AnchorStyles.Right| System.Windows.Forms.AnchorStyles.Top| System.Windows.Forms.AnchorStyles.Bottom;
             //B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("B_FS_");//System.Drawing.Color.FromArgb(0, System.Drawing.Color.White);
             Refresh_IC_BackColor();
 
             B_FS_Switcher_form.UseVisualStyleBackColor = true;
             B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
+            Init_ListOf_CheckButtons();
 
-            for (int i = 0; i < stackPanelPhacoButtons.Children.Count; i++)
-            {
-                renameableButtonsConfigs.Add(stackPanelPhacoButtons.Children[i] as RenameableToggleButton);
-            }
 
-            for (int i = 0; i < stackPanelVitreoButtons.Children.Count; i++)
-            {
-                renameableButtonsConfigs.Add(stackPanelVitreoButtons.Children[i] as RenameableToggleButton);
-            }
-           
-            for (int i = 0; i < stackPanelUserConfigs.Children.Count; i++)
-            {
-                renameableButtonsConfigs.Add(stackPanelUserConfigs.Children[i] as RenameableToggleButton);
-            }
-
+            Scaling_of_monitor = GetScalingFactor_ofMonitor();
             /*IC_Control.ShowDeviceSettingsDialog();
             if (IC_Control.DeviceValid) IC_Control.LiveStart();*/
 
@@ -210,8 +205,8 @@ namespace IC_EasyStart_WPF
             TB_CurrentDate.Text = ServiceFunctions.UI.GetDateString();
             TIS.Imaging.LibrarySetup.SetLocalizationLanguage("ru");
             //this.KeyPreview = true;
-           
-           
+            FLog.Log("Stage 2 of loading is completed");
+
             try
             {
                 try
@@ -231,15 +226,11 @@ namespace IC_EasyStart_WPF
                     FLog.Log("Load_AppSettings() call finished succesfully");
                 }
                 catch { FLog.Log("ERROR - Load_AppSettings() error"); }
-
+                FLog.Log("Stage 3 of loading is completed");
                 try //Комплексная проверка. Если конфиг не дефолт, то пытаемся его загрузить. В противном случае просим у юзера
                 {
                     if(Config_tag!= "default")
                     {
-                        /* for(int i=0;i<12;i++)
-                         {
-                             var local_tag = ((i / 4)).ToString() + "_" + ((i % 4)).ToString();
-                         }*/
                         if (!File.Exists("Config_" + Config_tag + ".xml")) Config_tag = "default";
                     }
                     if (Config_tag == "default")
@@ -263,7 +254,16 @@ namespace IC_EasyStart_WPF
                         Save_AllTheConfigs();
                     }
 
-                    try { Find_RenameableBut_byTag(Config_tag).IsChecked = true; }
+                    try
+                    {
+                        Find_RenameableBut_byTag(Config_tag).IsChecked = true;
+                        if (!IC_Control.DeviceValid)
+                        {
+                            MessageBox.Show("Не было выбрано ни одного устройства", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information);
+                            FLog.Log("No devices selected by user or loaded");
+                            Application.Current.Shutdown();
+                        }
+                    }
                     catch { Config_tag = "0_0"; renameableButtonsConfigs[0].IsChecked = true; }
                     FLog.Log("Check configs function call finished succesfully");
                     
@@ -273,7 +273,7 @@ namespace IC_EasyStart_WPF
                     FLog.Log("ERROR - Check configs error");
                 }
 
-
+                FLog.Log("Stage 4 of loading is completed");
                 try
                 {
                     Init_Sliders(IC_Control);
@@ -286,7 +286,7 @@ namespace IC_EasyStart_WPF
                     FLog.Log("ERROR - Init_Sliders or Load_ic_cam_easy  error");
                 }
 
-
+                FLog.Log("Stage 5 of loading is completed");
                 try
                 {
                     IMG_H_now = IC_Control.ImageHeight;
@@ -301,7 +301,7 @@ namespace IC_EasyStart_WPF
                 {
                     FLog.Log("ERROR - Format adaptation error");
                 }
-
+                FLog.Log("Stage 6 of loading is completed");
                 try
                 {
                     Load_FlipState();
@@ -320,6 +320,7 @@ namespace IC_EasyStart_WPF
                 try { Refresh_Values_on_Trackbars(); FLog.Log("Refresh_Values_on_Trackbars() call finished succesfully"); }
                 catch { FLog.Log("ERROR - Refreshing Values on TrB error"); }
 
+                FLog.Log("Stage 7 of loading is completed");
                 try
                 {
                     Prepare_encoder2("D:\\video.avi", (int)IC_Control.DeviceFrameRate, 25000 * 1000);
@@ -335,9 +336,8 @@ namespace IC_EasyStart_WPF
                 Device_name = IC_Control.Device;
                 Timer_camera_checker.Start();
                 STW_fps.Start();
-
+                FLog.Log("Stage 8 of loading is completed");
                 Everything_loaded = true;
-                FLog.Log("Initialization end");
             }
             catch (Exception ext)
             {
@@ -352,6 +352,7 @@ namespace IC_EasyStart_WPF
                     IC_Control.LiveStart();
                     Adapt_Size_ofCont(IC_Control as System.Windows.Forms.Control, IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
                 }
+                FLog.Log("Stage 9 of loading is completed");
             }
 
             var ov = IC_Control.OverlayBitmapAtPath[PathPositions.Display];
@@ -362,8 +363,33 @@ namespace IC_EasyStart_WPF
             ov.FontTransparent = true;
             ov.DrawText(System.Drawing.Color.Red, 10, 10, "IC Imaging Control 2.0");
             ov.DrawSolidRect(System.Drawing.Color.FromArgb(187, 100, 0, 0), 10, 10, 100, 100);
-        }
 
+            FLog.Log("Initialization end");
+        }
+        public void Init_ListOf_CheckButtons()
+        {
+            for (int i = 0; i < stackPanelPhacoButtons.Children.Count; i++)
+            {
+                renameableButtonsConfigs.Add(stackPanelPhacoButtons.Children[i] as RenameableToggleButton);
+            }
+
+            for (int i = 0; i < stackPanelVitreoButtons.Children.Count; i++)
+            {
+                renameableButtonsConfigs.Add(stackPanelVitreoButtons.Children[i] as RenameableToggleButton);
+            }
+
+            for (int i = 0; i < stackPanelUserConfigs.Children.Count; i++)
+            {
+                renameableButtonsConfigs.Add(stackPanelUserConfigs.Children[i] as RenameableToggleButton);
+            }
+
+        }
+        public double GetScalingFactor_ofMonitor()
+        {
+            double resHeight = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;  // 1440
+            double actualHeight = SystemParameters.PrimaryScreenHeight;  // 960
+            return (resHeight / actualHeight);            
+        }
         private void IC_Control_Invalidated(object sender, System.Windows.Forms.InvalidateEventArgs e)
         {
             
@@ -1019,7 +1045,7 @@ namespace IC_EasyStart_WPF
             STW_fps.Restart();
 
             this.Dispatcher.BeginInvoke((Action)(() =>
-            {
+            {                
                 Init_Sliders(IC_Control);
                 Load_ic_cam_easy(IC_Control);
                 Refresh_Values_on_Trackbars();
@@ -1027,6 +1053,8 @@ namespace IC_EasyStart_WPF
 
                 if (AutoExp_wasEnabled) Enable_AutoExposure_ctrl();
                 else Disable_AutoExposure_ctrl();
+                File.Delete("Config_" + LastConfig_tag + ".xml");
+                try { Save_cfg(LastConfig_tag); } catch { }
             }));
 
         }
