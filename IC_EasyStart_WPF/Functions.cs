@@ -59,123 +59,186 @@ namespace IC_EasyStart_WPF
         }
         private void Init_Sliders(ICImagingControl ic) //функция инициализации ползунка для регулировки отдельных свойст камеры
         {
+            bool locallogging = false; int il = 0; //отладочный режим
+            if (locallogging) { FLog.Log("Init_sliders L"+ (il++).ToString());}
             Init_Properties(ic);
             string VCDID_Exp = VCDIDs.VCDID_Exposure;
             string VCDID_Gain = VCDIDs.VCDID_Gain;
             string VCDID_Brightness = VCDIDs.VCDID_Brightness;
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
 
-            if (!vcdProp.AutoAvailable(VCDID_Exp))//если невозможна автоматическая регулировка,отключить возможность ее включения
+            try
             {
+                if (!vcdProp.AutoAvailable(VCDID_Exp))//если невозможна автоматическая регулировка,отключить возможность ее включения
+                {
+                    ChB_ExposureAuto.IsEnabled = false;
+                    if (locallogging) { FLog.Log("Init_sliders L_tr" + (il++).ToString()); }
+                }
+                else
+                {
+                    if (locallogging) { FLog.Log("Init_sliders F_tr" + (il++).ToString()); }
+                    ChB_ExposureAuto.IsEnabled = true;
+                    ChB_ExposureAuto.IsChecked = false;
+                    vcdProp.Automation[VCDID_Exp] = false;
+                   /* var a = vcdProp.RangeValue[VCDID_Exp] = 5;
+                    var b = AbsValExp.Value;*/
+
+                }
+            }
+            catch
+            {
+                FLog.Log("Error on autoexposure detecting. Deiniting autoexposure...");
                 ChB_ExposureAuto.IsEnabled = false;
             }
-            else
-            {
-                ChB_ExposureAuto.IsEnabled = true;
-                ChB_ExposureAuto.IsChecked = false;
-                vcdProp.Automation[VCDID_Exp] = false;
-                var a = vcdProp.RangeValue[VCDID_Exp] = 5;
-                var b = AbsValExp.Value;
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
 
+            try
+            {
+                if (!vcdProp.AutoAvailable(VCDID_Gain))//если невозможна автоматическая регулировка,отключить возможность ее включения
+                {
+                    ChB_GainAuto.IsEnabled = false;
+                }
+                else
+                {
+                    ChB_GainAuto.IsEnabled = true;
+                    ChB_GainAuto.IsChecked = false;
+                    vcdProp.Automation[VCDID_Gain] = false;
+                }
             }
-
-            if (!vcdProp.AutoAvailable(VCDID_Gain))//если невозможна автоматическая регулировка,отключить возможность ее включения
+            catch
             {
+                FLog.Log("Error on autogain detecting. Deiniting autogain...");
                 ChB_GainAuto.IsEnabled = false;
             }
-            else
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
+
+            try
             {
-                ChB_GainAuto.IsEnabled = true;
-                ChB_GainAuto.IsChecked = false;
-                vcdProp.Automation[VCDID_Gain] = false;
+                if (!vcdProp.AutoAvailable(VCDID_Brightness))//если невозможна автоматическая регулировка,отключить возможность ее включения
+                {
+                    ChB_BrightnessAuto.IsEnabled = false;
+                }
+                else
+                {
+                    ChB_BrightnessAuto.IsEnabled = true;
+                    ChB_BrightnessAuto.IsChecked = false;
+                    vcdProp.Automation[VCDID_Brightness] = false;
+                }
             }
-
-
-            if (!vcdProp.AutoAvailable(VCDID_Brightness))//если невозможна автоматическая регулировка,отключить возможность ее включения
+            catch
             {
+                FLog.Log("Error on autobrightness detecting. Deiniting autobrightness...");
                 ChB_BrightnessAuto.IsEnabled = false;
             }
-            else
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
+
+            try
             {
-                ChB_BrightnessAuto.IsEnabled = true;
-                ChB_BrightnessAuto.IsChecked = false;
-                vcdProp.Automation[VCDID_Brightness] = false;
+                if (!vcdProp.Available(VCDID_Exp))
+                {
+                    TrB_ExposureVal.IsEnabled = false;
+                    NUD_Exposure.IsEnabled = false;
+                }
+                else
+                {
+
+                    TrB_ExposureVal.IsEnabled = true;
+                    NUD_Exposure.IsEnabled = true;
+
+                    double Az = TrB_ExposureVal.Minimum = ServiceFunctions.Math.PerfectRounding((AbsValExp.RangeMin * zF), 0);
+                    double Bz = TrB_ExposureVal.Maximum = ServiceFunctions.Math.PerfectRounding((AbsValExp.RangeMax * zF), 0);
+                    alpha = (AbsValExp.RangeMin * AbsValExp.RangeMax - 0.25 * 0.25) / (AbsValExp.RangeMin + AbsValExp.RangeMax - 2 * 0.25);
+                    xenta = Math.Pow((AbsValExp.RangeMax - alpha) / (AbsValExp.RangeMin - alpha), (zF / ((Bz - Az))));
+                    beta = (0.25 - alpha) / Math.Pow(xenta, (Bz + Az) / (2 * zF));
+                    double val1slide = Az;
+                    try { TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value); }
+                    catch
+                    {
+                        if (TrB_ExposureVal.Value < TrB_ExposureVal.Minimum) TrB_ExposureVal.Value = TrB_ExposureVal.Minimum;
+                        else if (TrB_ExposureVal.Value > TrB_ExposureVal.Maximum) TrB_ExposureVal.Value = TrB_ExposureVal.Maximum;
+                    }
+                    TrB_ExposureVal.TickFrequency = (TrB_ExposureVal.Maximum - TrB_ExposureVal.Minimum) / 10;
+                    // ChangingActivatedTextBoxExp = false;
+                    NUD_Exposure.FormatString = "F" + DetectTheNumberOfDecimalPositions(AbsValExp.RangeMin);
+                    NUD_Exposure.Value = ServiceFunctions.Math.PerfectRounding(Exposure_Slide2real(TrB_ExposureVal.Value), 4);
+                    //ChangingActivatedTextBoxExp = true;
+                }
             }
-
-
-            if (!vcdProp.Available(VCDID_Exp))
+            catch
             {
+                FLog.Log("Error on exposure detecting. Deiniting exposure...");
                 TrB_ExposureVal.IsEnabled = false;
                 NUD_Exposure.IsEnabled = false;
             }
-            else
-            {
-                
-                TrB_ExposureVal.IsEnabled = true;
-                NUD_Exposure.IsEnabled = true;
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
 
-                double Az = TrB_ExposureVal.Minimum = ServiceFunctions.Math.PerfectRounding((AbsValExp.RangeMin * zF), 0);
-                double Bz = TrB_ExposureVal.Maximum = ServiceFunctions.Math.PerfectRounding((AbsValExp.RangeMax * zF), 0);
-                alpha = (AbsValExp.RangeMin * AbsValExp.RangeMax - 0.25 * 0.25) / (AbsValExp.RangeMin + AbsValExp.RangeMax - 2 * 0.25);
-                xenta = Math.Pow((AbsValExp.RangeMax - alpha) / (AbsValExp.RangeMin - alpha), (zF / ((Bz - Az))));
-                beta = (0.25 - alpha) / Math.Pow(xenta, (Bz + Az) / (2 * zF));
-                double val1slide = Az;             
-                try { TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value); }
-                catch
+            try
+            {
+                if (!vcdProp.Available(VCDID_Gain))
                 {
-                    if (TrB_ExposureVal.Value < TrB_ExposureVal.Minimum) TrB_ExposureVal.Value = TrB_ExposureVal.Minimum;
-                    else if (TrB_ExposureVal.Value > TrB_ExposureVal.Maximum) TrB_ExposureVal.Value = TrB_ExposureVal.Maximum;
+                    TrB_GainVal.IsEnabled = false;
+                    NUD_Gain.IsEnabled = false;
                 }
-                TrB_ExposureVal.TickFrequency = (TrB_ExposureVal.Maximum - TrB_ExposureVal.Minimum) / 10;
-                // ChangingActivatedTextBoxExp = false;
-                NUD_Exposure.FormatString = "F" + DetectTheNumberOfDecimalPositions(AbsValExp.RangeMin);
-                NUD_Exposure.Value = ServiceFunctions.Math.PerfectRounding(Exposure_Slide2real(TrB_ExposureVal.Value), 4);
-                //ChangingActivatedTextBoxExp = true;
-            }
+                else
+                {
 
-            if (!vcdProp.Available(VCDID_Gain))
+                    var a = vcdProp.RangeValue[VCDID_Gain];
+                    TrB_GainVal.IsEnabled = true;
+                    NUD_Gain.IsEnabled = true;
+                    TrB_GainVal.Minimum = vcdProp.RangeMin(VCDID_Gain);
+                    TrB_GainVal.Maximum = vcdProp.RangeMax(VCDID_Gain);
+                    TrB_GainVal.Value = a;
+                    TrB_GainVal.TickFrequency = (TrB_GainVal.Maximum - TrB_GainVal.Minimum) / 10;
+                    // ChangingActivatedTextBoxGain = false;
+                    NUD_Gain.Minimum = vcdProp.RangeMin(VCDID_Gain);
+                    NUD_Gain.Maximum = vcdProp.RangeMax(VCDID_Gain);
+                    NUD_Gain.Value = TrB_GainVal.Value;
+                    // ChangingActivatedTextBoxGain = true;
+                }
+            }
+            catch
             {
+                FLog.Log("Error on gain detecting. Deiniting gain...");
                 TrB_GainVal.IsEnabled = false;
                 NUD_Gain.IsEnabled = false;
             }
-            else
-            {
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
 
-                var a = vcdProp.RangeValue[VCDID_Gain];
-                TrB_GainVal.IsEnabled = true;
-                NUD_Gain.IsEnabled = true;
-                TrB_GainVal.Minimum = vcdProp.RangeMin(VCDID_Gain);
-                TrB_GainVal.Maximum = vcdProp.RangeMax(VCDID_Gain);
-                TrB_GainVal.Value = a;
-                TrB_GainVal.TickFrequency = (TrB_GainVal.Maximum - TrB_GainVal.Minimum) / 10;
-                // ChangingActivatedTextBoxGain = false;
-                NUD_Gain.Minimum = vcdProp.RangeMin(VCDID_Gain);
-                NUD_Gain.Maximum = vcdProp.RangeMax(VCDID_Gain);
-                NUD_Gain.Value = TrB_GainVal.Value;
-                // ChangingActivatedTextBoxGain = true;
+            try
+            {
+                if (!vcdProp.Available(VCDID_Brightness))
+                {
+                    TrB_Brightness.IsEnabled = false;
+                    NUD_Brightness.IsEnabled = false;
+                }
+                else
+                {
+                    TrB_Brightness.IsEnabled = true;
+                    NUD_Brightness.IsEnabled = true;
+
+                    TrB_Brightness.Minimum = vcdProp.RangeMin(VCDID_Brightness);
+                    TrB_Brightness.Maximum = vcdProp.RangeMax(VCDID_Brightness);
+                    TrB_Brightness.Value = vcdProp.RangeValue[VCDID_Brightness];
+                    TrB_Brightness.TickFrequency = (TrB_Brightness.Maximum - TrB_Brightness.Minimum) / 10;
+
+                    // ChangingActivatedTextBoxGain = false;
+                    NUD_Brightness.Minimum = vcdProp.RangeMin(VCDID_Brightness);
+                    NUD_Brightness.Maximum = vcdProp.RangeMax(VCDID_Brightness);
+                    NUD_Brightness.Value = TrB_Brightness.Value;
+                    // ChangingActivatedTextBoxGain = true;
+                }
             }
-
-            if (!vcdProp.Available(VCDID_Brightness))
+            catch
             {
+                FLog.Log("Error on brightness detecting. Deiniting brightness...");
                 TrB_Brightness.IsEnabled = false;
                 NUD_Brightness.IsEnabled = false;
             }
-            else
-            {
-                TrB_Brightness.IsEnabled = true;
-                NUD_Brightness.IsEnabled = true;
 
-                TrB_Brightness.Minimum = vcdProp.RangeMin(VCDID_Brightness);
-                TrB_Brightness.Maximum = vcdProp.RangeMax(VCDID_Brightness);
-                TrB_Brightness.Value = vcdProp.RangeValue[VCDID_Brightness];
-                TrB_Brightness.TickFrequency = (TrB_Brightness.Maximum - TrB_Brightness.Minimum) / 10;
-                
-                // ChangingActivatedTextBoxGain = false;
-                NUD_Brightness.Minimum = vcdProp.RangeMin(VCDID_Brightness);
-                NUD_Brightness.Maximum = vcdProp.RangeMax(VCDID_Brightness);
-                NUD_Brightness.Value = TrB_Brightness.Value;
-                // ChangingActivatedTextBoxGain = true;
-            }
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
+            if (locallogging) { FLog.Log("Init_sliders completed"); }
         }
+        
         private int DetectTheNumberOfDecimalPositions(double value)
         {
            // if ((int)(value + (10e-6)) - (int)(value) != 0) value = value + (10e-6);
@@ -559,12 +622,16 @@ namespace IC_EasyStart_WPF
             
             RecordingNeeded = false;
             isRecording = false;
-            System.Threading.Thread.Sleep((int)(2 * NUD_Exposure.Value*1000)+100);
-            if(writer_ffmpeg!=null)
+            FLog.Log("L1 of stop....");
+            // System.Threading.Thread.Sleep((int)(2 * NUD_Exposure.Value*1000)+100);
+            System.Threading.Thread.Sleep((int)(2 * AbsValExp.Value * 1000) + 100);
+            FLog.Log("L2 of stop....");
+            if (writer_ffmpeg!=null)
                 if (writer_ffmpeg.IsOpen) //запись закрывается в ImageAvalible, но если вдруг не закрылась, то тут
-                try { writer_ffmpeg.Close(); } catch { }
+                try { writer_ffmpeg.Close(); FLog.Log("L2_special_closing of stop...."); } catch { FLog.Log("Error on L3...."); }
             //enabling all the staff
             Switch_state_of_ctrls();
+            FLog.Log("L3 of stop....");
         }
         private bool Disable_AutoExposure_ctrl()
         {

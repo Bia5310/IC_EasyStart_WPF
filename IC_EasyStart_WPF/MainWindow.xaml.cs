@@ -278,12 +278,23 @@ namespace IC_EasyStart_WPF
                 {
                     Init_Sliders(IC_Control);
                     FLog.Log("Init_Sliders() call finished succesfully");
+                }
+                catch(Exception exc)
+                {
+
+                    FLog.Log("ERROR - Init_Sliders or Load_ic_cam_easy  error");
+                    FLog.Log("ORIGINAL:" + exc.Message);
+                }
+
+                try
+                {
                     Load_ic_cam_easy(IC_Control);
                     FLog.Log("Load_ic_cam_easy() call finished succesfully");
                 }
                 catch(Exception exc)
                 {
                     FLog.Log("ERROR - Init_Sliders or Load_ic_cam_easy  error");
+                    FLog.Log("ORIGINAL:" + exc.Message);
                 }
 
                 FLog.Log("Stage 5 of loading is completed");
@@ -323,7 +334,7 @@ namespace IC_EasyStart_WPF
                 FLog.Log("Stage 7 of loading is completed");
                 try
                 {
-                    Prepare_encoder2("D:\\video.avi", (int)IC_Control.DeviceFrameRate, 25000 * 1000);
+                    Prepare_encoder2("Video\\video.avi", (int)IC_Control.DeviceFrameRate, 25000 * 1000);
                     B_StopCapture.IsEnabled = false;
                     FLog.Log("Encoder preparing is succesful");
                 }
@@ -695,13 +706,18 @@ namespace IC_EasyStart_WPF
             {
                 if (isRecording)
                 {
-                    if (AutoExp_wasEnabled) Enable_AutoExposure_ctrl();
+                    try { if (AutoExp_wasEnabled) Enable_AutoExposure_ctrl(); } 
+                    catch(Exception exc)
+                    {
+                        FLog.Log("Error on B_StopCapture_Click: error in Enable_AutoExposure_ctrl(). ORIGINAL: " + exc.Message);
+                    }
                     StopRecording();
                     FLog.Log("Recording stopped successfully");
                 }
             }
             catch (Exception exc)
             {
+                FLog.Log("Error on record stop. ORIGINAL: " + exc.Message);
                 MessageBox.Show(exc.Message, "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
