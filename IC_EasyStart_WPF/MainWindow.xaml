@@ -9,7 +9,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:tis="clr-namespace:TIS.Imaging;assembly=TIS.Imaging.ICImagingControl34"
-        Title="IC Easy Version 2.45"
+        Title="IC EasyStart"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
         Width="1280"

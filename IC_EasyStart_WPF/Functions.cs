@@ -134,33 +134,40 @@ namespace IC_EasyStart_WPF
 
             try
             {
+                if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
                 if (!vcdProp.Available(VCDID_Exp))
                 {
+                    if (locallogging) { FLog.Log("Init_sliders L_noexp" + (il++).ToString()); }
                     TrB_ExposureVal.IsEnabled = false;
                     NUD_Exposure.IsEnabled = false;
                 }
                 else
                 {
-
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
                     TrB_ExposureVal.IsEnabled = true;
                     NUD_Exposure.IsEnabled = true;
-
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
                     double Az = TrB_ExposureVal.Minimum = ServiceFunctions.Math.PerfectRounding((AbsValExp.RangeMin * zF), 0);
                     double Bz = TrB_ExposureVal.Maximum = ServiceFunctions.Math.PerfectRounding((AbsValExp.RangeMax * zF), 0);
                     alpha = (AbsValExp.RangeMin * AbsValExp.RangeMax - 0.25 * 0.25) / (AbsValExp.RangeMin + AbsValExp.RangeMax - 2 * 0.25);
                     xenta = Math.Pow((AbsValExp.RangeMax - alpha) / (AbsValExp.RangeMin - alpha), (zF / ((Bz - Az))));
                     beta = (0.25 - alpha) / Math.Pow(xenta, (Bz + Az) / (2 * zF));
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
                     double val1slide = Az;
+                    if (locallogging) { FLog.Log("Init_sliders L_exp_this" + (il++).ToString()); }
                     try { TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value); }
                     catch
                     {
                         if (TrB_ExposureVal.Value < TrB_ExposureVal.Minimum) TrB_ExposureVal.Value = TrB_ExposureVal.Minimum;
                         else if (TrB_ExposureVal.Value > TrB_ExposureVal.Maximum) TrB_ExposureVal.Value = TrB_ExposureVal.Maximum;
                     }
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
                     TrB_ExposureVal.TickFrequency = (TrB_ExposureVal.Maximum - TrB_ExposureVal.Minimum) / 10;
                     // ChangingActivatedTextBoxExp = false;
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
                     NUD_Exposure.FormatString = "F" + DetectTheNumberOfDecimalPositions(AbsValExp.RangeMin);
                     NUD_Exposure.Value = ServiceFunctions.Math.PerfectRounding(Exposure_Slide2real(TrB_ExposureVal.Value), 4);
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
                     //ChangingActivatedTextBoxExp = true;
                 }
             }
@@ -601,7 +608,7 @@ namespace IC_EasyStart_WPF
                     string dataName = FindLast_Video(SaveVid_dir, FIO + H_num + TB_CurrentDate.Text);
                     string FullPathAndName = dataName;
 
-                    Prepare_encoder2(FullPathAndName, (int)IC_Control.DeviceFrameRate, 25000 * 1000);
+                    Prepare_encoder2(FullPathAndName, (int)IC_Control.DeviceFrameRate, 20000 * 1000);
                     RecordingNeeded = true;
                     isRecording = true;
 
@@ -646,14 +653,14 @@ namespace IC_EasyStart_WPF
             }
             return AutoExp_wasChecked;
         }
-        private void Enable_AutoExposure_ctrl()
+        private void Enable_AutoExposure_ctrl(bool wasChecked)
         {
             //enabling autoexposure, if was
             if ((vcdProp.AutoAvailable(VCDIDs.VCDID_Exposure)) && (!Camera_restart_need))
             {
                 ChB_ExposureAuto.IsEnabled = vcdProp.AutoAvailable(VCDIDs.VCDID_Exposure);
-                ChB_ExposureAuto.IsChecked = true;
-                vcdProp.Automation[VCDIDs.VCDID_Exposure] = true;
+                ChB_ExposureAuto.IsChecked = wasChecked;
+                vcdProp.Automation[VCDIDs.VCDID_Exposure] = wasChecked;
             }
         }
         private void Switch_state_of_ctrls()

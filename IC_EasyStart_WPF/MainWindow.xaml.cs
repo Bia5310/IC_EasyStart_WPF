@@ -33,7 +33,7 @@ namespace IC_EasyStart_WPF
         private VCDSimpleProperty vcdProp = null;
         private VCDAbsoluteValueProperty AbsValExp = null;// специально для времени экспонирования [c]
 
-        
+        string Version = "2.49";
         string Config_tag = "0_0"; //0_0 - default
         string LastConfig_tag = "0_0";
         string SaveVid_dir = "Video";
@@ -107,6 +107,8 @@ namespace IC_EasyStart_WPF
 
         public MainWindow()
         {
+            this.Title = "IC EasyStart v" + Version;
+           
             Directory.CreateDirectory("Logs");
             FLog = new ServiceFunctions.UI.Log.FileLogger("Logs\\Log_" + ServiceFunctions.UI.Get_TimeNow_String() + ".txt");
             FLog.Log("Programm started...");
@@ -706,13 +708,14 @@ namespace IC_EasyStart_WPF
             {
                 if (isRecording)
                 {
-                    try { if (AutoExp_wasEnabled) Enable_AutoExposure_ctrl(); } 
+                    try { Enable_AutoExposure_ctrl(AutoExp_wasEnabled); } 
                     catch(Exception exc)
                     {
                         FLog.Log("Error on B_StopCapture_Click: error in Enable_AutoExposure_ctrl(). ORIGINAL: " + exc.Message);
                     }
                     StopRecording();
                     FLog.Log("Recording stopped successfully");
+                    Enable_AutoExposure_ctrl(AutoExp_wasEnabled);
                 }
             }
             catch (Exception exc)
@@ -1067,8 +1070,7 @@ namespace IC_EasyStart_WPF
                 Refresh_Values_on_Trackbars();
                 if (wasrecording) StartRecording();
 
-                if (AutoExp_wasEnabled) Enable_AutoExposure_ctrl();
-                else Disable_AutoExposure_ctrl();
+                Enable_AutoExposure_ctrl(AutoExp_wasEnabled);
                 File.Delete("Config_" + LastConfig_tag + ".xml");
                 try { Save_cfg(LastConfig_tag); } catch { }
             }));
