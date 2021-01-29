@@ -5,6 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xc="clr-namespace:Xceed.Wpf.Toolkit.Core;assembly=Xceed.Wpf.Toolkit"
         xmlns:local="clr-namespace:IC_EasyStart_WPF"
+        xmlns:VM="clr-namespace:IC_EasyStart_WPF.ViewModels"
+        xmlns:VP="clr-namespace:IC_EasyStart_WPF.Viewport"
+        xmlns:convs="clr-namespace:IC_EasyStart_WPF.Converters"
         mc:Ignorable="d"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
@@ -18,17 +21,13 @@
         Style="{DynamicResource WindowStyle}">
 
     <Window.Resources>
+        <convs:PercentConverter x:Key="myPercentConverter"/>
+        <convs:InverseBoolConverter x:Key="myBoolInverterConverter"/>
         <Color x:Key="ColorToggleBlue">#FF1A89AA</Color>
         <Color x:Key="ColorToggleYellow">#FFBF00</Color>
         <SolidColorBrush x:Key="BrushToggleBlue" Color="{StaticResource ColorToggleBlue}"/>
         <SolidColorBrush x:Key="BrushToggleYellow" Color="{StaticResource ColorToggleYellow}"/>
 
-        <Style TargetType="ScrollBar">
-            <Setter Property="Width" Value="10"/>
-            <Setter Property="MinWidth" Value="5"/>
-            <Setter Property="Margin" Value="0 2 3 0"/>
-            <Setter Property="Opacity" Value="0.7"/>
-        </Style>
 
         <Style TargetType="{x:Type local:TextBoxWatermark}" BasedOn="{StaticResource TextBoxSytle}"
                x:Key="TextBoxWatermarkStyle">
@@ -296,6 +295,8 @@
                             <RowDefinition/>
                             <RowDefinition/>
                             <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Экспозиция" Margin="2"/>
@@ -321,27 +322,50 @@
                         <Slider Grid.Row="3" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="10000" x:Name="TrB_GainVal" ValueChanged="TrB_GainVal_Scroll"
                                 Style="{DynamicResource SliderStyle}"/>
 
-                        <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="Яркость" Margin="2"/>
-                        <xctk:DoubleUpDown Grid.Row="4" Grid.Column="1" Margin="2" Maximum="500" Minimum="-500" Increment="0.001" x:Name="NUD_Brightness" MaxWidth="120" ValueChanged="NUD_Brightness_ValueChanged"/>
-                        <CheckBox Grid.Row="4" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" IsEnabled="False"
+                        <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="Яркость" Margin="2" Visibility="Collapsed"/>
+                        <xctk:DoubleUpDown Grid.Row="4" Grid.Column="1" Margin="2" Maximum="500" Minimum="-500" Increment="0.001" Visibility="Collapsed" x:Name="NUD_Brightness" MaxWidth="120" ValueChanged="NUD_Brightness_ValueChanged"/>
+                        <CheckBox Grid.Row="4" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" IsEnabled="False" Visibility="Collapsed"
                                   Style="{DynamicResource CheckBoxSimpleStyle}"
                                   x:Name="ChB_BrightnessAuto"
                                   Checked="ChB_BrightnessAuto_CheckedChanged"
                                   Unchecked="ChB_BrightnessAuto_CheckedChanged"/>
                         <Slider Grid.Row="5" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="500" Minimum="-500" x:Name="TrB_Brightness" ValueChanged="TrB_Brightness_Scroll"
-                                Style="{DynamicResource SliderStyle}"/>
+                                Style="{DynamicResource SliderStyle}" Visibility="Collapsed"/>
 
-                        <UniformGrid Rows="3" Grid.Row="6" Grid.ColumnSpan="4" Margin="0 5 0 0">
-                            <Button MaxHeight="42" Margin="2" 
-                                    Style="{DynamicResource ButtonStyle}" 
-                                    x:Name="B_Properties"
-                                    Click="B_Properties_Click">
-                                <Button.Content>
-                                    <Viewbox Height="24">
-                                        <TextBlock Text="Дополнительные настройки"/>
+                        <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Text="Масштаб" Margin="2"/>
+                        <xctk:DoubleUpDown Grid.Row="6" Grid.Column="1" Margin="2"  x:Name="NUD_Scale" MaxWidth="120" ValueChanged="NUD_Scale_ValueChanged"
+                                           Value="{Binding Scale, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
+                                           Maximum="{Binding ScaleMax, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
+                                           Minimum="{Binding ScaleMin, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
+                                           Increment="{Binding ScaleIncrement, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
+                                           IsEnabled="{Binding ScaleAuto, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolInverterConverter}}"
+                                           FormatString="F0"/>
+                        <CheckBox Grid.Row="6" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center"
+                                  Style="{DynamicResource CheckBoxSimpleStyle}" 
+                                  x:Name="ChB_AutoScale"
+                                  Checked="ChB_ScaleAuto_CheckedChanged"
+                                  Unchecked="ChB_ScaleAuto_CheckedChanged"
+                                  IsChecked="{Binding ScaleAuto, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Slider Grid.Row="7" Grid.ColumnSpan="3" Margin="3 3 3 10" x:Name="TrB_ScaleVal" ValueChanged="TrB_ScaleVal_Scroll"
+                                Style="{DynamicResource SliderStyle}"
+                                Value="{Binding Scale, UpdateSourceTrigger=PropertyChanged}"
+                                Maximum="{Binding ScaleMax, UpdateSourceTrigger=PropertyChanged}"
+                                Minimum="{Binding ScaleMin, UpdateSourceTrigger=PropertyChanged}"
+                                IsSnapToTickEnabled="True"
+                                TickFrequency="{Binding ScaleIncrement, UpdateSourceTrigger=PropertyChanged}"
+                                IsEnabled="{Binding ScaleAuto, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolInverterConverter}}"/>
+
+                        <UniformGrid Rows="3" Grid.Row="8" Grid.ColumnSpan="4" Margin="0 5 0 0">
+
+                            <ToggleButton MaxHeight="42" Margin="2"
+                                          Style="{DynamicResource ToggleButtonSimpleStyle}" 
+                                          x:Name="ChB_WhiteBalanceAuto">
+                                <ToggleButton.Content>
+                                    <Viewbox MaxHeight="30">
+                                        <TextBlock Height="22" Text="Автобаланс белого"/>
                                     </Viewbox>
-                                </Button.Content>
-                            </Button>
+                                </ToggleButton.Content>
+                            </ToggleButton>
                             <Button MaxHeight="42" Margin="2" 
                                     Style="{DynamicResource ButtonStyle}" 
                                     x:Name="B_Cam_Select"
@@ -352,15 +376,17 @@
                                     </Viewbox>
                                 </Button.Content>
                             </Button>
-                            <ToggleButton MaxHeight="42" Margin="2"
-                                          Style="{DynamicResource ToggleButtonSimpleStyle}" 
-                                          x:Name="ChB_WhiteBalanceAuto">
-                                <ToggleButton.Content>
-                                    <Viewbox MaxHeight="30">
-                                        <TextBlock Height="22" Text="Автобаланс белого"/>
+
+                            <Button MaxHeight="42" Margin="2" 
+                                    Style="{DynamicResource ButtonStyle}" 
+                                    x:Name="B_Properties"
+                                    Click="B_Properties_Click">
+                                <Button.Content>
+                                    <Viewbox Height="24">
+                                        <TextBlock Text="Дополнительные настройки"/>
                                     </Viewbox>
-                                </ToggleButton.Content>
-                            </ToggleButton>
+                                </Button.Content>
+                            </Button>
                         </UniformGrid>
                     </Grid>
                 </Expander>
@@ -425,14 +451,26 @@
         </ScrollViewer>
 
         <Grid Name="grid_with_host" Grid.Row="0" Grid.Column="2" Margin="1" SizeChanged="Host_SizeChanged">
-            <Canvas Name="canvas" Margin="1">
-                <ToggleButton x:Name="B_FS_Switcher" Visibility="Hidden" Canvas.Right="20" Canvas.Bottom="20" Width="65" Height="65"
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <VP:ViewportControl x:Name="viewportControl" ClipToBounds="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="2"/>
+            
+            <Canvas Name="canvas" Margin="1" Grid.Column="2">
+                <ToggleButton x:Name="B_FS_Switcher" Visibility="Visible" Canvas.Right="20" Canvas.Bottom="20" Width="65" Height="65"
                           Style="{DynamicResource ToggleButtonFSStyle}"
                           Checked="B_FS_Switcher_Checked"
                           Unchecked="B_FS_Switcher_Unchecked"/>
             </Canvas>
 
-            <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="Host" SizeChanged="Host_SizeChanged">
+            
+
+            <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="Host" SizeChanged="Host_SizeChanged" Grid.RowSpan="2">
                 <WindowsFormsHost.Child>
                     <wf:Panel>
                         <wf:Panel.Controls>
@@ -463,6 +501,10 @@
             <ToolBar Background="Transparent" ToolBarTray.IsLocked="True">
                 </ToolBar>
         </ToolBarTray>-->
+
+        <!--SCROLL BAR -->
+
+        <!--END SCROLL BAR -->
 
     </Grid>
 </Window>

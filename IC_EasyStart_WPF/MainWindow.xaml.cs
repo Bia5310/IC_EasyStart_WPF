@@ -81,6 +81,8 @@ namespace IC_EasyStart_WPF
         string Device_name = "";
         string Device_state = null;
 
+        ViewModels.MainViewModel mainViewModel = null;
+
         //Timers
         DispatcherTimer TimerForRenew = null;
         DispatcherTimer WhiteBalanceTimer = null;
@@ -150,7 +152,10 @@ namespace IC_EasyStart_WPF
             BGW_CamRestarter.WorkerReportsProgress = false;
 
             InitializeComponent();
-
+            //Set main view model
+            mainViewModel = new ViewModels.MainViewModel();
+            DataContext = mainViewModel;
+            mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
 
             ChB_WhiteBalanceAuto.Checked += ChB_WhiteBalanceAuto_CheckedChanged;
             ChB_WhiteBalanceAuto.Unchecked += ChB_WhiteBalanceAuto_CheckedChanged;
@@ -162,10 +167,19 @@ namespace IC_EasyStart_WPF
             CommandBindings.Add(new CommandBinding(QuiteRoutedCommand, QuiteKey));
             CommandBindings.Add(new CommandBinding(CRoutedCommand, CodecPropKey));
 
-            B_FS_Switcher_form = Host.Child.Controls[0] as System.Windows.Forms.Button;
+            B_FS_Switcher_form = new System.Windows.Forms.Button();// Host.Child.Controls[0] as System.Windows.Forms.Button;
 
             bmpFS_on = Bitmap.FromFile("FS_on_form.png");
             bmpFS_off = Bitmap.FromFile("FS_off_form.png");
+        }
+
+        private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(mainViewModel.Scale))
+            {
+                //Set Zoom Factor
+                SetLiveDisplayZoomFactor((float)mainViewModel.Scale);
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -186,6 +200,8 @@ namespace IC_EasyStart_WPF
             FLog.Log("Stage 0.6 of loading is completed");
             IC_Control.ImageAvailable += IC_Control_ImageAvailable;
             IC_Control.Invalidated += IC_Control_Invalidated;
+            IC_Control.LiveDisplay = false;
+
             FLog.Log("Stage 0.8 of loading is completed");
             Panel = Host.Child as System.Windows.Forms.Panel;
             FLog.Log("Stage 1 of loading is completed");
@@ -244,11 +260,11 @@ namespace IC_EasyStart_WPF
                             {
                                 MessageBox.Show("Не было выбрано ни одного устройства", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information);
                                 FLog.Log("No devices selected by user or loaded");
-                                Application.Current.Shutdown();
+                                //Application.Current.Shutdown();
                             }    
                         }
                     }
-                   
+                    
 
                     if(Config_tag == "default")
                     {
@@ -305,10 +321,12 @@ namespace IC_EasyStart_WPF
                     IMG_H_now = IC_Control.ImageHeight;
                     IMG_W_now = IC_Control.ImageWidth;
                     this.WindowState = WindowState.Maximized;//  FormWindowState.Maximized;
-                    Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); //on load
-                    FLog.Log("Adapt_Size_ofCont() call finished succesfully");
-                    FormatAdaptation(IMG_W_now, IMG_H_now);
-                    FLog.Log("FormatAdaptation() call finished succesfully");
+                    //ВРЕМЕННО
+                    //Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); //on load
+                    //FLog.Log("Adapt_Size_ofCont() call finished succesfully");
+                    //FormatAdaptation(IMG_W_now, IMG_H_now);
+                    //FLog.Log("FormatAdaptation() call finished succesfully");
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
                 }
                 catch
                 {
@@ -363,7 +381,9 @@ namespace IC_EasyStart_WPF
                 if (IC_Control.DeviceValid)
                 {
                     IC_Control.LiveStart();
-                    Adapt_Size_ofCont(IC_Control as System.Windows.Forms.Control, IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+                    //ВРЕМЕННО
+                    //Adapt_Size_ofCont(IC_Control as System.Windows.Forms.Control, IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
                 }
                 FLog.Log("Stage 9 of loading is completed");
             }
@@ -378,7 +398,10 @@ namespace IC_EasyStart_WPF
             ov.DrawSolidRect(System.Drawing.Color.FromArgb(187, 100, 0, 0), 10, 10, 100, 100);
 
             FLog.Log("Initialization end");
+
+
         }
+
         public void Init_ListOf_CheckButtons()
         {
             for (int i = 0; i < stackPanelPhacoButtons.Children.Count; i++)
@@ -612,6 +635,25 @@ namespace IC_EasyStart_WPF
             Device_state = IC_Control.SaveDeviceState();
         }
 
+        #region Scale
+
+        private void NUD_Scale_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+
+        }
+
+        private void ChB_ScaleAuto_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void TrB_ScaleVal_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
+        }
+        
+        #endregion
+
         private void TrB_Brightness_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             FLog.Log("TrB_Brightness_Scroll");
@@ -793,8 +835,10 @@ namespace IC_EasyStart_WPF
 
                 IMG_H_now = IC_Control.ImageHeight;
                 IMG_W_now = IC_Control.ImageWidth;
-                Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
-                FormatAdaptation(IMG_W_now, IMG_H_now);
+                //ВРЕМЕННО
+                //Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
+                //FormatAdaptation(IMG_W_now, IMG_H_now);
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
 
                 vcdProp.Automation[VCDIDs.VCDID_WhiteBalance] = false;
                 Load_AppSettings();
@@ -809,10 +853,52 @@ namespace IC_EasyStart_WPF
             FLog.Log("Form1_Resize");
             if (Everything_loaded)
             {
-                if (FullScrin) Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 1, 1); // resize
+                //ВРЕМЕННО
+                /*if (FullScrin) Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 1, 1); // resize
                 else Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1);
-                FormatAdaptation(IMG_W_now, IMG_H_now);
+                FormatAdaptation(IMG_W_now, IMG_H_now);*/
+
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
             }
+        }
+
+        private void CalculateZoomFactor(int panelWidth, int panelHeight, int IMG_Width, int IMG_Height)
+        {
+            double Ratio = 1d*panelWidth/panelHeight; // panel W/H
+            double ratio = 1d*IMG_Width/ IMG_Height; // image w/h
+
+            var ctrl = IC_Control;
+
+            double delta_h = 30;
+            if (FullScrin) delta_h = 0;
+            int PanelNewWidth = (int)((Host.ActualWidth) * Scaling_of_monitor);
+            int PanelNewHeight = (int)((Host.ActualHeight - delta_h) * Scaling_of_monitor);
+            double Img_SizeRelation = (double)IMG_Width / (double)IMG_Height;
+
+            double zoomFactor = 1f;
+            if (ratio > Ratio)
+            {//вписываем по горизонтали
+                zoomFactor = (1d* PanelNewWidth / IMG_Width);
+                zoomFactor = mainViewModel.RoundZoomFactor(zoomFactor);
+
+                ctrl.Height = PanelNewHeight;
+                ctrl.Width = (int)((double)Img_SizeRelation * (double)ctrl.Height);
+                ctrl.Location = new System.Drawing.Point((PanelNewWidth - ctrl.Width) / 2, 0);
+            }
+            else
+            {//вписываем по вертикали
+                zoomFactor = (1d* PanelNewHeight / IMG_Height);
+                zoomFactor = mainViewModel.RoundZoomFactor(zoomFactor);
+
+                ctrl.Width = PanelNewWidth;
+                ctrl.Height = (int)((double)ctrl.Width / (double)Img_SizeRelation);
+                ctrl.Location = new System.Drawing.Point(0, (PanelNewHeight - ctrl.Height + (int)delta_h) / 2);
+            }
+
+            mainViewModel.Scale = zoomFactor;
+
+            ChangePos_of_FSBut();
+            Font_Adaptation();
         }
 
         private void B_CodecProp_Click(object sender, EventArgs e)
@@ -945,11 +1031,32 @@ namespace IC_EasyStart_WPF
 
             if (Everything_loaded)
             {
-
                 try
                 {
-
                     ImgBuffer_RGB = IC_Control.ImageActiveBuffer;
+
+                    unsafe
+                    {
+                        ImgBuffer_RGB.Lock();
+                        viewportControl.SetImageByBuffer(ImgBuffer_RGB.GetImageData(),
+                            ImgBuffer_RGB.BytesPerLine,
+                            IC_Control.ImageWidth,
+                            IC_Control.ImageHeight,
+                            ConvertPixelFormats(IC_Control.MemoryPixelFormat),
+                            this.Dispatcher);
+                        ImgBuffer_RGB.Unlock();
+                    }
+
+                    /*this.Dispatcher.Invoke((Action)(() =>
+                    {
+                        wb = viewportControl.WriteableBitmap;
+                        unsafe
+                        {
+                            ImgBuffer_RGB.Lock();
+                            viewportControl.SetImageByBuffer(ImgBuffer_RGB.GetImageData(), ImgBuffer_RGB.BytesPerLine, IC_Control.ImageWidth, IC_Control.ImageHeight, ConvertPixelFormats(IC_Control.MemoryPixelFormat));
+                            ImgBuffer_RGB.Unlock();
+                        }
+                    }));*/
 
                     if (RecordingNeeded)
                     {
@@ -1127,9 +1234,12 @@ namespace IC_EasyStart_WPF
             FLog.Log("Resize");
             if (Everything_loaded)
             {
-                if (FullScrin) Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 1, 1); // resize
+                //ВРЕМЕННО
+                /*if (FullScrin) Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 1, 1); // resize
                 else Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1);
-                FormatAdaptation(IMG_W_now, IMG_H_now);
+                FormatAdaptation(IMG_W_now, IMG_H_now);*/
+
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
             }
         }
 
@@ -1202,8 +1312,10 @@ namespace IC_EasyStart_WPF
                 Load_ic_cam_easy(IC_Control);
                 IMG_H_now = IC_Control.ImageHeight;
                 IMG_W_now = IC_Control.ImageWidth;
-                Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
-                FormatAdaptation(IMG_W_now, IMG_H_now);
+                //ВРЕМЕННО
+                /*Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
+                FormatAdaptation(IMG_W_now, IMG_H_now);*/
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
                 IC_Control.LiveStart();
 
                 LastConfig_tag = Config_tag;

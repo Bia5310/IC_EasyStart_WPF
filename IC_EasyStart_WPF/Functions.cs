@@ -10,6 +10,7 @@ using LDZ_Code;
 //using H264_Classes;
 using AForge.Video;
 using AForge.Video.FFMPEG;
+using System.Windows.Media;
 
 namespace IC_EasyStart_WPF
 {
@@ -545,6 +546,7 @@ namespace IC_EasyStart_WPF
                 return "1";
             }
         }
+
         private void FormatAdaptation(int WidthOfImage = -1,int HeightOfImage = -1)
         {
             var ic = IC_Control;
@@ -561,6 +563,7 @@ namespace IC_EasyStart_WPF
             if (ic.LiveDisplayDefault == false)
             {
                 ic.LiveDisplayZoomFactor = ZFactFinal;
+                
                 if (ic.LiveDisplayZoomFactor > 1.0) ic.ScrollbarsEnabled = true;
                 else ic.ScrollbarsEnabled = false;
             }
@@ -571,6 +574,16 @@ namespace IC_EasyStart_WPF
 
         }
         
+        private void SetLiveDisplayZoomFactor(float zoomFactor)
+        {
+            IC_Control.LiveDisplayZoomFactor = zoomFactor;
+
+            if (IC_Control.LiveDisplayZoomFactor > 1.0)
+                IC_Control.ScrollbarsEnabled = true;
+            else
+                IC_Control.ScrollbarsEnabled = false;
+        }
+
         private string FindLast_Video(string VidPathName,string CurrentName,string Extension = ".avi")
         {
             string dataName = CurrentName + "_" + VideoIndex.ToString() + Extension;
@@ -866,9 +879,10 @@ namespace IC_EasyStart_WPF
             grid_main.ColumnDefinitions[0].Width = new System.Windows.GridLength(0, System.Windows.GridUnitType.Auto);
 
             FullScrin = true;
-            
-            Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
-            FormatAdaptation(IMG_W_now, IMG_H_now);
+            //ВРЕМЕННО УБРАЛ
+            /*Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+            FormatAdaptation(IMG_W_now, IMG_H_now);*/
+
             /*Size_was = this.Size;
             Location_was = new Point(this.Location.X,this.Location.Y);
 
@@ -903,9 +917,11 @@ namespace IC_EasyStart_WPF
             grid_main.ColumnDefinitions[0].Width = column_width_old;
 
             FullScrin = false;
+            //ВРЕМЕННО
+            //Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+            //FormatAdaptation(IMG_W_now, IMG_H_now);
+            CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
 
-            Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
-            FormatAdaptation(IMG_W_now, IMG_H_now);
             /*this.FormBorderStyle = FormBorderStyle.Sizable;
             this.Size = Size_was;
             this.Location = Location_was;
@@ -919,5 +935,38 @@ namespace IC_EasyStart_WPF
             Adapt_Size_ofCont((IC_Control as Control), IMG_W_now, IMG_H_now, 0.8, 1); // Minimizing
             FormatAdaptation(IMG_W_now, IMG_H_now);*/
         }
+
+        public static PixelFormat ConvertPixelFormats(System.Drawing.Imaging.PixelFormat pixelFormat)
+        {//Не работает!
+            switch(pixelFormat)
+            {
+                case System.Drawing.Imaging.PixelFormat.Alpha:
+                    return PixelFormats.Gray8;
+                case System.Drawing.Imaging.PixelFormat.Canonical:
+                    return PixelFormats.Bgra32;
+                case System.Drawing.Imaging.PixelFormat.Format16bppGrayScale:
+                    return PixelFormats.Gray16;
+                case System.Drawing.Imaging.PixelFormat.Format32bppArgb:
+                    return PixelFormats.Bgra32;
+                case System.Drawing.Imaging.PixelFormat.Format24bppRgb:
+                    return PixelFormats.Bgr24;
+                case System.Drawing.Imaging.PixelFormat.Format32bppPArgb:
+                    return PixelFormats.Pbgra32;
+                case System.Drawing.Imaging.PixelFormat.Format32bppRgb:
+                    return PixelFormats.Bgr32;
+                case System.Drawing.Imaging.PixelFormat.Format8bppIndexed:
+                    return PixelFormats.Indexed8;
+                case System.Drawing.Imaging.PixelFormat.Format1bppIndexed:
+                    return PixelFormats.Indexed1;
+                case System.Drawing.Imaging.PixelFormat.Format16bppRgb555:
+                    return PixelFormats.Bgr555;
+                case System.Drawing.Imaging.PixelFormat.Format16bppRgb565:
+                    return PixelFormats.Bgr565;
+                case System.Drawing.Imaging.PixelFormat.Format48bppRgb:
+                    return PixelFormats.Rgb48;
+            }
+            return PixelFormats.Pbgra32;
+        }
+
     }
 }
