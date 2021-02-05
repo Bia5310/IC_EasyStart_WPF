@@ -78,7 +78,7 @@ namespace IC_EasyStart_WPF
                 {
                     if (locallogging) { FLog.Log("Init_sliders F_tr" + (il++).ToString()); }
                     ChB_ExposureAuto.IsEnabled = true;
-                    ChB_ExposureAuto.IsChecked = false;
+                    ChB_ExposureAuto.IsChecked = Exposure_Auto;
                     vcdProp.Automation[VCDID_Exp] = false;
                    /* var a = vcdProp.RangeValue[VCDID_Exp] = 5;
                     var b = AbsValExp.Value;*/
@@ -101,7 +101,7 @@ namespace IC_EasyStart_WPF
                 else
                 {
                     ChB_GainAuto.IsEnabled = true;
-                    ChB_GainAuto.IsChecked = false;
+                    ChB_GainAuto.IsChecked = Gain_Auto;
                     vcdProp.Automation[VCDID_Gain] = false;
                 }
             }
@@ -289,16 +289,18 @@ namespace IC_EasyStart_WPF
             }
 
             */
-            
-           
-                ic.LiveDisplayDefault = false; //если false, то позволяет изменения размеров окна
-
-                ic.LiveCaptureLastImage = true; // отображает и захватывает последний фрейм при LiveStop;
-
-                ic.LiveCaptureContinuous = true; //нужно для FormatAdaptation и граба фреймов
 
 
-                if(!ic.LiveVideoRunning) ic.LiveStart();
+            try { IC_Control.ImageRingBufferSize = 2; } catch { }; //на всякий случай
+
+            ic.LiveDisplayDefault = false; //если false, то позволяет изменения размеров окна
+
+            ic.LiveCaptureLastImage = true; // отображает и захватывает последний фрейм при LiveStop;
+
+            ic.LiveCaptureContinuous = true; //нужно для FormatAdaptation и граба фреймов
+
+
+            if(!ic.LiveVideoRunning) ic.LiveStart();
            
         }
 
@@ -308,12 +310,14 @@ namespace IC_EasyStart_WPF
             {
                 NUD_Exposure.Value = AbsValExp.Value;
                 TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value);
+                vcdProp.Automation[VCDIDs.VCDID_Exposure] = Exposure_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
                 ChB_ExposureAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Exposure];
             }
             if (NUD_Gain.Value != null)
             {
                 NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
                 TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
+                vcdProp.Automation[VCDIDs.VCDID_Gain] = Gain_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
                 ChB_GainAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Gain];
             }
             if (NUD_Brightness.Value != null)
