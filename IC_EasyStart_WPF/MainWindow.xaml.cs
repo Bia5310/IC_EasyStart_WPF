@@ -674,12 +674,16 @@ namespace IC_EasyStart_WPF
 
         private void TimerForRenew_Tick(object sender, EventArgs e)
         {
-            FLog.Log("TimerForRenew_Tick");
+            
             try
             {
                 Refresh_Values_on_Trackbars();
+                FLog.Log("Scrollbars values refreshed!");
             }
-            catch { }
+            catch
+            {
+                FLog.Log("Error on scrollbars values refresh");
+            }
         }
         bool AutoExp_wasEnabled_beforeRecording = false;
         bool RecordingNeeded = false;
@@ -1081,6 +1085,7 @@ namespace IC_EasyStart_WPF
                         RestartAttempts = 0;
                     }
                     STW_fps.Restart();
+                    FLog.Log("Camera restarted!");
                 }
             }
             //this.BeginInvoke((Action)(() => this.Text = "Device state: " + (IC_Control.DeviceValid ? "valid" : "invalid")));

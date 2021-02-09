@@ -635,7 +635,15 @@ namespace IC_EasyStart_WPF
             isRecording = false;
             FLog.Log("L1 of stop....");
             // System.Threading.Thread.Sleep((int)(2 * NUD_Exposure.Value*1000)+100);
-            System.Threading.Thread.Sleep((int)(2 * AbsValExp.Value * 1000) + 100);
+            try
+            {
+                System.Threading.Thread.Sleep((int)(2 * AbsValExp.Value * 1000) + 100);
+            }
+            catch
+            {
+                System.Threading.Thread.Sleep(500);
+                FLog.Log("Can't read exposure...");
+            }
             FLog.Log("L2 of stop....");
             if (writer_ffmpeg!=null)
                 if (writer_ffmpeg.IsOpen) //запись закрывается в ImageAvalible, но если вдруг не закрылась, то тут
