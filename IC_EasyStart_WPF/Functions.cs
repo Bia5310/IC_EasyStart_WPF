@@ -578,10 +578,12 @@ namespace IC_EasyStart_WPF
         {
             IC_Control.LiveDisplayZoomFactor = zoomFactor;
 
-            if (IC_Control.LiveDisplayZoomFactor > 1.0)
+            /*if (IC_Control.LiveDisplayZoomFactor > 1.0)
                 IC_Control.ScrollbarsEnabled = true;
             else
-                IC_Control.ScrollbarsEnabled = false;
+                IC_Control.ScrollbarsEnabled = false;*/
+
+            AdaptViewportControl();
         }
 
         private string FindLast_Video(string VidPathName,string CurrentName,string Extension = ".avi")
@@ -624,7 +626,7 @@ namespace IC_EasyStart_WPF
                     Prepare_encoder2(FullPathAndName, (int)IC_Control.DeviceFrameRate, 20000 * 1000);
                     RecordingNeeded = true;
                     isRecording = true;
-
+                    mainViewModel.VideoCapturing = true;
                     
                     //disabling all the staff
 
@@ -651,6 +653,7 @@ namespace IC_EasyStart_WPF
                 try { writer_ffmpeg.Close(); FLog.Log("L2_special_closing of stop...."); } catch { FLog.Log("Error on L3...."); }
             //enabling all the staff
             Switch_state_of_ctrls();
+            mainViewModel.VideoCapturing = false;
             FLog.Log("L3 of stop....");
         }
         private bool Disable_AutoExposure_ctrl()
@@ -852,8 +855,11 @@ namespace IC_EasyStart_WPF
 
         private void ChangePos_of_FSBut()
         {
-            Point NewLocation_onPanel = (new Point(IC_Control.Location.X + IC_Control.Width, IC_Control.Location.Y + IC_Control.Height));
-            B_FS_Switcher_form.Location = new Point((int)((double)NewLocation_onPanel.X-100), (int)((double)NewLocation_onPanel.Y-100));
+            //Point NewLocation_onPanel = (new Point(IC_Control.Location.X + IC_Control.Width, IC_Control.Location.Y + IC_Control.Height));
+            //B_FS_Switcher_form.Location = new Point((int)((double)NewLocation_onPanel.X-100), (int)((double)NewLocation_onPanel.Y-100));
+
+            B_FS_Switcher_form.Location = new Point((int) (Host.ActualWidth - 30 - B_FS_Switcher_form.Width),
+                                                     (int)(Host.ActualHeight - 30 - B_FS_Switcher_form.Height));
         }
 
         System.Windows.GridLength column_width_old;

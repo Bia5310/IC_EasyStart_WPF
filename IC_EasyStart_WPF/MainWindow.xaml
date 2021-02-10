@@ -23,11 +23,22 @@
     <Window.Resources>
         <convs:PercentConverter x:Key="myPercentConverter"/>
         <convs:InverseBoolConverter x:Key="myBoolInverterConverter"/>
+        <convs:BoolVisibilityConverter x:Key="myBoolVisibilityConvertery"/>
+        <convs:BoolToRedColorConverter x:Key="myBoolToRedColorConverter"/>
         <Color x:Key="ColorToggleBlue">#FF1A89AA</Color>
         <Color x:Key="ColorToggleYellow">#FFBF00</Color>
         <SolidColorBrush x:Key="BrushToggleBlue" Color="{StaticResource ColorToggleBlue}"/>
         <SolidColorBrush x:Key="BrushToggleYellow" Color="{StaticResource ColorToggleYellow}"/>
 
+        <!-- Animation to flicker, like a cursor when typing -->
+        <Storyboard x:Key="AnimateFlicker" RepeatBehavior="Forever">
+            <ColorAnimation Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)"
+                     From="Red"
+                     To="DarkGray"
+                     AutoReverse="True"
+                     Duration="0:0:0.5"
+                     RepeatBehavior="Forever"/>
+        </Storyboard>
 
         <Style TargetType="{x:Type local:TextBoxWatermark}" BasedOn="{StaticResource TextBoxSytle}"
                x:Key="TextBoxWatermarkStyle">
@@ -455,35 +466,38 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="1"/>
             </Grid.ColumnDefinitions>
 
             <VP:ViewportControl x:Name="viewportControl" ClipToBounds="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="2"/>
             
-            <Canvas Name="canvas" Margin="1" Grid.Column="2">
+            <Canvas Name="canvas" Margin="1" Grid.Column="1">
                 <ToggleButton x:Name="B_FS_Switcher" Visibility="Visible" Canvas.Right="20" Canvas.Bottom="20" Width="65" Height="65"
                           Style="{DynamicResource ToggleButtonFSStyle}"
                           Checked="B_FS_Switcher_Checked"
                           Unchecked="B_FS_Switcher_Unchecked"/>
             </Canvas>
 
-            
-
-            <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="Host" SizeChanged="Host_SizeChanged" Grid.RowSpan="2">
-                <WindowsFormsHost.Child>
-                    <wf:Panel>
-                        <wf:Panel.Controls>
-                            <wf:Button Width="72" Height="72"
+            <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Column="0" Grid.RowSpan="2"  x:Name="border_host"
+                    BorderThickness="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolToRedColorConverter}}">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="Red"></SolidColorBrush>
+                </Border.BorderBrush>
+                <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="Host" SizeChanged="Host_SizeChanged" Grid.RowSpan="2">
+                    <WindowsFormsHost.Child>
+                        <wf:Panel>
+                            <wf:Panel.Controls>
+                                <wf:Button Width="72" Height="72"
                                        Click="Button_Click" 
                                        Margin="20, 20, 20, 20"
                                        FlatStyle="Flat"/>
-                        </wf:Panel.Controls>
-                    </wf:Panel>
-                </WindowsFormsHost.Child>
-            </WindowsFormsHost>
-
-
+                            </wf:Panel.Controls>
+                        </wf:Panel>
+                    </WindowsFormsHost.Child>
+                </WindowsFormsHost>
+            </Border>
+            
         </Grid>
 
         <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Width="6" HorizontalAlignment="Center" Margin="0 2 0 2" 
@@ -494,6 +508,22 @@
             <StackPanel Orientation="Horizontal">
                 <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Тема" VerticalAlignment="Center" FontSize="16" Margin="10 2 2 2"/>
                 <ToggleButton ToolBar.OverflowMode="Never" x:Name="toggleTheme" Margin="2" Style="{StaticResource ToggleButtonSwitchStyle}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Checked"/>
+                <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Видеозапись" VerticalAlignment="Center" FontSize="16" Margin="100 2 2 2"
+                           Visibility="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolVisibilityConvertery}}"/>
+
+                <Ellipse Width="22" Height="22" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 0 0 0"
+                         StrokeThickness="1" Stroke="Gray"
+                         Visibility="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolVisibilityConvertery}}">
+                    <Ellipse.Fill>
+                        <SolidColorBrush Color="Red"/>
+                    </Ellipse.Fill>
+                    <Ellipse.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard Storyboard="{StaticResource AnimateFlicker}" />
+                        </EventTrigger>
+                    </Ellipse.Triggers>
+                </Ellipse>
+
             </StackPanel>
         </Border>
 

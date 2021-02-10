@@ -19,6 +19,7 @@ using TIS.Imaging.VCDHelpers;
 using TIS.Imaging;
 using LDZ_Code;
 using System.Windows.Threading;
+using System.Windows.Media.Animation;
 
 namespace IC_EasyStart_WPF
 {
@@ -167,7 +168,7 @@ namespace IC_EasyStart_WPF
             CommandBindings.Add(new CommandBinding(QuiteRoutedCommand, QuiteKey));
             CommandBindings.Add(new CommandBinding(CRoutedCommand, CodecPropKey));
 
-            B_FS_Switcher_form = new System.Windows.Forms.Button();// Host.Child.Controls[0] as System.Windows.Forms.Button;
+            B_FS_Switcher_form = Host.Child.Controls[0] as System.Windows.Forms.Button; //new System.Windows.Forms.Button();
 
             bmpFS_on = Bitmap.FromFile("FS_on_form.png");
             bmpFS_off = Bitmap.FromFile("FS_off_form.png");
@@ -200,8 +201,7 @@ namespace IC_EasyStart_WPF
             FLog.Log("Stage 0.6 of loading is completed");
             IC_Control.ImageAvailable += IC_Control_ImageAvailable;
             IC_Control.Invalidated += IC_Control_Invalidated;
-            IC_Control.LiveDisplay = false;
-
+            //IC_Control.LiveDisplay = false;
             FLog.Log("Stage 0.8 of loading is completed");
             Panel = Host.Child as System.Windows.Forms.Panel;
             FLog.Log("Stage 1 of loading is completed");
@@ -225,6 +225,8 @@ namespace IC_EasyStart_WPF
             //this.KeyPreview = true;
             FLog.Log("Stage 2 of loading is completed");
 
+            mainViewModel.VideoCapturing = false;
+
             try
             {
                 try
@@ -236,7 +238,7 @@ namespace IC_EasyStart_WPF
                 {
                     FLog.Log("Dictionary loading fault");
                 }
-             
+                
                 try
                 {
                     MainConfigPath = System.AppDomain.CurrentDomain.BaseDirectory + "\\" + App_cfg_name;
@@ -644,7 +646,8 @@ namespace IC_EasyStart_WPF
 
         private void ChB_ScaleAuto_CheckedChanged(object sender, RoutedEventArgs e)
         {
-
+            if(IC_Control != null && IC_Control.DeviceValid)
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
         }
 
         private void TrB_ScaleVal_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -818,6 +821,22 @@ namespace IC_EasyStart_WPF
             string dataName = FindLast_Photo(SavePhoto_dir, (TB_FIO.Text + "_" + TB_CurrentDate.Text + "_" + TB_HistoryNumber.Text), ".tiff");
             string FullPathAndName = dataName;
             IC_Control.MemorySaveImage(FullPathAndName);
+
+            //запустить анимаицю
+            ThicknessAnimationUsingKeyFrames thicknessAnimationUsingKeyFrames = new ThicknessAnimationUsingKeyFrames();
+            thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(0, 0, 0, 0), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 50))));
+            thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(2, 2, 2, 2), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 200))));
+            thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(0, 0, 0, 0), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 50))));
+            thicknessAnimationUsingKeyFrames.AutoReverse = false;
+            thicknessAnimationUsingKeyFrames.FillBehavior = FillBehavior.Stop;
+            thicknessAnimationUsingKeyFrames.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 300));
+
+            ThicknessAnimation thicknessAnimation = new ThicknessAnimation(new Thickness(0, 0, 0, 0),
+                new Thickness(2, 2, 2, 2),
+                new TimeSpan(0, 0, 0, 0, 300),
+                FillBehavior.Stop);
+            thicknessAnimation.AutoReverse = true;
+            border_host.BeginAnimation(Border.BorderThicknessProperty, thicknessAnimationUsingKeyFrames);
         }
 
         private void B_Cam_Select_Click(object sender, RoutedEventArgs e)
@@ -862,11 +881,36 @@ namespace IC_EasyStart_WPF
             }
         }
 
+        private void AdaptViewportControl()
+        {
+            double zf = mainViewModel.Scale;
+
+            Rect rectHost = new Rect(0,0,Host.ActualWidth, Host.ActualHeight);
+            Rect imageRect = new Rect(0, 0, IC_Control.ImageWidth, IC_Control.ImageHeight);
+            imageRect.Scale(zf, zf);
+            imageRect.Offset((rectHost.Width - imageRect.Width) * 0.5d, (rectHost.Height - imageRect.Height) * 0.5d);
+            
+            Rect controlRect = Rect.Intersect(rectHost, imageRect);
+
+            IC_Control.Width = (int)controlRect.Width;
+            IC_Control.Height = (int)controlRect.Height;
+            IC_Control.Left = (int)controlRect.Left;
+            IC_Control.Top = (int)controlRect.Top;
+
+
+            if (imageRect.Width > IC_Control.Width || imageRect.Height > IC_Control.Height)
+                IC_Control.ScrollbarsEnabled = true;
+            else
+                IC_Control.ScrollbarsEnabled = false;
+
+            ChangePos_of_FSBut();
+        }
+
         private void CalculateZoomFactor(int panelWidth, int panelHeight, int IMG_Width, int IMG_Height)
         {
             double Ratio = 1d*panelWidth/panelHeight; // panel W/H
             double ratio = 1d*IMG_Width/ IMG_Height; // image w/h
-
+            
             var ctrl = IC_Control;
 
             double delta_h = 30;
@@ -879,25 +923,20 @@ namespace IC_EasyStart_WPF
             if (ratio > Ratio)
             {//вписываем по горизонтали
                 zoomFactor = (1d* PanelNewWidth / IMG_Width);
-                zoomFactor = mainViewModel.RoundZoomFactor(zoomFactor);
-
-                ctrl.Height = PanelNewHeight;
-                ctrl.Width = (int)((double)Img_SizeRelation * (double)ctrl.Height);
-                ctrl.Location = new System.Drawing.Point((PanelNewWidth - ctrl.Width) / 2, 0);
             }
             else
             {//вписываем по вертикали
                 zoomFactor = (1d* PanelNewHeight / IMG_Height);
-                zoomFactor = mainViewModel.RoundZoomFactor(zoomFactor);
 
-                ctrl.Width = PanelNewWidth;
-                ctrl.Height = (int)((double)ctrl.Width / (double)Img_SizeRelation);
-                ctrl.Location = new System.Drawing.Point(0, (PanelNewHeight - ctrl.Height + (int)delta_h) / 2);
             }
 
-            mainViewModel.Scale = zoomFactor;
+            if(!FullScrin)
+                zoomFactor = mainViewModel.RoundZoomFactor(zoomFactor);
 
-            ChangePos_of_FSBut();
+            mainViewModel.Scale = zoomFactor;
+            
+            AdaptViewportControl();
+            
             Font_Adaptation();
         }
 
@@ -1035,7 +1074,7 @@ namespace IC_EasyStart_WPF
                 {
                     ImgBuffer_RGB = IC_Control.ImageActiveBuffer;
 
-                    unsafe
+                    /*unsafe
                     {
                         ImgBuffer_RGB.Lock();
                         viewportControl.SetImageByBuffer(ImgBuffer_RGB.GetImageData(),
@@ -1045,7 +1084,7 @@ namespace IC_EasyStart_WPF
                             ConvertPixelFormats(IC_Control.MemoryPixelFormat),
                             this.Dispatcher);
                         ImgBuffer_RGB.Unlock();
-                    }
+                    }*/
 
                     /*this.Dispatcher.Invoke((Action)(() =>
                     {
@@ -1239,7 +1278,10 @@ namespace IC_EasyStart_WPF
                 else Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1);
                 FormatAdaptation(IMG_W_now, IMG_H_now);*/
 
-                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                if (mainViewModel.ScaleAuto)
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                else
+                    AdaptViewportControl();
             }
         }
 
@@ -1315,7 +1357,11 @@ namespace IC_EasyStart_WPF
                 //ВРЕМЕННО
                 /*Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
                 FormatAdaptation(IMG_W_now, IMG_H_now);*/
-                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                if (mainViewModel.ScaleAuto)
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                else
+                    AdaptViewportControl();
+
                 IC_Control.LiveStart();
 
                 LastConfig_tag = Config_tag;

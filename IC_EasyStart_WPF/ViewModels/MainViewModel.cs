@@ -39,7 +39,7 @@ namespace IC_EasyStart_WPF.ViewModels
             }
         }
 
-        private double scaleMin = 0.5d;
+        private double scaleMin = 0.1d;
         public double ScaleMin
         {
             get => scaleMin;
@@ -61,7 +61,7 @@ namespace IC_EasyStart_WPF.ViewModels
             }
         }
 
-        private bool scaleAuto = false;
+        private bool scaleAuto = true;
         public bool ScaleAuto
         {
             get => scaleAuto;
@@ -69,6 +69,17 @@ namespace IC_EasyStart_WPF.ViewModels
             {
                 scaleAuto = value;
                 OnPropertyChanged("ScaleAuto");
+            }
+        }
+
+        private bool videoCapturing = false;
+        public bool VideoCapturing
+        {
+            get => videoCapturing;
+            set
+            {
+                videoCapturing = value;
+                OnPropertyChanged("VideoCapturing");
             }
         }
 
