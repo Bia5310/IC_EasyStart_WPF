@@ -348,9 +348,10 @@
                                            Value="{Binding Scale, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
                                            Maximum="{Binding ScaleMax, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
                                            Minimum="{Binding ScaleMin, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
-                                           Increment="{Binding ScaleIncrement, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
+                                           Increment="10"
                                            IsEnabled="{Binding ScaleAuto, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolInverterConverter}}"
                                            FormatString="F0"/>
+                        <!--Increment="{Binding ScaleIncrement, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"-->
                         <CheckBox Grid.Row="6" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center"
                                   Style="{DynamicResource CheckBoxSimpleStyle}" 
                                   x:Name="ChB_AutoScale"

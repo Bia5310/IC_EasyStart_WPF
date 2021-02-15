@@ -50,7 +50,7 @@ namespace IC_EasyStart_WPF.ViewModels
             }
         }
 
-        private double scaleIncrement = 0.1d; //10%
+        private double scaleIncrement = 0.01d; //10%
         public double ScaleIncrement
         {
             get => scaleIncrement;
