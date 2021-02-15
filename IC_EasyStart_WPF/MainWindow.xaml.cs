@@ -34,7 +34,7 @@ namespace IC_EasyStart_WPF
         private VCDSimpleProperty vcdProp = null;
         private VCDAbsoluteValueProperty AbsValExp = null;// специально для времени экспонирования [c]
 
-        string Version = "2.49";
+        string Version = "2.51";
         string Config_tag = "0_0"; //0_0 - default
         string LastConfig_tag = "0_0";
         string SaveVid_dir = "Video";
@@ -45,6 +45,8 @@ namespace IC_EasyStart_WPF
 
         int IMG_W_now = 0;
         int IMG_H_now = 0;
+        bool Exposure_Auto = false;
+        bool Gain_Auto = false;
         //WB
         int WB_FinalSum = 0;
 
@@ -593,6 +595,7 @@ namespace IC_EasyStart_WPF
                 TimerForRenew.IsEnabled = true;
                 TimerForRenew.Start();
             }
+            Exposure_Auto = vcdProp.Automation[VCDIDs.VCDID_Exposure];
             Device_state = IC_Control.SaveDeviceState();
         }
 
@@ -634,6 +637,7 @@ namespace IC_EasyStart_WPF
                 TimerForRenew.IsEnabled = true;
                 TimerForRenew.Start();
             }
+            Gain_Auto = vcdProp.Automation[VCDIDs.VCDID_Gain];
             Device_state = IC_Control.SaveDeviceState();
         }
 
@@ -715,14 +719,18 @@ namespace IC_EasyStart_WPF
 
         private void TimerForRenew_Tick(object sender, EventArgs e)
         {
-            FLog.Log("TimerForRenew_Tick");
+            
             try
             {
                 Refresh_Values_on_Trackbars();
+                FLog.Log("Scrollbars values refreshed!");
             }
-            catch { }
+            catch
+            {
+                FLog.Log("Error on scrollbars values refresh");
+            }
         }
-        bool AutoExp_wasEnabled = false;
+        bool AutoExp_wasEnabled_beforeRecording = false;
         bool RecordingNeeded = false;
         List<Bitmap> bmp_list = new List<Bitmap>();
         private void B_StartCapture_Click(object sender, RoutedEventArgs e)
@@ -733,7 +741,7 @@ namespace IC_EasyStart_WPF
             {
                 if (!isRecording)
                 {
-                    AutoExp_wasEnabled = Disable_AutoExposure_ctrl();
+                    AutoExp_wasEnabled_beforeRecording = Disable_AutoExposure_ctrl();
                     StartRecording();
                 }
             }
@@ -753,14 +761,14 @@ namespace IC_EasyStart_WPF
             {
                 if (isRecording)
                 {
-                    try { Enable_AutoExposure_ctrl(AutoExp_wasEnabled); } 
+                    try { Enable_AutoExposure_ctrl(AutoExp_wasEnabled_beforeRecording); } 
                     catch(Exception exc)
                     {
                         FLog.Log("Error on B_StopCapture_Click: error in Enable_AutoExposure_ctrl(). ORIGINAL: " + exc.Message);
                     }
                     StopRecording();
                     FLog.Log("Recording stopped successfully");
-                    Enable_AutoExposure_ctrl(AutoExp_wasEnabled);
+                    Enable_AutoExposure_ctrl(AutoExp_wasEnabled_beforeRecording);
                 }
             }
             catch (Exception exc)
@@ -1142,6 +1150,7 @@ namespace IC_EasyStart_WPF
             // PB_Debug.Image = BMP;
         }
         bool Camera_restart_need = false;
+        int RestartAttempts = 0;
         private void Timer_camera_checker_Tick(object sender, EventArgs e)
         {
             if (!Camera_restart_need)//даже если рестарт не нужен
@@ -1153,14 +1162,21 @@ namespace IC_EasyStart_WPF
 
                     // this.BeginInvoke((Action)(() => this.Text = "Device state: " + (IC_Control.DeviceValid ? "valid" : "invalid")));
                     this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Device state: " + (IC_Control.DeviceValid ? "valid" : "invalid"))));
-                    if (IC_Control.DeviceValid)//check validicity
+                    /*if (IC_Control.DeviceValid && RestartAttempts==0)//check validicity
+                     {
+                         this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Waiting for translation start....")));
+                         Camera_restart_need = false;
+                         STW_fps.Restart();
+                         RestartAttempts++;
+                     }
+                     else
+                     {
+                         this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Restarting Camera")));
+                         if (!BGW_CamRestarter.IsBusy) BGW_CamRestarter.RunWorkerAsync();
+                     }*/
+                                     
                     {
                         this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Waiting for translation start....")));
-                        Camera_restart_need = false;
-                        STW_fps.Restart();
-                    }
-                    else
-                    {
                         this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Restarting Camera")));
                         if (!BGW_CamRestarter.IsBusy) BGW_CamRestarter.RunWorkerAsync();
                     }
@@ -1179,7 +1195,8 @@ namespace IC_EasyStart_WPF
             bool wasrecording = isRecording;
             if (isRecording) this.Dispatcher.BeginInvoke((Action)(() => StopRecording()));
 
-            while (!IC_Control.DeviceValid)
+            while (!IC_Control.DeviceValid || 
+                (STW_fps.Elapsed.TotalMilliseconds > 1000))
             {
                 int i_rem = -1;
                 for (int i = 0; i < IC_Control.Devices.Count(); i++)
@@ -1193,7 +1210,17 @@ namespace IC_EasyStart_WPF
                 }
                 if (i_rem != -1)
                 {
-                    IC_Control.Device = Device_name;
+                    try
+                    {
+                        IC_Control.Device = Device_name;
+                    }
+                    catch(Exception exc)
+                    {
+                        IC_Control.LiveStop();
+                        IC_Control.Device = Device_name;
+                    }
+
+
                     if (Device_state != null)
                         this.Dispatcher.BeginInvoke((Action)(() => IC_Control.LoadDeviceState(Device_state, true)));
                     //this.BeginInvoke((Action)(() => IC_Control.LiveStop()));
@@ -1201,7 +1228,10 @@ namespace IC_EasyStart_WPF
                     {
                         System.Threading.Thread.Sleep(200);
                         this.Dispatcher.BeginInvoke((Action)(() => IC_Control.LiveStart()));
+                        RestartAttempts = 0;
                     }
+                    STW_fps.Restart();
+                    FLog.Log("Camera restarted!");
                 }
             }
             //this.BeginInvoke((Action)(() => this.Text = "Device state: " + (IC_Control.DeviceValid ? "valid" : "invalid")));
@@ -1216,7 +1246,7 @@ namespace IC_EasyStart_WPF
                 Refresh_Values_on_Trackbars();
                 if (wasrecording) StartRecording();
 
-                Enable_AutoExposure_ctrl(AutoExp_wasEnabled);
+                Enable_AutoExposure_ctrl(Exposure_Auto);
                 File.Delete("Config_" + LastConfig_tag + ".xml");
                 try { Save_cfg(LastConfig_tag); } catch { }
             }));
