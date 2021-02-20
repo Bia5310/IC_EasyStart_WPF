@@ -769,7 +769,7 @@ namespace Medical_Studio
             int a = 0;
             int b = a + 3;
             writer_ffmpeg = new VideoFileWriter();
-            writer_ffmpeg.Open(path, IMG_W_now, IMG_H_now, pFPS, VideoCodec.MPEG4, BitsPerSecond);
+            writer_ffmpeg.Open(path, IMG_W_now, IMG_H_now, pFPS, VideoCodec.MSMPEG4v3, BitsPerSecond);
             videoStartTime = DateTime.Now;
         }
         private int Get_WB_Sum()
