@@ -832,11 +832,11 @@ namespace Medical_Studio
             //запустить анимаицю
             ThicknessAnimationUsingKeyFrames thicknessAnimationUsingKeyFrames = new ThicknessAnimationUsingKeyFrames();
             thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(0, 0, 0, 0), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 50))));
-            thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(2, 2, 2, 2), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 200))));
+            thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(4, 4, 4, 4), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 200))));
             thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(0, 0, 0, 0), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 50))));
             thicknessAnimationUsingKeyFrames.AutoReverse = false;
             thicknessAnimationUsingKeyFrames.FillBehavior = FillBehavior.Stop;
-            thicknessAnimationUsingKeyFrames.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 300));
+            thicknessAnimationUsingKeyFrames.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 500));
 
             ThicknessAnimation thicknessAnimation = new ThicknessAnimation(new Thickness(0, 0, 0, 0),
                 new Thickness(2, 2, 2, 2),
