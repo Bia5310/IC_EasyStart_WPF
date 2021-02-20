@@ -5,7 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Windows;
 
-namespace IC_EasyStart_WPF
+namespace Medical_Studio
 {
     /// <summary>
     /// Логика взаимодействия для App.xaml

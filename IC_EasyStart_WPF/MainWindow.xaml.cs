@@ -19,8 +19,9 @@ using TIS.Imaging.VCDHelpers;
 using TIS.Imaging;
 using LDZ_Code;
 using System.Windows.Threading;
+using System.Windows.Media.Animation;
 
-namespace IC_EasyStart_WPF
+namespace Medical_Studio
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
@@ -33,16 +34,18 @@ namespace IC_EasyStart_WPF
         private VCDSimpleProperty vcdProp = null;
         private VCDAbsoluteValueProperty AbsValExp = null;// специально для времени экспонирования [c]
 
-        string[] ConfigNames = new string[3] { "Default_config.xml", "Config_1.xml", "Config_2.xml" };
-        int Config_num = 0; //0 - default
-        int LastConfig_num = 0;
+        string Config_tag = "0_0"; //0_0 - default
+        string LastConfig_tag = "0_0";
         string SaveVid_dir = "Video";
         string SavePhoto_dir = "Photo";
 
         string App_cfg_name = "App_prop.cfg";
+        string ConfigNames_filename = "ConfigNames.xml";
 
         int IMG_W_now = 0;
         int IMG_H_now = 0;
+        bool Exposure_Auto = false;
+        bool Gain_Auto = false;
         //WB
         int WB_FinalSum = 0;
 
@@ -67,6 +70,7 @@ namespace IC_EasyStart_WPF
         Bitmap GplusR_res = new Bitmap(1920, 1080, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
         static double coeff = 0.1;
         int coeff256 = (int)(coeff * 256);
+        double Scaling_of_monitor = 1;
 
         BitmapData bd_res_r;
         Bitmap pRes_r;
@@ -78,6 +82,8 @@ namespace IC_EasyStart_WPF
 
         string Device_name = "";
         string Device_state = null;
+
+        ViewModels.MainViewModel mainViewModel = null;
 
         //Timers
         DispatcherTimer TimerForRenew = null;
@@ -101,11 +107,14 @@ namespace IC_EasyStart_WPF
 
         private List<RenameableToggleButton> renameableButtonsConfigs = new List<RenameableToggleButton>();
 
-        private Dictionary<string, string> NamesConfigsDictionary = new Dictionary<string, string>();
+        private Dictionary<string, string> ConfigsNamesDictionary = new Dictionary<string, string>();
 
         public MainWindow()
         {
-            FLog = new ServiceFunctions.UI.Log.FileLogger("Log_" + ServiceFunctions.UI.Get_TimeNow_String() + ".txt");
+           // this.Title = "IC EasyStart v" + Version; //20022021. Moved to MainViewModel and binded
+           
+            Directory.CreateDirectory("Logs");
+            FLog = new ServiceFunctions.UI.Log.FileLogger("Logs\\Log_" + ServiceFunctions.UI.Get_TimeNow_String() + ".txt");
             FLog.Log("Programm started...");
 
             //Init timers
@@ -145,13 +154,10 @@ namespace IC_EasyStart_WPF
             BGW_CamRestarter.WorkerReportsProgress = false;
 
             InitializeComponent();
-
-            ChB_Config_0.Checked += ChB_Config_N_Checked;
-            ChB_Config_0.Unchecked += ChB_Config_N_Unchecked;
-            ChB_Config_1.Checked += ChB_Config_N_Checked;
-            ChB_Config_1.Unchecked += ChB_Config_N_Unchecked;
-            ChB_Config_2.Checked += ChB_Config_N_Checked;
-            ChB_Config_2.Unchecked += ChB_Config_N_Unchecked;
+            //Set main view model
+            mainViewModel = new ViewModels.MainViewModel();
+            DataContext = mainViewModel;
+            mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
 
             ChB_WhiteBalanceAuto.Checked += ChB_WhiteBalanceAuto_CheckedChanged;
             ChB_WhiteBalanceAuto.Unchecked += ChB_WhiteBalanceAuto_CheckedChanged;
@@ -163,47 +169,53 @@ namespace IC_EasyStart_WPF
             CommandBindings.Add(new CommandBinding(QuiteRoutedCommand, QuiteKey));
             CommandBindings.Add(new CommandBinding(CRoutedCommand, CodecPropKey));
 
-            B_FS_Switcher_form = Host.Child.Controls[0] as System.Windows.Forms.Button;
+            B_FS_Switcher_form = Host.Child.Controls[0] as System.Windows.Forms.Button; //new System.Windows.Forms.Button();
 
             bmpFS_on = Bitmap.FromFile("FS_on_form.png");
             bmpFS_off = Bitmap.FromFile("FS_off_form.png");
         }
 
+        private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(mainViewModel.Scale))
+            {
+                //Set Zoom Factor
+                SetLiveDisplayZoomFactor((float)mainViewModel.Scale);
+            }
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            FLog.Log("Stage 0 of loading is completed");
             IC_Control = new ICImagingControl();
             Host.Child.Controls.Add(IC_Control);
+
+            FLog.Log("Stage 0.2 of loading is completed");
             IC_Control.SendToBack();
             IC_Control.Paint += IC_Control_Paint;
+            FLog.Log("Stage 0.4 of loading is completed");
             //IC_Control.OverlayBitmapPosition = PathPositions.Display;
             IC_Control.OverlayBitmapAtPath[PathPositions.Display].Enable = true;
             //IC_Control.OverlayBitmap.Enable = true;
             IC_Control.LiveCaptureContinuous = true;
-            IC_Control.ImageAvailable += IC_Control_ImageAvailable1;
+
+            FLog.Log("Stage 0.6 of loading is completed");
+            IC_Control.ImageAvailable += IC_Control_ImageAvailable;
             IC_Control.Invalidated += IC_Control_Invalidated;
-
+            //IC_Control.LiveDisplay = false;
+            FLog.Log("Stage 0.8 of loading is completed");
             Panel = Host.Child as System.Windows.Forms.Panel;
-
+            FLog.Log("Stage 1 of loading is completed");
             //IC_Control.Anchor = System.Windows.Forms.AnchorStyles.Left|System.Windows.Forms.AnchorStyles.Right| System.Windows.Forms.AnchorStyles.Top| System.Windows.Forms.AnchorStyles.Bottom;
             //B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("B_FS_");//System.Drawing.Color.FromArgb(0, System.Drawing.Color.White);
             Refresh_IC_BackColor();
 
             B_FS_Switcher_form.UseVisualStyleBackColor = true;
             B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
+            Init_ListOf_CheckButtons();
 
-            for(int i = 0; i < stackPanelVitreoButtons.Children.Count; i++)
-            {
-                renameableButtonsConfigs.Add(stackPanelVitreoButtons.Children[i] as RenameableToggleButton);
-            }
-            for (int i = 0; i < stackPanelUserConfigs.Children.Count; i++)
-            {
-                renameableButtonsConfigs.Add(stackPanelUserConfigs.Children[i] as RenameableToggleButton);
-            }
-            for (int i = 0; i < stackPanelPhacoButtons.Children.Count; i++)
-            {
-                renameableButtonsConfigs.Add(stackPanelPhacoButtons.Children[i] as RenameableToggleButton);
-            }
 
+            Scaling_of_monitor = GetScalingFactor_ofMonitor();
             /*IC_Control.ShowDeviceSettingsDialog();
             if (IC_Control.DeviceValid) IC_Control.LiveStart();*/
 
@@ -212,32 +224,22 @@ namespace IC_EasyStart_WPF
             TB_CurrentDate.Text = ServiceFunctions.UI.GetDateString();
             TIS.Imaging.LibrarySetup.SetLocalizationLanguage("ru");
             //this.KeyPreview = true;
-            if (File.Exists(ConfigNames[0]))
-            {
-                try
-                {
-                    Load_cfg(ConfigNames[0], true);
-                    FLog.Log("Load_cfg() call finished succesfully");
-                }
-                catch (Exception exc)
-                {
-                    //  MessageBox.Show(exc.Message);
-                    FLog.Log("ERROR - Load_cfg(). ORIGINAL:" + exc.Message);
-                }
-            }
+            FLog.Log("Stage 2 of loading is completed");
+
+            mainViewModel.VideoCapturing = false;
 
             try
             {
-                if (!IC_Control.DeviceValid)
+                try
                 {
-                    IC_Control.ShowDeviceSettingsDialog();
-                    if (!IC_Control.DeviceValid)
-                    {
-                        MessageBox.Show("Не было выбрано ни одного устройства", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information);
-                        FLog.Log("No devices selected by user or loaded");
-                        //Application.Exit();
-                    }
+                    Dictionary_Load();
+                    FLog.Log("Dictionary loading is successful");
                 }
+                catch
+                {
+                    FLog.Log("Dictionary loading fault");
+                }
+                
                 try
                 {
                     MainConfigPath = System.AppDomain.CurrentDomain.BaseDirectory + "\\" + App_cfg_name;
@@ -245,30 +247,95 @@ namespace IC_EasyStart_WPF
                     FLog.Log("Load_AppSettings() call finished succesfully");
                 }
                 catch { FLog.Log("ERROR - Load_AppSettings() error"); }
+                FLog.Log("Stage 3 of loading is completed");
+                try //Комплексная проверка. Если конфиг не дефолт, то пытаемся его загрузить. В противном случае просим у юзера
+                {
+                    if(Config_tag!= "default")
+                    {
+                        if (!File.Exists("Config_" + Config_tag + ".xml")) Config_tag = "default";
+                    }
+                    if (Config_tag == "default")
+                    {
+                        if (!IC_Control.DeviceValid)
+                        {
+                            IC_Control.ShowDeviceSettingsDialog();
+                            if (!IC_Control.DeviceValid)
+                            {
+                                MessageBox.Show("Не было выбрано ни одного устройства", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information);
+                                FLog.Log("No devices selected by user or loaded");
+                                //Application.Current.Shutdown();
+                            }    
+                        }
+                    }
+                    
+
+                    if(Config_tag == "default")
+                    {
+                        Set_appropriate_params();
+                        Save_AllTheConfigs();
+                    }
+
+                    try
+                    {
+                        Find_RenameableBut_byTag(Config_tag).IsChecked = true;
+                        if (!IC_Control.DeviceValid)
+                        {
+                            MessageBox.Show("Не было выбрано ни одного устройства", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information);
+                            FLog.Log("No devices selected by user or loaded");
+                            Application.Current.Shutdown();
+                        }
+                    }
+                    catch { Config_tag = "0_0"; renameableButtonsConfigs[0].IsChecked = true; }
+                    FLog.Log("Check configs function call finished succesfully");
+                    
+                }
+                catch
+                {
+                    FLog.Log("ERROR - Check configs error");
+                }
+
+                FLog.Log("Stage 4 of loading is completed");
                 try
                 {
                     Init_Sliders(IC_Control);
                     FLog.Log("Init_Sliders() call finished succesfully");
+                }
+                catch(Exception exc)
+                {
+
+                    FLog.Log("ERROR - Init_Sliders or Load_ic_cam_easy  error");
+                    FLog.Log("ORIGINAL:" + exc.Message);
+                }
+
+                try
+                {
                     Load_ic_cam_easy(IC_Control);
                     FLog.Log("Load_ic_cam_easy() call finished succesfully");
                 }
-                catch { FLog.Log("ERROR - Init_Sliders or Load_ic_cam_easy  error"); }
+                catch(Exception exc)
+                {
+                    FLog.Log("ERROR - Init_Sliders or Load_ic_cam_easy  error");
+                    FLog.Log("ORIGINAL:" + exc.Message);
+                }
 
+                FLog.Log("Stage 5 of loading is completed");
                 try
                 {
                     IMG_H_now = IC_Control.ImageHeight;
                     IMG_W_now = IC_Control.ImageWidth;
                     this.WindowState = WindowState.Maximized;//  FormWindowState.Maximized;
-                    Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); //on load
-                    FLog.Log("Adapt_Size_ofCont() call finished succesfully");
-                    FormatAdaptation(IMG_W_now, IMG_H_now);
-                    FLog.Log("FormatAdaptation() call finished succesfully");
+                    //ВРЕМЕННО
+                    //Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); //on load
+                    //FLog.Log("Adapt_Size_ofCont() call finished succesfully");
+                    //FormatAdaptation(IMG_W_now, IMG_H_now);
+                    //FLog.Log("FormatAdaptation() call finished succesfully");
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
                 }
                 catch
                 {
                     FLog.Log("ERROR - Format adaptation error");
                 }
-
+                FLog.Log("Stage 6 of loading is completed");
                 try
                 {
                     Load_FlipState();
@@ -277,20 +344,7 @@ namespace IC_EasyStart_WPF
                 catch (Exception exc)
                 { FLog.Log("ERROR - Load_flipstate error "); }
 
-                try
-                {
-                    object sender_f = null;
-                    if (Config_num == 1) sender_f = ChB_Config_1;
-                    else if (Config_num == 2) sender_f = ChB_Config_2;
-                    else sender_f = ChB_Config_0;
-
-                    (sender_f as CheckBox).IsChecked = true;
-                    FLog.Log("Check configs function call finished succesfully");
-                }
-                catch
-                {
-                    FLog.Log("ERROR - Check configs error");
-                }
+                
 
                 if (vcdProp.AutoAvailable(VCDIDs.VCDID_WhiteBalance))
                     vcdProp.Automation[VCDIDs.VCDID_WhiteBalance] = false;
@@ -300,21 +354,24 @@ namespace IC_EasyStart_WPF
                 try { Refresh_Values_on_Trackbars(); FLog.Log("Refresh_Values_on_Trackbars() call finished succesfully"); }
                 catch { FLog.Log("ERROR - Refreshing Values on TrB error"); }
 
+                FLog.Log("Stage 7 of loading is completed");
                 try
                 {
-                    Prepare_encoder2("D:\\video.avi", (int)IC_Control.DeviceFrameRate, 25000 * 1000);
+                    Prepare_encoder2("Video\\video.avi", (int)IC_Control.DeviceFrameRate, 25000 * 1000);
+                    B_StopCapture.IsEnabled = false;
                     FLog.Log("Encoder preparing is succesful");
                 }
                 catch (Exception exc)
                 {
+                    B_StartCapture.IsEnabled = false;
+                    B_StopCapture.IsEnabled = false;
                     FLog.Log("ERROR - Encoder preparing finished this error: " + exc.Message);
                 }
                 Device_name = IC_Control.Device;
                 Timer_camera_checker.Start();
                 STW_fps.Start();
-
+                FLog.Log("Stage 8 of loading is completed");
                 Everything_loaded = true;
-                FLog.Log("Initialization end");
             }
             catch (Exception ext)
             {
@@ -327,8 +384,11 @@ namespace IC_EasyStart_WPF
                 if (IC_Control.DeviceValid)
                 {
                     IC_Control.LiveStart();
-                    Adapt_Size_ofCont(IC_Control as System.Windows.Forms.Control, IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+                    //ВРЕМЕННО
+                    //Adapt_Size_ofCont(IC_Control as System.Windows.Forms.Control, IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
                 }
+                FLog.Log("Stage 9 of loading is completed");
             }
 
             var ov = IC_Control.OverlayBitmapAtPath[PathPositions.Display];
@@ -339,8 +399,36 @@ namespace IC_EasyStart_WPF
             ov.FontTransparent = true;
             ov.DrawText(System.Drawing.Color.Red, 10, 10, "IC Imaging Control 2.0");
             ov.DrawSolidRect(System.Drawing.Color.FromArgb(187, 100, 0, 0), 10, 10, 100, 100);
+
+            FLog.Log("Initialization end");
+
+
         }
 
+        public void Init_ListOf_CheckButtons()
+        {
+            for (int i = 0; i < stackPanelPhacoButtons.Children.Count; i++)
+            {
+                renameableButtonsConfigs.Add(stackPanelPhacoButtons.Children[i] as RenameableToggleButton);
+            }
+
+            for (int i = 0; i < stackPanelVitreoButtons.Children.Count; i++)
+            {
+                renameableButtonsConfigs.Add(stackPanelVitreoButtons.Children[i] as RenameableToggleButton);
+            }
+
+            for (int i = 0; i < stackPanelUserConfigs.Children.Count; i++)
+            {
+                renameableButtonsConfigs.Add(stackPanelUserConfigs.Children[i] as RenameableToggleButton);
+            }
+
+        }
+        public double GetScalingFactor_ofMonitor()
+        {
+            double resHeight = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;  // 1440
+            double actualHeight = SystemParameters.PrimaryScreenHeight;  // 960
+            return (resHeight / actualHeight);
+        }
         private void IC_Control_Invalidated(object sender, System.Windows.Forms.InvalidateEventArgs e)
         {
             
@@ -371,94 +459,6 @@ namespace IC_EasyStart_WPF
             e.Graphics.FillRectangle(System.Drawing.Brushes.Red, 0, 0, width, height);*/
         }
 
-        //private void ChB_Config_N_CheckedChanged(object sender, RoutedEventArgs e)
-        //{
-        //    FLog.Log("ChB_Config_N_CheckedChanged");
-        //    Timer_camera_checker.Stop();
-        //    var ctrl = sender as CheckBox;
-        //    //Config_num = Convert.ToInt32(ctrl.Name.Last().ToString());
-        //    Config_num = (int) (sender as RadioButton).Tag;
-
-        //    // IC_Control.SaveDeviceStateToFile(ConfigNames[LastConfig_num]);
-
-        //    if (ctrl.IsChecked ?? false)
-        //    {
-        //        for (int i = 0; i < ConfigNames.Count(); i++)
-        //        {
-        //            /*var Current_ChB = (TLP_Configs.Controls.Find("ChB_Config_" + (i).ToString(), false)[0]);
-        //            (Current_ChB as CheckBox).CheckedChanged -= ChB_Config_N_CheckedChanged;
-        //            if (Convert.ToInt32((Current_ChB as CheckBox).Name.Last().ToString()) != Config_num)
-        //                (Current_ChB as CheckBox).Checked = false;
-        //            (Current_ChB as CheckBox).CheckedChanged += ChB_Config_N_CheckedChanged;*/
-        //        }
-        //        IC_Control.LiveStop();
-        //        Save_cfg(ConfigNames[LastConfig_num]);
-        //        Load_cfg(ConfigNames[Config_num]);
-        //        // Refresh_Values_on_Trackbars();
-
-        //        /*NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
-        //        TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];*/
-
-        //        Load_ic_cam_easy(IC_Control);
-        //        IMG_H_now = IC_Control.ImageHeight;
-        //        IMG_W_now = IC_Control.ImageWidth;
-        //        Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
-        //        FormatAdaptation(IMG_W_now, IMG_H_now);
-        //        IC_Control.LiveStart();
-
-        //    }
-        //    else
-        //    {
-        //        /*var Current_ChB = ChB_Config_0;
-        //        if (ctrl.Name != "ChB_Config_0")
-        //        {
-        //            Config_num = 0;
-        //            (Current_ChB as CheckBox).Checked = true;
-        //        }
-        //        else
-        //        {
-        //            (Current_ChB as CheckBox).CheckedChanged -= ChB_Config_N_CheckedChanged;
-        //            (Current_ChB as CheckBox).Checked = true;
-        //            (Current_ChB as CheckBox).CheckedChanged += ChB_Config_N_CheckedChanged;
-        //        }*/
-        //    }
-        //    LastConfig_num = Config_num;
-        //    Refresh_Values_on_Trackbars();
-        //    Timer_camera_checker.Start();
-        //}
-
-        private void ChB_Config_N_Checked(object sender, RoutedEventArgs e)
-        {
-            FLog.Log("ChB_Config_N_Checked");
-            Timer_camera_checker.Stop();
-            Config_num = int.Parse((sender as RadioButton).Tag as string); //Вычленяем номер конфигурации
-
-            // IC_Control.SaveDeviceStateToFile(ConfigNames[LastConfig_num]);
-
-            IC_Control.LiveStop();
-
-            Load_cfg(ConfigNames[Config_num]);
-            // Refresh_Values_on_Trackbars();
-
-            /*NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
-            TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];*/
-
-            Load_ic_cam_easy(IC_Control);
-            IMG_H_now = IC_Control.ImageHeight;
-            IMG_W_now = IC_Control.ImageWidth;
-            Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
-            FormatAdaptation(IMG_W_now, IMG_H_now);
-            IC_Control.LiveStart();
-
-            LastConfig_num = Config_num;
-            Refresh_Values_on_Trackbars();
-            Timer_camera_checker.Start();
-        }
-
-        private void ChB_Config_N_Unchecked(object sender, RoutedEventArgs e)
-        {
-            Save_cfg(ConfigNames[LastConfig_num]);
-        }
 
         private void B_Browse_Vid_Click(object sender, RoutedEventArgs e)
         {
@@ -477,14 +477,17 @@ namespace IC_EasyStart_WPF
         private void Form1_FormClosing(object sender, CancelEventArgs e)
         {
             FLog.Log("Form1_FormClosing");
+            try { Save_cfg(Config_tag); } catch { }
             try { if (isRecording) B_StopCapture_Click(null, null); } catch { }
             if (IC_Control.LiveVideoRunning)
             {
                 IC_Control.LiveStop();
             }
+
             try { Save_AppSettings(); } catch { }
+            try { Dictionary_Save(); } catch { }
             try { Save_Flipstate(); } catch { }
-            try { Save_cfg(ConfigNames[LastConfig_num]); } catch { }
+          //  try { Save_cfg(ConfigNames[LastConfig_num]); } catch { }
         }
 
         private void Load_FlipState()
@@ -551,6 +554,7 @@ namespace IC_EasyStart_WPF
             {
                 double value = Exposure_Slide2real(TrB_ExposureVal.Value);
                 LoadExposure_ToCam(ref AbsValExp, value);
+                Device_state = IC_Control.SaveDeviceState();
                 double promval = (Exposure_Slide2real(TrB_ExposureVal.Value));
                 if (promval > 1) NUD_Exposure.Value = promval;
                 else NUD_Exposure.Value = promval;
@@ -559,7 +563,6 @@ namespace IC_EasyStart_WPF
             }
             catch (Exception ex) { }
         }
-
         private void NUD_Exposure_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             FLog.Log("NUD_Exposure_ValueChanged");
@@ -571,6 +574,8 @@ namespace IC_EasyStart_WPF
                     TrB_ExposureVal.Value = toslide;
                 else
                     TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Default);
+
+                Device_state = IC_Control.SaveDeviceState();
             }
         }
 
@@ -589,6 +594,8 @@ namespace IC_EasyStart_WPF
                 TimerForRenew.IsEnabled = true;
                 TimerForRenew.Start();
             }
+            Exposure_Auto = vcdProp.Automation[VCDIDs.VCDID_Exposure];
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void TrB_GainVal_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -596,6 +603,7 @@ namespace IC_EasyStart_WPF
             FLog.Log("TrB_GainVal_Scroll");
             vcdProp.RangeValue[VCDIDs.VCDID_Gain] = (int)TrB_GainVal.Value;
             NUD_Gain.Value = TrB_GainVal.Value;
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void NUD_Gain_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -609,6 +617,7 @@ namespace IC_EasyStart_WPF
                     TrB_GainVal.Value = toslide;
                 else
                     TrB_GainVal.Value = vcdProp.DefaultValue(VCDIDs.VCDID_Gain);
+                Device_state = IC_Control.SaveDeviceState();
             }
         }
 
@@ -627,14 +636,36 @@ namespace IC_EasyStart_WPF
                 TimerForRenew.IsEnabled = true;
                 TimerForRenew.Start();
             }
+            Gain_Auto = vcdProp.Automation[VCDIDs.VCDID_Gain];
+            Device_state = IC_Control.SaveDeviceState();
         }
+
+        #region Scale
+
+        private void NUD_Scale_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+
+        }
+
+        private void ChB_ScaleAuto_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if(IC_Control != null && IC_Control.DeviceValid)
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+        }
+
+        private void TrB_ScaleVal_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+
+        }
+        
+        #endregion
 
         private void TrB_Brightness_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            int a = 0;
             FLog.Log("TrB_Brightness_Scroll");
             vcdProp.RangeValue[VCDIDs.VCDID_Brightness] = (int)TrB_Brightness.Value;
             NUD_Brightness.Value = TrB_Brightness.Value;
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void NUD_Brightness_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -663,6 +694,7 @@ namespace IC_EasyStart_WPF
                     TrB_Brightness.Value = vcdProp.DefaultValue(VCDIDs.VCDID_Brightness);
 
             }
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void ChB_BrightnessAuto_CheckedChanged(object sender, RoutedEventArgs e)
@@ -680,18 +712,24 @@ namespace IC_EasyStart_WPF
                 TimerForRenew.IsEnabled = true;
                 TimerForRenew.Start();
             }
+            Device_state = IC_Control.SaveDeviceState();
+
         }
 
         private void TimerForRenew_Tick(object sender, EventArgs e)
         {
-            FLog.Log("TimerForRenew_Tick");
+            
             try
             {
                 Refresh_Values_on_Trackbars();
+                FLog.Log("Scrollbars values refreshed!");
             }
-            catch { }
+            catch
+            {
+                FLog.Log("Error on scrollbars values refresh");
+            }
         }
-        bool AutoExp_wasEnabled = false;
+        bool AutoExp_wasEnabled_beforeRecording = false;
         bool RecordingNeeded = false;
         List<Bitmap> bmp_list = new List<Bitmap>();
         private void B_StartCapture_Click(object sender, RoutedEventArgs e)
@@ -702,7 +740,7 @@ namespace IC_EasyStart_WPF
             {
                 if (!isRecording)
                 {
-                    AutoExp_wasEnabled = Disable_AutoExposure_ctrl();
+                    AutoExp_wasEnabled_beforeRecording = Disable_AutoExposure_ctrl();
                     StartRecording();
                 }
             }
@@ -722,13 +760,19 @@ namespace IC_EasyStart_WPF
             {
                 if (isRecording)
                 {
-                    if (AutoExp_wasEnabled) Enable_AutoExposure_ctrl();
+                    try { Enable_AutoExposure_ctrl(AutoExp_wasEnabled_beforeRecording); } 
+                    catch(Exception exc)
+                    {
+                        FLog.Log("Error on B_StopCapture_Click: error in Enable_AutoExposure_ctrl(). ORIGINAL: " + exc.Message);
+                    }
                     StopRecording();
                     FLog.Log("Recording stopped successfully");
+                    Enable_AutoExposure_ctrl(AutoExp_wasEnabled_beforeRecording);
                 }
             }
             catch (Exception exc)
             {
+                FLog.Log("Error on record stop. ORIGINAL: " + exc.Message);
                 MessageBox.Show(exc.Message, "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -738,6 +782,7 @@ namespace IC_EasyStart_WPF
             FLog.Log("B_Properties_Click");
             IC_Control.ShowPropertyDialog();
             Refresh_Values_on_Trackbars();
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void ChB_WhiteBalanceAuto_CheckedChanged(object sender, RoutedEventArgs e)
@@ -748,7 +793,7 @@ namespace IC_EasyStart_WPF
                 vcdProp.OnePush(VCDIDs.VCDID_WhiteBalance);
                 WhiteBalanceTimer.Start();
                 WB_FinalSum = 0;
-                Save_cfg(ConfigNames[LastConfig_num]);
+                Save_cfg(Config_tag);
             }
         }
 
@@ -783,6 +828,22 @@ namespace IC_EasyStart_WPF
             string dataName = FindLast_Photo(SavePhoto_dir, (TB_FIO.Text + "_" + TB_CurrentDate.Text + "_" + TB_HistoryNumber.Text), ".tiff");
             string FullPathAndName = dataName;
             IC_Control.MemorySaveImage(FullPathAndName);
+
+            //запустить анимаицю
+            ThicknessAnimationUsingKeyFrames thicknessAnimationUsingKeyFrames = new ThicknessAnimationUsingKeyFrames();
+            thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(0, 0, 0, 0), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 50))));
+            thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(2, 2, 2, 2), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 200))));
+            thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(0, 0, 0, 0), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 50))));
+            thicknessAnimationUsingKeyFrames.AutoReverse = false;
+            thicknessAnimationUsingKeyFrames.FillBehavior = FillBehavior.Stop;
+            thicknessAnimationUsingKeyFrames.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 300));
+
+            ThicknessAnimation thicknessAnimation = new ThicknessAnimation(new Thickness(0, 0, 0, 0),
+                new Thickness(2, 2, 2, 2),
+                new TimeSpan(0, 0, 0, 0, 300),
+                FillBehavior.Stop);
+            thicknessAnimation.AutoReverse = true;
+            border_host.BeginAnimation(Border.BorderThicknessProperty, thicknessAnimationUsingKeyFrames);
         }
 
         private void B_Cam_Select_Click(object sender, RoutedEventArgs e)
@@ -800,8 +861,10 @@ namespace IC_EasyStart_WPF
 
                 IMG_H_now = IC_Control.ImageHeight;
                 IMG_W_now = IC_Control.ImageWidth;
-                Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
-                FormatAdaptation(IMG_W_now, IMG_H_now);
+                //ВРЕМЕННО
+                //Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
+                //FormatAdaptation(IMG_W_now, IMG_H_now);
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
 
                 vcdProp.Automation[VCDIDs.VCDID_WhiteBalance] = false;
                 Load_AppSettings();
@@ -816,10 +879,77 @@ namespace IC_EasyStart_WPF
             FLog.Log("Form1_Resize");
             if (Everything_loaded)
             {
-                if (FullScrin) Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 1, 1); // resize
+                //ВРЕМЕННО
+                /*if (FullScrin) Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 1, 1); // resize
                 else Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1);
-                FormatAdaptation(IMG_W_now, IMG_H_now);
+                FormatAdaptation(IMG_W_now, IMG_H_now);*/
+
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
             }
+        }
+        int datacounter = 0;
+        private void AdaptViewportControl()
+        {
+            datacounter++;
+            if(datacounter >= 6)
+            {
+                int a = 0;
+            }
+            double zf = mainViewModel.Scale;
+
+            Rect rectHost = new Rect(0,0,Host.ActualWidth*Scaling_of_monitor, Host.ActualHeight* Scaling_of_monitor);
+            Rect imageRect = new Rect(0, 0, IC_Control.ImageWidth, IC_Control.ImageHeight);
+            imageRect.Scale(zf, zf);
+            imageRect.Offset((rectHost.Width - imageRect.Width) * 0.5d, (rectHost.Height - imageRect.Height) * 0.5d);
+            
+            Rect controlRect = Rect.Intersect(rectHost, imageRect);
+
+            IC_Control.Width = (int)controlRect.Width;
+            IC_Control.Height = (int)controlRect.Height;
+            IC_Control.Left = (int)controlRect.Left;
+            IC_Control.Top = (int)controlRect.Top;
+
+
+            if (imageRect.Width > IC_Control.Width || imageRect.Height > IC_Control.Height)
+                IC_Control.ScrollbarsEnabled = true;
+            else
+                IC_Control.ScrollbarsEnabled = false;
+
+            ChangePos_of_FSBut();
+        }
+
+        private void CalculateZoomFactor(int panelWidth, int panelHeight, int IMG_Width, int IMG_Height)
+        {
+            double Ratio = 1d*panelWidth/panelHeight; // panel W/H
+            double ratio = 1d*IMG_Width/ IMG_Height; // image w/h
+            
+            var ctrl = IC_Control;
+
+            double delta_h = 30;
+            if (FullScrin) delta_h = 0;
+            int PanelNewWidth = (int)((Host.ActualWidth) * Scaling_of_monitor);
+            int PanelNewHeight = (int)((Host.ActualHeight - delta_h) * Scaling_of_monitor);
+            double Img_SizeRelation = (double)IMG_Width / (double)IMG_Height;
+
+            double zoomFactor = 1f;
+            if (ratio > Ratio)
+            {//вписываем по горизонтали
+                zoomFactor = (1d* PanelNewWidth / IMG_Width);
+            }
+            else
+            {//вписываем по вертикали
+                zoomFactor = (1d* PanelNewHeight / IMG_Height);
+
+            }
+
+            if(!FullScrin)
+                zoomFactor = mainViewModel.RoundZoomFactor(zoomFactor);
+
+            mainViewModel.Scale = zoomFactor;
+            
+            AdaptViewportControl();
+            
+            Font_Adaptation();
         }
 
         private void B_CodecProp_Click(object sender, EventArgs e)
@@ -952,11 +1082,32 @@ namespace IC_EasyStart_WPF
 
             if (Everything_loaded)
             {
-
                 try
                 {
-
                     ImgBuffer_RGB = IC_Control.ImageActiveBuffer;
+
+                    /*unsafe
+                    {
+                        ImgBuffer_RGB.Lock();
+                        viewportControl.SetImageByBuffer(ImgBuffer_RGB.GetImageData(),
+                            ImgBuffer_RGB.BytesPerLine,
+                            IC_Control.ImageWidth,
+                            IC_Control.ImageHeight,
+                            ConvertPixelFormats(IC_Control.MemoryPixelFormat),
+                            this.Dispatcher);
+                        ImgBuffer_RGB.Unlock();
+                    }*/
+
+                    /*this.Dispatcher.Invoke((Action)(() =>
+                    {
+                        wb = viewportControl.WriteableBitmap;
+                        unsafe
+                        {
+                            ImgBuffer_RGB.Lock();
+                            viewportControl.SetImageByBuffer(ImgBuffer_RGB.GetImageData(), ImgBuffer_RGB.BytesPerLine, IC_Control.ImageWidth, IC_Control.ImageHeight, ConvertPixelFormats(IC_Control.MemoryPixelFormat));
+                            ImgBuffer_RGB.Unlock();
+                        }
+                    }));*/
 
                     if (RecordingNeeded)
                     {
@@ -1003,25 +1154,33 @@ namespace IC_EasyStart_WPF
             // PB_Debug.Image = BMP;
         }
         bool Camera_restart_need = false;
+        int RestartAttempts = 0;
         private void Timer_camera_checker_Tick(object sender, EventArgs e)
         {
-            if (!Camera_restart_need)
+            if (!Camera_restart_need)//даже если рестарт не нужен
             {
-                if ((STW_fps.Elapsed.TotalMilliseconds > 1000) && (STW_fps.Elapsed.TotalMilliseconds > 20 * (double)(NUD_Exposure.Value??0)))
+                if ((STW_fps.Elapsed.TotalMilliseconds > 1000) && (STW_fps.Elapsed.TotalMilliseconds > 20 * (double)(NUD_Exposure.Value??0)))//но камера по непонятной причине отвалилась
                 {
                     // Timer_camera_checker.Dispose(); 
                     Camera_restart_need = true;
 
                     // this.BeginInvoke((Action)(() => this.Text = "Device state: " + (IC_Control.DeviceValid ? "valid" : "invalid")));
                     this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Device state: " + (IC_Control.DeviceValid ? "valid" : "invalid"))));
-                    if (IC_Control.DeviceValid)//check validicity
+                    /*if (IC_Control.DeviceValid && RestartAttempts==0)//check validicity
+                     {
+                         this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Waiting for translation start....")));
+                         Camera_restart_need = false;
+                         STW_fps.Restart();
+                         RestartAttempts++;
+                     }
+                     else
+                     {
+                         this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Restarting Camera")));
+                         if (!BGW_CamRestarter.IsBusy) BGW_CamRestarter.RunWorkerAsync();
+                     }*/
+                                     
                     {
                         this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Waiting for translation start....")));
-                        Camera_restart_need = false;
-                        STW_fps.Restart();
-                    }
-                    else
-                    {
                         this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Restarting Camera")));
                         if (!BGW_CamRestarter.IsBusy) BGW_CamRestarter.RunWorkerAsync();
                     }
@@ -1040,7 +1199,8 @@ namespace IC_EasyStart_WPF
             bool wasrecording = isRecording;
             if (isRecording) this.Dispatcher.BeginInvoke((Action)(() => StopRecording()));
 
-            while (!IC_Control.DeviceValid)
+            while (!IC_Control.DeviceValid || 
+                (STW_fps.Elapsed.TotalMilliseconds > 1000))
             {
                 int i_rem = -1;
                 for (int i = 0; i < IC_Control.Devices.Count(); i++)
@@ -1054,7 +1214,17 @@ namespace IC_EasyStart_WPF
                 }
                 if (i_rem != -1)
                 {
-                    IC_Control.Device = Device_name;
+                    try
+                    {
+                        IC_Control.Device = Device_name;
+                    }
+                    catch(Exception exc)
+                    {
+                        IC_Control.LiveStop();
+                        IC_Control.Device = Device_name;
+                    }
+
+
                     if (Device_state != null)
                         this.Dispatcher.BeginInvoke((Action)(() => IC_Control.LoadDeviceState(Device_state, true)));
                     //this.BeginInvoke((Action)(() => IC_Control.LiveStop()));
@@ -1062,7 +1232,10 @@ namespace IC_EasyStart_WPF
                     {
                         System.Threading.Thread.Sleep(200);
                         this.Dispatcher.BeginInvoke((Action)(() => IC_Control.LiveStart()));
+                        RestartAttempts = 0;
                     }
+                    STW_fps.Restart();
+                    FLog.Log("Camera restarted!");
                 }
             }
             //this.BeginInvoke((Action)(() => this.Text = "Device state: " + (IC_Control.DeviceValid ? "valid" : "invalid")));
@@ -1071,14 +1244,15 @@ namespace IC_EasyStart_WPF
             STW_fps.Restart();
 
             this.Dispatcher.BeginInvoke((Action)(() =>
-            {
+            {                
                 Init_Sliders(IC_Control);
                 Load_ic_cam_easy(IC_Control);
                 Refresh_Values_on_Trackbars();
                 if (wasrecording) StartRecording();
 
-                if (AutoExp_wasEnabled) Enable_AutoExposure_ctrl();
-                else Disable_AutoExposure_ctrl();
+                Enable_AutoExposure_ctrl(Exposure_Auto);
+                File.Delete("Config_" + LastConfig_tag + ".xml");
+                try { Save_cfg(LastConfig_tag); } catch { }
             }));
 
         }
@@ -1133,9 +1307,15 @@ namespace IC_EasyStart_WPF
             FLog.Log("Resize");
             if (Everything_loaded)
             {
-                if (FullScrin) Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 1, 1); // resize
+                //ВРЕМЕННО
+                /*if (FullScrin) Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 1, 1); // resize
                 else Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1);
-                FormatAdaptation(IMG_W_now, IMG_H_now);
+                FormatAdaptation(IMG_W_now, IMG_H_now);*/
+
+                if (mainViewModel.ScaleAuto)
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                else
+                    AdaptViewportControl();
             }
         }
 
@@ -1191,9 +1371,47 @@ namespace IC_EasyStart_WPF
 
             //Обработка переключения до цикла!
 
-            //
+            //FLog.Log("ChB_Config_N_Checked");
+            try
+            {
+                Timer_camera_checker.Stop();
+                Config_tag = ((sender as RenameableToggleButton).Tag as string); //Вычленяем номер конфигурации
 
-            for(int i = 0; i < renameableButtonsConfigs.Count; i++)
+                //IC_Control.SaveDeviceStateToFile(ConfigNames[LastConfig_num]);
+
+                IC_Control.LiveStop();
+                try { Save_cfg(LastConfig_tag); } catch { }
+                Load_cfg(Config_tag);
+               /* NUD_Gain.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
+                TrB_GainVal.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain];*/
+
+                Load_ic_cam_easy(IC_Control);
+                IMG_H_now = IC_Control.ImageHeight;
+                IMG_W_now = IC_Control.ImageWidth;
+                //ВРЕМЕННО
+                /*Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
+                FormatAdaptation(IMG_W_now, IMG_H_now);*/
+                if (mainViewModel.ScaleAuto)
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                else
+                    AdaptViewportControl();
+
+                IC_Control.LiveStart();
+
+                LastConfig_tag = Config_tag;
+                try { Refresh_Values_on_Trackbars(); }
+                catch
+                {
+                    FLog.Log("Не удалось обновить значения на ползунках");
+                }
+                Timer_camera_checker.Start();
+
+            }
+            catch(Exception exc)
+            {
+                FLog.Log("Ошибка при переключении конфигураций");
+            }
+            for (int i = 0; i < renameableButtonsConfigs.Count; i++)
             {
                 if(renameableButtonsConfigs[i] != toggleButton && renameableButtonsConfigs[i].toggleButon.IsChecked == true)
                 {
@@ -1209,7 +1427,20 @@ namespace IC_EasyStart_WPF
 
         private void RenameableToggleButton_OnApplyChanges(object sender, RoutedEventArgs eventArgs)
         {
-            MessageBox.Show((sender as RenameableToggleButton).textBox.Text);
+            string local_tag = (sender as RenameableToggleButton).Tag as string;
+            string local_text = (sender as RenameableToggleButton).Text;
+            ConfigsNamesDictionary[local_tag] = local_text;
+            Dictionary_Save();
+        }
+
+        private void RenameableToggleButton_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RenameableToggleButton_Loaded_1(object sender, RoutedEventArgs e)
+        {
+
         }
 
         private void Refresh_IC_BackColor()

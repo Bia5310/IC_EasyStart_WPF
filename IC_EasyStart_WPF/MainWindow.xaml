@@ -1,15 +1,18 @@
-﻿<Window x:Class="IC_EasyStart_WPF.MainWindow"
+﻿<Window x:Class="Medical_Studio.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xc="clr-namespace:Xceed.Wpf.Toolkit.Core;assembly=Xceed.Wpf.Toolkit"
-        xmlns:local="clr-namespace:IC_EasyStart_WPF"
+        xmlns:local="clr-namespace:Medical_Studio"
+        xmlns:VM="clr-namespace:Medical_Studio.ViewModels"
+        xmlns:VP="clr-namespace:Medical_Studio.Viewport"
+        xmlns:convs="clr-namespace:Medical_Studio.Converters"
         mc:Ignorable="d"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:tis="clr-namespace:TIS.Imaging;assembly=TIS.Imaging.ICImagingControl34"
-        Title="IC Easy Version 2.45"
+        Title="{Binding WindowTitle}"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
         Width="1280"
@@ -18,17 +21,24 @@
         Style="{DynamicResource WindowStyle}">
 
     <Window.Resources>
+        <convs:PercentConverter x:Key="myPercentConverter"/>
+        <convs:InverseBoolConverter x:Key="myBoolInverterConverter"/>
+        <convs:BoolVisibilityConverter x:Key="myBoolVisibilityConvertery"/>
+        <convs:BoolToRedColorConverter x:Key="myBoolToRedColorConverter"/>
         <Color x:Key="ColorToggleBlue">#FF1A89AA</Color>
         <Color x:Key="ColorToggleYellow">#FFBF00</Color>
         <SolidColorBrush x:Key="BrushToggleBlue" Color="{StaticResource ColorToggleBlue}"/>
         <SolidColorBrush x:Key="BrushToggleYellow" Color="{StaticResource ColorToggleYellow}"/>
 
-        <Style TargetType="ScrollBar">
-            <Setter Property="Width" Value="10"/>
-            <Setter Property="MinWidth" Value="5"/>
-            <Setter Property="Margin" Value="0 2 3 0"/>
-            <Setter Property="Opacity" Value="0.7"/>
-        </Style>
+        <!-- Animation to flicker, like a cursor when typing -->
+        <Storyboard x:Key="AnimateFlicker" RepeatBehavior="Forever">
+            <ColorAnimation Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)"
+                     From="Red"
+                     To="DarkGray"
+                     AutoReverse="True"
+                     Duration="0:0:0.5"
+                     RepeatBehavior="Forever"/>
+        </Storyboard>
 
         <Style TargetType="{x:Type local:TextBoxWatermark}" BasedOn="{StaticResource TextBoxSytle}"
                x:Key="TextBoxWatermarkStyle">
@@ -174,19 +184,22 @@
                                     <local:RenameableToggleButton Text="Config Phaco 0"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
-                                                                  OnApplyChanges="RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="0_0" IsChecked="True"/>
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
+                                                                  Tag="0_0" IsChecked="False" Loaded="RenameableToggleButton_Loaded"/>
                                     <local:RenameableToggleButton Text="Config Phaco 1" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="0_1"/>
                                     <local:RenameableToggleButton Text="Config Phaco 2" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="0_2"/>
                                     <local:RenameableToggleButton Text="Config Phaco 3" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="0_3"/>
                                 </StackPanel>
                             </TabItem>
@@ -200,19 +213,22 @@
                                     <local:RenameableToggleButton Text="Config Vitreo 0" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
-                                                                  
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="1_0"/>
                                     <local:RenameableToggleButton Text="Config Vitreo 1" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="1_1"/>
                                     <local:RenameableToggleButton Text="Config Vitreo 2" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="1_2"/>
                                     <local:RenameableToggleButton Text="Config Vitreo 3" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="1_3"/>
                                 </StackPanel>
                             </TabItem>
@@ -226,18 +242,22 @@
                                     <local:RenameableToggleButton Text="Config User 0" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="2_0"/>
                                     <local:RenameableToggleButton Text="Config User 1" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="2_1"/>
                                     <local:RenameableToggleButton Text="Config User 2" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="2_2"/>
                                     <local:RenameableToggleButton Text="Config User 3" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
+                                                                  OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
                                                                   Tag="2_3"/>
                                 </StackPanel>
                             </TabItem>
@@ -286,6 +306,8 @@
                             <RowDefinition/>
                             <RowDefinition/>
                             <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Экспозиция" Margin="2"/>
@@ -297,9 +319,9 @@
                                   x:Name="ChB_ExposureAuto" 
                                   Checked="ChB_ExposureAuto_CheckedChanged"
                                   Unchecked="ChB_ExposureAuto_CheckedChanged"/>
-                        <Slider Grid.Row="1" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="10000" 
+                        <Slider Grid.Row="1" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="1000000" 
                                 ValueChanged="TrB_ExposureVal_Scroll" x:Name="TrB_ExposureVal"
-                                Style="{DynamicResource SliderStyle}"/>
+                                Style="{DynamicResource SliderStyle}" Minimum="10" Value="500000" LargeChange="100000" SmallChange="10000"/>
 
                         <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Усиление" Margin="2"/>
                         <xctk:DoubleUpDown Grid.Row="2" Grid.Column="1" Margin="2" Maximum="10000" Increment="0.001" x:Name="NUD_Gain" MaxWidth="120" ValueChanged="NUD_Gain_ValueChanged"/>
@@ -311,27 +333,51 @@
                         <Slider Grid.Row="3" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="10000" x:Name="TrB_GainVal" ValueChanged="TrB_GainVal_Scroll"
                                 Style="{DynamicResource SliderStyle}"/>
 
-                        <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="Яркость" Margin="2"/>
-                        <xctk:DoubleUpDown Grid.Row="4" Grid.Column="1" Margin="2" Maximum="500" Minimum="-500" Increment="0.001" x:Name="NUD_Brightness" MaxWidth="120" ValueChanged="NUD_Brightness_ValueChanged"/>
-                        <CheckBox Grid.Row="4" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" IsEnabled="False"
+                        <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="Яркость" Margin="2" Visibility="Collapsed"/>
+                        <xctk:DoubleUpDown Grid.Row="4" Grid.Column="1" Margin="2" Maximum="500" Minimum="-500" Increment="0.001" Visibility="Collapsed" x:Name="NUD_Brightness" MaxWidth="120" ValueChanged="NUD_Brightness_ValueChanged"/>
+                        <CheckBox Grid.Row="4" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" IsEnabled="False" Visibility="Collapsed"
                                   Style="{DynamicResource CheckBoxSimpleStyle}"
                                   x:Name="ChB_BrightnessAuto"
                                   Checked="ChB_BrightnessAuto_CheckedChanged"
                                   Unchecked="ChB_BrightnessAuto_CheckedChanged"/>
                         <Slider Grid.Row="5" Grid.ColumnSpan="3" Margin="3 3 3 10" Maximum="500" Minimum="-500" x:Name="TrB_Brightness" ValueChanged="TrB_Brightness_Scroll"
-                                Style="{DynamicResource SliderStyle}"/>
+                                Style="{DynamicResource SliderStyle}" Visibility="Collapsed"/>
 
-                        <UniformGrid Rows="3" Grid.Row="6" Grid.ColumnSpan="4" Margin="0 5 0 0">
-                            <Button MaxHeight="42" Margin="2" 
-                                    Style="{DynamicResource ButtonStyle}" 
-                                    x:Name="B_Properties"
-                                    Click="B_Properties_Click">
-                                <Button.Content>
-                                    <Viewbox Height="24">
-                                        <TextBlock Text="Дополнительные настройки"/>
+                        <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Text="Масштаб" Margin="2"/>
+                        <xctk:DoubleUpDown Grid.Row="6" Grid.Column="1" Margin="2"  x:Name="NUD_Scale" MaxWidth="120" ValueChanged="NUD_Scale_ValueChanged"
+                                           Value="{Binding Scale, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
+                                           Maximum="{Binding ScaleMax, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
+                                           Minimum="{Binding ScaleMin, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
+                                           Increment="10"
+                                           IsEnabled="{Binding ScaleAuto, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolInverterConverter}}"
+                                           FormatString="F0"/>
+                        <!--Increment="{Binding ScaleIncrement, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"-->
+                        <CheckBox Grid.Row="6" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center"
+                                  Style="{DynamicResource CheckBoxSimpleStyle}" 
+                                  x:Name="ChB_AutoScale"
+                                  Checked="ChB_ScaleAuto_CheckedChanged"
+                                  Unchecked="ChB_ScaleAuto_CheckedChanged"
+                                  IsChecked="{Binding ScaleAuto, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Slider Grid.Row="7" Grid.ColumnSpan="3" Margin="3 3 3 10" x:Name="TrB_ScaleVal" ValueChanged="TrB_ScaleVal_Scroll"
+                                Style="{DynamicResource SliderStyle}"
+                                Value="{Binding Scale, UpdateSourceTrigger=PropertyChanged}"
+                                Maximum="{Binding ScaleMax, UpdateSourceTrigger=PropertyChanged}"
+                                Minimum="{Binding ScaleMin, UpdateSourceTrigger=PropertyChanged}"
+                                IsSnapToTickEnabled="True"
+                                TickFrequency="{Binding ScaleIncrement, UpdateSourceTrigger=PropertyChanged}"
+                                IsEnabled="{Binding ScaleAuto, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolInverterConverter}}"/>
+
+                        <UniformGrid Rows="3" Grid.Row="8" Grid.ColumnSpan="4" Margin="0 5 0 0">
+
+                            <ToggleButton MaxHeight="42" Margin="2"
+                                          Style="{DynamicResource ToggleButtonSimpleStyle}" 
+                                          x:Name="ChB_WhiteBalanceAuto">
+                                <ToggleButton.Content>
+                                    <Viewbox MaxHeight="30">
+                                        <TextBlock Height="22" Text="Автобаланс белого"/>
                                     </Viewbox>
-                                </Button.Content>
-                            </Button>
+                                </ToggleButton.Content>
+                            </ToggleButton>
                             <Button MaxHeight="42" Margin="2" 
                                     Style="{DynamicResource ButtonStyle}" 
                                     x:Name="B_Cam_Select"
@@ -342,15 +388,17 @@
                                     </Viewbox>
                                 </Button.Content>
                             </Button>
-                            <ToggleButton MaxHeight="42" Margin="2"
-                                          Style="{DynamicResource ToggleButtonSimpleStyle}" 
-                                          x:Name="ChB_WhiteBalanceAuto">
-                                <ToggleButton.Content>
-                                    <Viewbox MaxHeight="30">
-                                        <TextBlock Height="22" Text="Автобаланс белого"/>
+
+                            <Button MaxHeight="42" Margin="2" 
+                                    Style="{DynamicResource ButtonStyle}" 
+                                    x:Name="B_Properties"
+                                    Click="B_Properties_Click">
+                                <Button.Content>
+                                    <Viewbox Height="24">
+                                        <TextBlock Text="Дополнительные настройки"/>
                                     </Viewbox>
-                                </ToggleButton.Content>
-                            </ToggleButton>
+                                </Button.Content>
+                            </Button>
                         </UniformGrid>
                     </Grid>
                 </Expander>
@@ -415,25 +463,42 @@
         </ScrollViewer>
 
         <Grid Name="grid_with_host" Grid.Row="0" Grid.Column="2" Margin="1" SizeChanged="Host_SizeChanged">
-            <Canvas Name="canvas" Margin="1">
-                <ToggleButton x:Name="B_FS_Switcher" Visibility="Hidden" Canvas.Right="20" Canvas.Bottom="20" Width="65" Height="65"
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="1"/>
+            </Grid.ColumnDefinitions>
+
+            <VP:ViewportControl x:Name="viewportControl" ClipToBounds="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Column="2"/>
+            
+            <Canvas Name="canvas" Margin="1" Grid.Column="1">
+                <ToggleButton x:Name="B_FS_Switcher" Visibility="Visible" Canvas.Right="20" Canvas.Bottom="20" Width="65" Height="65"
                           Style="{DynamicResource ToggleButtonFSStyle}"
                           Checked="B_FS_Switcher_Checked"
                           Unchecked="B_FS_Switcher_Unchecked"/>
             </Canvas>
 
-            <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="Host" SizeChanged="Host_SizeChanged">
-                <WindowsFormsHost.Child>
-                    <wf:Panel>
-                        <wf:Panel.Controls>
-                            <wf:Button Width="72" Height="72"
+            <Border VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Column="0" Grid.RowSpan="2"  x:Name="border_host"
+                    BorderThickness="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolToRedColorConverter}}">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="Red"></SolidColorBrush>
+                </Border.BorderBrush>
+                <WindowsFormsHost VerticalAlignment="Stretch" HorizontalAlignment="Stretch" x:Name="Host" SizeChanged="Host_SizeChanged" Grid.RowSpan="2">
+                    <WindowsFormsHost.Child>
+                        <wf:Panel>
+                            <wf:Panel.Controls>
+                                <wf:Button Width="72" Height="72"
                                        Click="Button_Click" 
                                        Margin="20, 20, 20, 20"
                                        FlatStyle="Flat"/>
-                        </wf:Panel.Controls>
-                    </wf:Panel>
-                </WindowsFormsHost.Child>
-            </WindowsFormsHost>
+                            </wf:Panel.Controls>
+                        </wf:Panel>
+                    </WindowsFormsHost.Child>
+                </WindowsFormsHost>
+            </Border>
+            
         </Grid>
 
         <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Width="6" HorizontalAlignment="Center" Margin="0 2 0 2" 
@@ -444,6 +509,22 @@
             <StackPanel Orientation="Horizontal">
                 <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Тема" VerticalAlignment="Center" FontSize="16" Margin="10 2 2 2"/>
                 <ToggleButton ToolBar.OverflowMode="Never" x:Name="toggleTheme" Margin="2" Style="{StaticResource ToggleButtonSwitchStyle}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Checked"/>
+                <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Видеозапись" VerticalAlignment="Center" FontSize="16" Margin="100 2 2 2"
+                           Visibility="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolVisibilityConvertery}}"/>
+
+                <Ellipse Width="22" Height="22" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 0 0 0"
+                         StrokeThickness="1" Stroke="Gray"
+                         Visibility="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolVisibilityConvertery}}">
+                    <Ellipse.Fill>
+                        <SolidColorBrush Color="Red"/>
+                    </Ellipse.Fill>
+                    <Ellipse.Triggers>
+                        <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard Storyboard="{StaticResource AnimateFlicker}" />
+                        </EventTrigger>
+                    </Ellipse.Triggers>
+                </Ellipse>
+
             </StackPanel>
         </Border>
 
@@ -451,6 +532,10 @@
             <ToolBar Background="Transparent" ToolBarTray.IsLocked="True">
                 </ToolBar>
         </ToolBarTray>-->
+
+        <!--SCROLL BAR -->
+
+        <!--END SCROLL BAR -->
 
     </Grid>
 </Window>

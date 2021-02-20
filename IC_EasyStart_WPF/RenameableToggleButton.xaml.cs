@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace IC_EasyStart_WPF
+namespace Medical_Studio
 {
     /// <summary>
     /// Логика взаимодействия для RenameableToggleButton.xaml

@@ -10,8 +10,9 @@ using LDZ_Code;
 //using H264_Classes;
 using AForge.Video;
 using AForge.Video.FFMPEG;
+using System.Windows.Media;
 
-namespace IC_EasyStart_WPF
+namespace Medical_Studio
 {
     partial class MainWindow
     {
@@ -33,129 +34,229 @@ namespace IC_EasyStart_WPF
         //videowriting new
         string aviPath;
         System.IO.FileStream aviFile;
-        //H264Writer writer;
 
-        // H264エンコーダーを作成(create H264 encoder)
-        //OpenH264Lib.Encoder encoder = new OpenH264Lib.Encoder("openh264-1.7.0-win32.dll");
 
-        
 
+
+        private void Set_appropriate_params()
+        {
+            var local_vcdprop = new TIS.Imaging.VCDHelpers.VCDSimpleProperty(IC_Control.VCDPropertyItems);
+            var local_AbsValExp = (VCDAbsoluteValueProperty)IC_Control.VCDPropertyItems.FindInterface(VCDIDs.VCDID_Exposure +
+                    ":" + VCDIDs.VCDElement_Value + ":" + VCDIDs.VCDInterface_AbsoluteValue);
+            LoadExposure_ToCam(ref local_AbsValExp, 0.016f);
+            local_vcdprop.RangeValue[VCDIDs.VCDID_Gain] = (local_vcdprop.RangeMin(VCDIDs.VCDID_Gain)  + local_vcdprop.RangeMax(VCDIDs.VCDID_Gain))/2;
+
+        }
+        private void Init_Properties(ICImagingControl ic)
+        {
+            vcdProp = new TIS.Imaging.VCDHelpers.VCDSimpleProperty(ic.VCDPropertyItems);
+            var a = ic.VCDPropertyItems.CategoryMap;
+            var b = ic.VCDPropertyItems.Count;
+            var c = ic.VCDPropertyItems.get_Item(0);
+            
+            AbsValExp = (VCDAbsoluteValueProperty)ic.VCDPropertyItems.FindInterface(VCDIDs.VCDID_Exposure +
+                    ":" + VCDIDs.VCDElement_Value + ":" + VCDIDs.VCDInterface_AbsoluteValue);
+            
+        }
         private void Init_Sliders(ICImagingControl ic) //функция инициализации ползунка для регулировки отдельных свойст камеры
         {
-            vcdProp = new TIS.Imaging.VCDHelpers.VCDSimpleProperty(IC_Control.VCDPropertyItems);
+            bool locallogging = false; int il = 0; //отладочный режим
+            if (locallogging) { FLog.Log("Init_sliders L"+ (il++).ToString());}
+            Init_Properties(ic);
             string VCDID_Exp = VCDIDs.VCDID_Exposure;
             string VCDID_Gain = VCDIDs.VCDID_Gain;
             string VCDID_Brightness = VCDIDs.VCDID_Brightness;
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
 
-            if (!vcdProp.AutoAvailable(VCDID_Exp))//если невозможна автоматическая регулировка,отключить возможность ее включения
+            try
             {
+                if (!vcdProp.AutoAvailable(VCDID_Exp))//если невозможна автоматическая регулировка,отключить возможность ее включения
+                {
+                    ChB_ExposureAuto.IsEnabled = false;
+                    if (locallogging) { FLog.Log("Init_sliders L_tr" + (il++).ToString()); }
+                }
+                else
+                {
+                    if (locallogging) { FLog.Log("Init_sliders F_tr" + (il++).ToString()); }
+                    ChB_ExposureAuto.IsEnabled = true;
+                    ChB_ExposureAuto.IsChecked = Exposure_Auto;
+                    vcdProp.Automation[VCDID_Exp] = false;
+                   /* var a = vcdProp.RangeValue[VCDID_Exp] = 5;
+                    var b = AbsValExp.Value;*/
+
+                }
+            }
+            catch
+            {
+                FLog.Log("Error on autoexposure detecting. Deiniting autoexposure...");
                 ChB_ExposureAuto.IsEnabled = false;
             }
-            else
-            {
-                ChB_ExposureAuto.IsEnabled = true;
-                ChB_ExposureAuto.IsChecked = false;
-                vcdProp.Automation[VCDID_Exp] = false;
-            }
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
 
-            if (!vcdProp.AutoAvailable(VCDID_Gain))//если невозможна автоматическая регулировка,отключить возможность ее включения
+            try
             {
+                if (!vcdProp.AutoAvailable(VCDID_Gain))//если невозможна автоматическая регулировка,отключить возможность ее включения
+                {
+                    ChB_GainAuto.IsEnabled = false;
+                }
+                else
+                {
+                    ChB_GainAuto.IsEnabled = true;
+                    ChB_GainAuto.IsChecked = Gain_Auto;
+                    vcdProp.Automation[VCDID_Gain] = false;
+                }
+            }
+            catch
+            {
+                FLog.Log("Error on autogain detecting. Deiniting autogain...");
                 ChB_GainAuto.IsEnabled = false;
             }
-            else
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
+
+            try
             {
-                ChB_GainAuto.IsEnabled = true;
-                ChB_GainAuto.IsChecked = false;
-                vcdProp.Automation[VCDID_Gain] = false;
+                if (!vcdProp.AutoAvailable(VCDID_Brightness))//если невозможна автоматическая регулировка,отключить возможность ее включения
+                {
+                    ChB_BrightnessAuto.IsEnabled = false;
+                }
+                else
+                {
+                    ChB_BrightnessAuto.IsEnabled = true;
+                    ChB_BrightnessAuto.IsChecked = false;
+                    vcdProp.Automation[VCDID_Brightness] = false;
+                }
             }
-
-
-            if (!vcdProp.AutoAvailable(VCDID_Brightness))//если невозможна автоматическая регулировка,отключить возможность ее включения
+            catch
             {
+                FLog.Log("Error on autobrightness detecting. Deiniting autobrightness...");
                 ChB_BrightnessAuto.IsEnabled = false;
             }
-            else
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
+
+            try
             {
-                ChB_BrightnessAuto.IsEnabled = true;
-                ChB_BrightnessAuto.IsChecked = false;
-                vcdProp.Automation[VCDID_Brightness] = false;
+                if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
+                if (!vcdProp.Available(VCDID_Exp))
+                {
+                    if (locallogging) { FLog.Log("Init_sliders L_noexp" + (il++).ToString()); }
+                    TrB_ExposureVal.IsEnabled = false;
+                    NUD_Exposure.IsEnabled = false;
+                }
+                else
+                {
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
+                    TrB_ExposureVal.IsEnabled = true;
+                    NUD_Exposure.IsEnabled = true;
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
+                    double Az = TrB_ExposureVal.Minimum = ServiceFunctions.Math.PerfectRounding((AbsValExp.RangeMin * zF), 0);
+                    double Bz = TrB_ExposureVal.Maximum = ServiceFunctions.Math.PerfectRounding((AbsValExp.RangeMax * zF), 0);
+                    alpha = (AbsValExp.RangeMin * AbsValExp.RangeMax - 0.25 * 0.25) / (AbsValExp.RangeMin + AbsValExp.RangeMax - 2 * 0.25);
+                    xenta = Math.Pow((AbsValExp.RangeMax - alpha) / (AbsValExp.RangeMin - alpha), (zF / ((Bz - Az))));
+                    beta = (0.25 - alpha) / Math.Pow(xenta, (Bz + Az) / (2 * zF));
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
+                    double val1slide = Az;
+                    if (locallogging) { FLog.Log("Init_sliders L_exp_this" + (il++).ToString()); }
+                    try { TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value); }
+                    catch
+                    {
+                        if (TrB_ExposureVal.Value < TrB_ExposureVal.Minimum) TrB_ExposureVal.Value = TrB_ExposureVal.Minimum;
+                        else if (TrB_ExposureVal.Value > TrB_ExposureVal.Maximum) TrB_ExposureVal.Value = TrB_ExposureVal.Maximum;
+                    }
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
+                    TrB_ExposureVal.TickFrequency = (TrB_ExposureVal.Maximum - TrB_ExposureVal.Minimum) / 10;
+                    // ChangingActivatedTextBoxExp = false;
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
+                    NUD_Exposure.FormatString = "F" + DetectTheNumberOfDecimalPositions(AbsValExp.RangeMin);
+                    NUD_Exposure.Value = ServiceFunctions.Math.PerfectRounding(Exposure_Slide2real(TrB_ExposureVal.Value), 4);
+                    if (locallogging) { FLog.Log("Init_sliders L_exp" + (il++).ToString()); }
+                    //ChangingActivatedTextBoxExp = true;
+                }
             }
-
-
-            if (!vcdProp.Available(VCDID_Exp))
+            catch
             {
+                FLog.Log("Error on exposure detecting. Deiniting exposure...");
                 TrB_ExposureVal.IsEnabled = false;
                 NUD_Exposure.IsEnabled = false;
             }
-            else
-            {
-                AbsValExp = (VCDAbsoluteValueProperty)ic.VCDPropertyItems.FindInterface(VCDID_Exp +
-                    ":" + VCDIDs.VCDElement_Value + ":" + VCDIDs.VCDInterface_AbsoluteValue);
-                TrB_ExposureVal.IsEnabled = true;
-                NUD_Exposure.IsEnabled = true;
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
 
-                double Az = TrB_ExposureVal.Minimum = ServiceFunctions.Math.PerfectRounding((AbsValExp.RangeMin * zF), 0);
-                double Bz = TrB_ExposureVal.Maximum = ServiceFunctions.Math.PerfectRounding((AbsValExp.RangeMax * zF), 0);
-                alpha = (AbsValExp.RangeMin * AbsValExp.RangeMax - 0.25 * 0.25) / (AbsValExp.RangeMin + AbsValExp.RangeMax - 2 * 0.25);
-                xenta = Math.Pow((AbsValExp.RangeMax - alpha) / (AbsValExp.RangeMin - alpha), (zF / ((Bz - Az))));
-                beta = (0.25 - alpha) / Math.Pow(xenta, (Bz + Az) / (2 * zF));
-                double val1slide = Az;             
-                try { TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value); }
-                catch
+            try
+            {
+                if (!vcdProp.Available(VCDID_Gain))
                 {
-                    if (TrB_ExposureVal.Value < TrB_ExposureVal.Minimum) TrB_ExposureVal.Value = TrB_ExposureVal.Minimum;
-                    else if (TrB_ExposureVal.Value > TrB_ExposureVal.Maximum) TrB_ExposureVal.Value = TrB_ExposureVal.Maximum;
+                    TrB_GainVal.IsEnabled = false;
+                    NUD_Gain.IsEnabled = false;
                 }
-                TrB_ExposureVal.TickFrequency = (TrB_ExposureVal.Maximum - TrB_ExposureVal.Minimum) / 10;
-               // ChangingActivatedTextBoxExp = false;
-                NUD_Exposure.Value = ServiceFunctions.Math.PerfectRounding(Exposure_Slide2real(TrB_ExposureVal.Value), 4);
-                //ChangingActivatedTextBoxExp = true;
-            }
+                else
+                {
 
-            if (!vcdProp.Available(VCDID_Gain))
+                    var a = vcdProp.RangeValue[VCDID_Gain];
+                    TrB_GainVal.IsEnabled = true;
+                    NUD_Gain.IsEnabled = true;
+                    TrB_GainVal.Minimum = vcdProp.RangeMin(VCDID_Gain);
+                    TrB_GainVal.Maximum = vcdProp.RangeMax(VCDID_Gain);
+                    TrB_GainVal.Value = a;
+                    TrB_GainVal.TickFrequency = (TrB_GainVal.Maximum - TrB_GainVal.Minimum) / 10;
+                    // ChangingActivatedTextBoxGain = false;
+                    NUD_Gain.Minimum = vcdProp.RangeMin(VCDID_Gain);
+                    NUD_Gain.Maximum = vcdProp.RangeMax(VCDID_Gain);
+                    NUD_Gain.Value = TrB_GainVal.Value;
+                    // ChangingActivatedTextBoxGain = true;
+                }
+            }
+            catch
             {
+                FLog.Log("Error on gain detecting. Deiniting gain...");
                 TrB_GainVal.IsEnabled = false;
                 NUD_Gain.IsEnabled = false;
             }
-            else
-            {
-                TrB_GainVal.IsEnabled = true;
-                NUD_Gain.IsEnabled = true;
-                TrB_GainVal.Minimum = vcdProp.RangeMin(VCDID_Gain);
-                TrB_GainVal.Maximum = vcdProp.RangeMax(VCDID_Gain);
-                var a = vcdProp.RangeValue[VCDID_Gain];
-                TrB_GainVal.Value = a;
-                TrB_GainVal.TickFrequency = (TrB_GainVal.Maximum - TrB_GainVal.Minimum) / 10;
-                // ChangingActivatedTextBoxGain = false;
-                NUD_Gain.Minimum = vcdProp.RangeMin(VCDID_Gain);
-                NUD_Gain.Maximum = vcdProp.RangeMax(VCDID_Gain);
-                NUD_Gain.Value = TrB_GainVal.Value;;
-                // ChangingActivatedTextBoxGain = true;
-            }
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
 
-            if (!vcdProp.Available(VCDID_Brightness))
+            try
             {
+                if (!vcdProp.Available(VCDID_Brightness))
+                {
+                    TrB_Brightness.IsEnabled = false;
+                    NUD_Brightness.IsEnabled = false;
+                }
+                else
+                {
+                    TrB_Brightness.IsEnabled = true;
+                    NUD_Brightness.IsEnabled = true;
+
+                    TrB_Brightness.Minimum = vcdProp.RangeMin(VCDID_Brightness);
+                    TrB_Brightness.Maximum = vcdProp.RangeMax(VCDID_Brightness);
+                    TrB_Brightness.Value = vcdProp.RangeValue[VCDID_Brightness];
+                    TrB_Brightness.TickFrequency = (TrB_Brightness.Maximum - TrB_Brightness.Minimum) / 10;
+
+                    // ChangingActivatedTextBoxGain = false;
+                    NUD_Brightness.Minimum = vcdProp.RangeMin(VCDID_Brightness);
+                    NUD_Brightness.Maximum = vcdProp.RangeMax(VCDID_Brightness);
+                    NUD_Brightness.Value = TrB_Brightness.Value;
+                    // ChangingActivatedTextBoxGain = true;
+                }
+            }
+            catch
+            {
+                FLog.Log("Error on brightness detecting. Deiniting brightness...");
                 TrB_Brightness.IsEnabled = false;
                 NUD_Brightness.IsEnabled = false;
             }
-            else
-            {
-                TrB_Brightness.IsEnabled = true;
-                NUD_Brightness.IsEnabled = true;
 
-                TrB_Brightness.Minimum = vcdProp.RangeMin(VCDID_Brightness);
-                TrB_Brightness.Maximum = vcdProp.RangeMax(VCDID_Brightness);
-                TrB_Brightness.Value = vcdProp.RangeValue[VCDID_Brightness];
-                TrB_Brightness.TickFrequency = (TrB_Brightness.Maximum - TrB_Brightness.Minimum) / 10;
-                
-                // ChangingActivatedTextBoxGain = false;
-                NUD_Brightness.Minimum = vcdProp.RangeMin(VCDID_Brightness);
-                NUD_Brightness.Maximum = vcdProp.RangeMax(VCDID_Brightness);
-                NUD_Brightness.Value = TrB_Brightness.Value;
-                // ChangingActivatedTextBoxGain = true;
-            }
+            if (locallogging) { FLog.Log("Init_sliders L" + (il++).ToString()); }
+            if (locallogging) { FLog.Log("Init_sliders completed"); }
         }
-
+        
+        private int DetectTheNumberOfDecimalPositions(double value)
+        {
+           // if ((int)(value + (10e-6)) - (int)(value) != 0) value = value + (10e-6);
+            double half = value; int decplaces =0;
+            while((int)(half)==0)
+            {
+                half *= 10; decplaces++;
+            }
+            return decplaces;
+        }
         private double Exposure_Slide2real(double arg)
         {           
             double a = Math.Pow(xenta, arg / zF);
@@ -189,31 +290,42 @@ namespace IC_EasyStart_WPF
             }
 
             */
-            
-           
-                ic.LiveDisplayDefault = false; //если false, то позволяет изменения размеров окна
-
-                ic.LiveCaptureLastImage = true; // отображает и захватывает последний фрейм при LiveStop;
-
-                ic.LiveCaptureContinuous = true; //нужно для FormatAdaptation и граба фреймов
 
 
-                if(!ic.LiveVideoRunning) ic.LiveStart();
+            try { IC_Control.ImageRingBufferSize = 2; } catch { }; //на всякий случай
+
+            ic.LiveDisplayDefault = false; //если false, то позволяет изменения размеров окна
+
+            ic.LiveCaptureLastImage = true; // отображает и захватывает последний фрейм при LiveStop;
+
+            ic.LiveCaptureContinuous = true; //нужно для FormatAdaptation и граба фреймов
+
+
+            if(!ic.LiveVideoRunning) ic.LiveStart();
            
         }
 
         private void Refresh_Values_on_Trackbars()
         {
-            NUD_Exposure.Value = AbsValExp.Value;
-            TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value);
-            ChB_ExposureAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Exposure];
-
-            NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
-            TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
-            ChB_GainAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Gain];
-
-            NUD_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
-            TrB_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
+            if (NUD_Exposure.Value != null)
+            {
+                NUD_Exposure.Value = AbsValExp.Value;
+                TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value);
+                vcdProp.Automation[VCDIDs.VCDID_Exposure] = Exposure_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
+                ChB_ExposureAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Exposure];
+            }
+            if (NUD_Gain.Value != null)
+            {
+                NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
+                TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
+                vcdProp.Automation[VCDIDs.VCDID_Gain] = Gain_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
+                ChB_GainAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Gain];
+            }
+            if (NUD_Brightness.Value != null)
+            {
+                NUD_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
+                TrB_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
+            }
         }
 
         private void Save_AppSettings()
@@ -223,7 +335,7 @@ namespace IC_EasyStart_WPF
             if (SavePhoto_dir == "") SaveVid_dir = "Photo";
             Str_2_write.Add("<SaveVideo_dir>" + SaveVid_dir + "</SaveVideo_dir>");
             Str_2_write.Add("<SavePhoto_dir>" + SavePhoto_dir + "</SavePhoto_dir>");
-            Str_2_write.Add("<ConfigNumber>" + Config_num + "</ConfigNumber>");
+            Str_2_write.Add("<LastConfig_tag>" + Config_tag + "</LastConfig_tag>");
             
             ServiceFunctions.Files.Write_txt(MainConfigPath, Str_2_write);
             
@@ -249,7 +361,9 @@ namespace IC_EasyStart_WPF
                                     else
                                     {
                                         string data_path = System.IO.Path.Combine(Application.StartupPath, "Video");
-                                        try { System.IO.Directory.CreateDirectory(data_path); SaveVid_dir = data_path; }
+                                        try { System.IO.Directory.CreateDirectory(data_path);
+                                            //this.GetType().GetProperty("SaveVid_dir").SetValue(this, data_path);//let's try this
+                                            SaveVid_dir = data_path; }
                                         catch { SaveVid_dir = ""; }
                                     }
                                     break;
@@ -267,12 +381,12 @@ namespace IC_EasyStart_WPF
                                     break;
                                 }
 
-                            case "ConfigNumber":
+                            case "LastConfig_tag":
                                 {
                                     string toObject = CutFromEdges(AllLines[i]);
-                                    if (toObject != "-1") Config_num = Convert.ToInt32(toObject);
-                                    else Config_num = 0;
-                                    LastConfig_num = Config_num;
+                                    if (!string.IsNullOrEmpty(toObject)) Config_tag = toObject;
+                                    else Config_tag = "default";
+                                    LastConfig_tag = Config_tag;
                                     break;
                                 }
                         }
@@ -292,6 +406,116 @@ namespace IC_EasyStart_WPF
             TB_Directory_Vid.Text = SaveVid_dir;
             TB_Directory_Photo.Text = SavePhoto_dir;
         }
+        private void Dictionary_Load()
+        {
+            try
+            {
+                Dictionary_Load_fromFile();
+            }
+            catch
+            {
+                Dictionary_Load_Default();
+                Dictionary_Save();
+            }
+        }
+
+        private void Dictionary_Load_Default()
+        {
+            int Max_modes = 4;
+            ConfigsNamesDictionary = new Dictionary<string, string>();
+            for (int i =0;i< Max_modes;i++)
+                ConfigsNamesDictionary.Add("0_"+i.ToString(), "Config Phaco " + i.ToString());
+
+            for (int i = 0; i < Max_modes; i++)
+                ConfigsNamesDictionary.Add("1_" + i.ToString(), "Config Vitreo " + i.ToString());
+
+            for (int i = 0; i < Max_modes; i++)
+                ConfigsNamesDictionary.Add("2_" + i.ToString(), "Config User " + i.ToString());
+        }
+        private void Dictionary_Save()
+        {
+            List<string> List_2_file = new List<string>();
+            for(int i = 0;i< ConfigsNamesDictionary.Count;i++)
+            {
+                string local_key = (i / 4).ToString() + "_" + (i % 4).ToString();
+                List_2_file.Add(String.Format("<{0}>{1}</{0}>", local_key, ConfigsNamesDictionary[local_key]));
+            }
+            Files.Write_txt(ConfigNames_filename, List_2_file);
+        }
+        private void Dictionary_Load_fromFile()
+        {
+            var alpha = "beta";
+            var gamma = nameof(alpha);
+
+            ConfigsNamesDictionary = new Dictionary<string, string>();
+
+            if (System.IO.File.Exists(ConfigNames_filename))
+            {
+                string[] AllLines = System.IO.File.ReadAllLines(ConfigNames_filename);
+                for (int i = 0; i < AllLines.Count(); i++)
+                {
+                    int startind2 = AllLines[i].IndexOf('<');
+                    int finishind2 = AllLines[i].IndexOf('>');
+                    string data_tag = AllLines[i].Substring(startind2 + 1, finishind2 - startind2 - 1);
+                    string text_on_but = CutFromEdges(AllLines[i]);
+                    ConfigsNamesDictionary.Add(data_tag, text_on_but);
+                    /*var modenum = data_tag.Substring(0,1);
+                    var conf_num = data_tag.Substring(2, 1);
+                    int local_index = Convert.ToInt32(modenum) * 4 + Convert.ToInt32(conf_num);
+                    renameableButtonsConfigs[local_index].Text = text_on_but;*/
+                    Find_RenameableBut_byTag(data_tag).Text = text_on_but;
+                }
+            }
+            else
+            {
+                throw new Exception("Файл не существует");
+            }
+            
+            
+        }
+        private RenameableToggleButton Find_RenameableBut_byTag(string Tag)
+        {
+            var modenum = Tag.Substring(0, 1);
+            var conf_num = Tag.Substring(2, 1);
+            int local_index = Convert.ToInt32(modenum) * 4 + Convert.ToInt32(conf_num);
+            try
+            {
+                if ((renameableButtonsConfigs.Count > local_index))
+                {
+                    if ((string)renameableButtonsConfigs[local_index].Tag == Tag)
+                    {
+                        var reference = renameableButtonsConfigs[local_index];
+                        return reference;
+                    }
+                    else
+                    {
+                        var list = FindVisualChildren<RenameableToggleButton>(this).Where(x => x.Tag != null && x.Tag.ToString() == Tag);
+                        return list.First();
+                    }
+                }
+                else return null;
+            }
+            catch { return null; }
+        }
+        public static IEnumerable<T> FindVisualChildren<T>(System.Windows.DependencyObject depObj) where T : System.Windows.DependencyObject
+        {
+            if (depObj != null)
+            {
+                for (int i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(depObj); i++)
+                {
+                    System.Windows.DependencyObject child = System.Windows.Media.VisualTreeHelper.GetChild(depObj, i);
+                    if (child != null && child is T)
+                    {
+                        yield return (T)child;
+                    }
+
+                    foreach (T childOfChild in FindVisualChildren<T>(child))
+                    {
+                        yield return childOfChild;
+                    }
+                }
+            }
+        }
         private void Create_Directs_forPhotoVideo()
         {
             try
@@ -308,7 +532,9 @@ namespace IC_EasyStart_WPF
         private void Load_Default_Settings()
         {
             SaveVid_dir = System.IO.Path.Combine(Application.StartupPath,"Video"); 
-            SavePhoto_dir = System.IO.Path.Combine(Application.StartupPath, "Photo"); 
+            SavePhoto_dir = System.IO.Path.Combine(Application.StartupPath, "Photo");
+            Config_tag = "default";
+            LastConfig_tag = "default";
         }
         private string CutFromEdges(string target)
         {
@@ -324,6 +550,7 @@ namespace IC_EasyStart_WPF
                 return "1";
             }
         }
+
         private void FormatAdaptation(int WidthOfImage = -1,int HeightOfImage = -1)
         {
             var ic = IC_Control;
@@ -340,6 +567,7 @@ namespace IC_EasyStart_WPF
             if (ic.LiveDisplayDefault == false)
             {
                 ic.LiveDisplayZoomFactor = ZFactFinal;
+                
                 if (ic.LiveDisplayZoomFactor > 1.0) ic.ScrollbarsEnabled = true;
                 else ic.ScrollbarsEnabled = false;
             }
@@ -350,6 +578,18 @@ namespace IC_EasyStart_WPF
 
         }
         
+        private void SetLiveDisplayZoomFactor(float zoomFactor)
+        {
+            IC_Control.LiveDisplayZoomFactor = zoomFactor;
+
+            /*if (IC_Control.LiveDisplayZoomFactor > 1.0)
+                IC_Control.ScrollbarsEnabled = true;
+            else
+                IC_Control.ScrollbarsEnabled = false;*/
+
+            AdaptViewportControl();
+        }
+
         private string FindLast_Video(string VidPathName,string CurrentName,string Extension = ".avi")
         {
             string dataName = CurrentName + "_" + VideoIndex.ToString() + Extension;
@@ -382,21 +622,23 @@ namespace IC_EasyStart_WPF
             {
                 try
                 {
-                    string dataName = FindLast_Video(SaveVid_dir, TB_FIO.Text + " " + TB_HistoryNumber.Text + " " + TB_CurrentDate.Text);
+                    string FIO = !string.IsNullOrEmpty(TB_FIO.Text) ? TB_FIO.Text + " " : "";
+                    string H_num = !string.IsNullOrEmpty(TB_HistoryNumber.Text) ? TB_HistoryNumber.Text + " " : "";
+                    string dataName = FindLast_Video(SaveVid_dir, FIO + H_num + TB_CurrentDate.Text);
                     string FullPathAndName = dataName;
 
-                    Prepare_encoder2(FullPathAndName, (int)IC_Control.DeviceFrameRate, 25000 * 1000);
+                    Prepare_encoder2(FullPathAndName, (int)IC_Control.DeviceFrameRate, 20000 * 1000);
                     RecordingNeeded = true;
                     isRecording = true;
-
+                    mainViewModel.VideoCapturing = true;
                     
                     //disabling all the staff
 
                     Switch_state_of_ctrls();
                 }
-                catch
+                catch(Exception e)
                 {
-                    MessageBox.Show("Ошибка при подготовке к записи. Проверьте настойки. ");
+                    MessageBox.Show("Ошибка при подготовке к записи. Проверьте настройки. ");
                     //noErrors = false;
                 }
              }   
@@ -406,11 +648,25 @@ namespace IC_EasyStart_WPF
             
             RecordingNeeded = false;
             isRecording = false;
-            System.Threading.Thread.Sleep((int)(2 * NUD_Exposure.Value*1000)+100);
-            if (writer_ffmpeg.IsOpen)
-                try { writer_ffmpeg.Close(); } catch { }
+            FLog.Log("L1 of stop....");
+            // System.Threading.Thread.Sleep((int)(2 * NUD_Exposure.Value*1000)+100);
+            try
+            {
+                System.Threading.Thread.Sleep((int)(2 * AbsValExp.Value * 1000) + 100);
+            }
+            catch
+            {
+                System.Threading.Thread.Sleep(500);
+                FLog.Log("Can't read exposure...");
+            }
+            FLog.Log("L2 of stop....");
+            if (writer_ffmpeg!=null)
+                if (writer_ffmpeg.IsOpen) //запись закрывается в ImageAvalible, но если вдруг не закрылась, то тут
+                try { writer_ffmpeg.Close(); FLog.Log("L2_special_closing of stop...."); } catch { FLog.Log("Error on L3...."); }
             //enabling all the staff
             Switch_state_of_ctrls();
+            mainViewModel.VideoCapturing = false;
+            FLog.Log("L3 of stop....");
         }
         private bool Disable_AutoExposure_ctrl()
         {
@@ -425,14 +681,14 @@ namespace IC_EasyStart_WPF
             }
             return AutoExp_wasChecked;
         }
-        private void Enable_AutoExposure_ctrl()
+        private void Enable_AutoExposure_ctrl(bool wasChecked)
         {
             //enabling autoexposure, if was
             if ((vcdProp.AutoAvailable(VCDIDs.VCDID_Exposure)) && (!Camera_restart_need))
             {
                 ChB_ExposureAuto.IsEnabled = vcdProp.AutoAvailable(VCDIDs.VCDID_Exposure);
-                ChB_ExposureAuto.IsChecked = true;
-                vcdProp.Automation[VCDIDs.VCDID_Exposure] = true;
+                ChB_ExposureAuto.IsChecked = wasChecked;
+                vcdProp.Automation[VCDIDs.VCDID_Exposure] = wasChecked;
             }
         }
         private void Switch_state_of_ctrls()
@@ -454,8 +710,9 @@ namespace IC_EasyStart_WPF
             B_Browse_Vid.IsEnabled = !isRecording;
         }
        
-        private void Load_cfg(string CFG_name, bool Open_dev = true)
+        private void Load_cfg(string CFG_tag, bool Open_dev = true)
         {
+            string CFG_name = "Config_" + CFG_tag + ".xml";
             bool isDataSaved = true;
             try { IC_Control.SaveDeviceStateToFile("data.xml"); } catch { isDataSaved = false; }
             if (System.IO.File.Exists(CFG_name))
@@ -463,11 +720,13 @@ namespace IC_EasyStart_WPF
                 try
                 {
                     IC_Control.LoadDeviceStateFromFile(CFG_name, Open_dev);
+                    Init_Properties(IC_Control);
                     Device_state = IC_Control.SaveDeviceState();
                 }
                 catch(Exception e)
                 {
                     IC_Control.ShowDeviceSettingsDialog();
+                    Init_Properties(IC_Control);
                     Device_state = IC_Control.SaveDeviceState();
                     if(isDataSaved) IC_Control.LoadDeviceStateFromFile("data.xml", Open_dev);
                 }
@@ -478,12 +737,20 @@ namespace IC_EasyStart_WPF
             }
             System.IO.File.Delete("data.xml");
         }
-        private void Save_cfg(string CFG_name)
+        private void Save_cfg(string CFG_tag)
         {
+            string CFG_name = "Config_" + CFG_tag + ".xml";
             IC_Control.SaveDeviceStateToFile(CFG_name);
             Device_state = IC_Control.SaveDeviceState();
         }
-
+        private void Save_AllTheConfigs()
+        {
+            for(int i=0;i<3;i++)
+                for(int j=0;j<4;j++)
+                {
+                    Save_cfg(i.ToString() + "_" + j.ToString());
+                }
+        }
         private static void SetDecimalPlaces(Xceed.Wpf.Toolkit.DoubleUpDown doubleUpDown, int decimalPlaces)
         {
             if (doubleUpDown == null)
@@ -494,64 +761,14 @@ namespace IC_EasyStart_WPF
             doubleUpDown.FormatString = "F" + decimalPlaces.ToString();
         }
 
-        private void Prepare_encoder(string path, int pFPS, float TimaInterval, int BitsPerSecond)
-        {/*
-            aviPath = path;
-            aviFile = System.IO.File.OpenWrite(aviPath);
-            int fps = pFPS;
-            // fps = 50; 
-            writer = new H264Writer(aviFile, IMG_W_now, IMG_H_now, fps);
-
-            // H264エンコーダーを作成(create H264 encoder)
-            encoder = new OpenH264Lib.Encoder("openh264-1.7.0-win32.dll");
-
-
-            // 1フレームエンコードするごとにライターに書き込み(write frame data for each frame encoded)
-            OpenH264Lib.Encoder.OnEncodeCallback onEncode = (data, length, frameType) =>
-            {
-                var keyFrame = (frameType == OpenH264Lib.Encoder.FrameType.IDR) || (frameType == OpenH264Lib.Encoder.FrameType.I);
-                writer.AddImage(data, keyFrame);
-                System.Diagnostics.Debug.WriteLine("Encord {0} bytes, KeyFrame:{1}", length, keyFrame);
-            };
-
-            // H264エンコーダーの設定(encoder setup)
-            int bps = BitsPerSecond;         // target bitrate. 5Mbps.
-            float keyFrameInterval = TimaInterval; // insert key frame interval. unit is second.
-            encoder.Setup(IMG_W_now, IMG_H_now, bps, (int)fps, keyFrameInterval, onEncode);*/
-
-        }
-
         VideoFileWriter writer_ffmpeg;
 
         private void Prepare_encoder2(string path, int pFPS, int BitsPerSecond)
         {
+            int a = 0;
+            int b = a + 3;
             writer_ffmpeg = new VideoFileWriter();
             writer_ffmpeg.Open(path, IMG_W_now, IMG_H_now, pFPS, VideoCodec.MPEG4, BitsPerSecond);
-            //AVI
-            ///////////////////////////////////
-            /*aviPath = path;
-            aviFile = System.IO.File.OpenWrite(aviPath);
-            int fps = pFPS;
-            // fps = 50; 
-            writer = new H264Writer(aviFile, IMG_W_now, IMG_H_now, fps);
-
-            // H264エンコーダーを作成(create H264 encoder)
-            encoder = new OpenH264Lib.Encoder("openh264-1.7.0-win32.dll");
-
-
-            // 1フレームエンコードするごとにライターに書き込み(write frame data for each frame encoded)
-            OpenH264Lib.Encoder.OnEncodeCallback onEncode = (data, length, frameType) =>
-            {
-                var keyFrame = (frameType == OpenH264Lib.Encoder.FrameType.IDR) || (frameType == OpenH264Lib.Encoder.FrameType.I);
-                writer.AddImage(data, keyFrame);
-                System.Diagnostics.Debug.WriteLine("Encord {0} bytes, KeyFrame:{1}", length, keyFrame);
-            };
-
-            // H264エンコーダーの設定(encoder setup)
-            int bps = BitsPerSecond;         // target bitrate. 5Mbps.
-            float keyFrameInterval = TimaInterval; // insert key frame interval. unit is second.
-            encoder.Setup(IMG_W_now, IMG_H_now, bps, (int)fps, keyFrameInterval, onEncode);*/
-
         }
         private int Get_WB_Sum()
         {
@@ -559,7 +776,6 @@ namespace IC_EasyStart_WPF
             var G = vcdProp.RangeValue[VCDIDs.VCDElement_WhiteBalanceGreen];
             var B = vcdProp.RangeValue[VCDIDs.VCDElement_WhiteBalanceBlue];
             return (R + G + B);
-
         }
         private void Adapt_Size_ofCont(Control ctrl, int ImgW, int ImgH,double Width_Modifier, double Height_Modifier)
         {
@@ -577,7 +793,8 @@ namespace IC_EasyStart_WPF
 
             double delta_h = 30;
             if (FullScrin) delta_h = 0;
-            Size_for_Resizing = new Size((int)((double)(Host.ActualWidth) * Width_Modifier), (int)((Host.ActualHeight- delta_h) * Height_Modifier));
+            Size_for_Resizing = new Size((int)((Host.ActualWidth) * Width_Modifier * Scaling_of_monitor), 
+                                         (int)((Host.ActualHeight- delta_h) * Height_Modifier * Scaling_of_monitor));
             int PanelNewWidth = Size_for_Resizing.Width;
             int PanelNewHeight = Size_for_Resizing.Height;
             ctrl.Dock = DockStyle.None;
@@ -650,8 +867,11 @@ namespace IC_EasyStart_WPF
 
         private void ChangePos_of_FSBut()
         {
-            Point NewLocation_onPanel = (new Point(IC_Control.Location.X + IC_Control.Width, IC_Control.Location.Y + IC_Control.Height));
-            B_FS_Switcher_form.Location = new Point((int)((double)NewLocation_onPanel.X-100), (int)((double)NewLocation_onPanel.Y-100));
+            //Point NewLocation_onPanel = (new Point(IC_Control.Location.X + IC_Control.Width, IC_Control.Location.Y + IC_Control.Height));
+            //B_FS_Switcher_form.Location = new Point((int)((double)NewLocation_onPanel.X-100), (int)((double)NewLocation_onPanel.Y-100));
+
+            B_FS_Switcher_form.Location = new Point((int) (Host.ActualWidth* Scaling_of_monitor - 30 - B_FS_Switcher_form.Width),
+                                                     (int)(Host.ActualHeight* Scaling_of_monitor - 30 - B_FS_Switcher_form.Height));
         }
 
         System.Windows.GridLength column_width_old;
@@ -677,9 +897,10 @@ namespace IC_EasyStart_WPF
             grid_main.ColumnDefinitions[0].Width = new System.Windows.GridLength(0, System.Windows.GridUnitType.Auto);
 
             FullScrin = true;
-            
-            Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
-            FormatAdaptation(IMG_W_now, IMG_H_now);
+            //ВРЕМЕННО УБРАЛ
+            /*Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+            FormatAdaptation(IMG_W_now, IMG_H_now);*/
+
             /*Size_was = this.Size;
             Location_was = new Point(this.Location.X,this.Location.Y);
 
@@ -714,9 +935,11 @@ namespace IC_EasyStart_WPF
             grid_main.ColumnDefinitions[0].Width = column_width_old;
 
             FullScrin = false;
+            //ВРЕМЕННО
+            //Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+            //FormatAdaptation(IMG_W_now, IMG_H_now);
+            CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
 
-            Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
-            FormatAdaptation(IMG_W_now, IMG_H_now);
             /*this.FormBorderStyle = FormBorderStyle.Sizable;
             this.Size = Size_was;
             this.Location = Location_was;
@@ -730,5 +953,38 @@ namespace IC_EasyStart_WPF
             Adapt_Size_ofCont((IC_Control as Control), IMG_W_now, IMG_H_now, 0.8, 1); // Minimizing
             FormatAdaptation(IMG_W_now, IMG_H_now);*/
         }
+
+        public static PixelFormat ConvertPixelFormats(System.Drawing.Imaging.PixelFormat pixelFormat)
+        {//Не работает!
+            switch(pixelFormat)
+            {
+                case System.Drawing.Imaging.PixelFormat.Alpha:
+                    return PixelFormats.Gray8;
+                case System.Drawing.Imaging.PixelFormat.Canonical:
+                    return PixelFormats.Bgra32;
+                case System.Drawing.Imaging.PixelFormat.Format16bppGrayScale:
+                    return PixelFormats.Gray16;
+                case System.Drawing.Imaging.PixelFormat.Format32bppArgb:
+                    return PixelFormats.Bgra32;
+                case System.Drawing.Imaging.PixelFormat.Format24bppRgb:
+                    return PixelFormats.Bgr24;
+                case System.Drawing.Imaging.PixelFormat.Format32bppPArgb:
+                    return PixelFormats.Pbgra32;
+                case System.Drawing.Imaging.PixelFormat.Format32bppRgb:
+                    return PixelFormats.Bgr32;
+                case System.Drawing.Imaging.PixelFormat.Format8bppIndexed:
+                    return PixelFormats.Indexed8;
+                case System.Drawing.Imaging.PixelFormat.Format1bppIndexed:
+                    return PixelFormats.Indexed1;
+                case System.Drawing.Imaging.PixelFormat.Format16bppRgb555:
+                    return PixelFormats.Bgr555;
+                case System.Drawing.Imaging.PixelFormat.Format16bppRgb565:
+                    return PixelFormats.Bgr565;
+                case System.Drawing.Imaging.PixelFormat.Format48bppRgb:
+                    return PixelFormats.Rgb48;
+            }
+            return PixelFormats.Pbgra32;
+        }
+
     }
 }
