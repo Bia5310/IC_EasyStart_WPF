@@ -12,7 +12,7 @@ using AForge.Video;
 using AForge.Video.FFMPEG;
 using System.Windows.Media;
 
-namespace IC_EasyStart_WPF
+namespace Medical_Studio
 {
     partial class MainWindow
     {
@@ -870,8 +870,8 @@ namespace IC_EasyStart_WPF
             //Point NewLocation_onPanel = (new Point(IC_Control.Location.X + IC_Control.Width, IC_Control.Location.Y + IC_Control.Height));
             //B_FS_Switcher_form.Location = new Point((int)((double)NewLocation_onPanel.X-100), (int)((double)NewLocation_onPanel.Y-100));
 
-            B_FS_Switcher_form.Location = new Point((int) (Host.ActualWidth - 30 - B_FS_Switcher_form.Width),
-                                                     (int)(Host.ActualHeight - 30 - B_FS_Switcher_form.Height));
+            B_FS_Switcher_form.Location = new Point((int) (Host.ActualWidth* Scaling_of_monitor - 30 - B_FS_Switcher_form.Width),
+                                                     (int)(Host.ActualHeight* Scaling_of_monitor - 30 - B_FS_Switcher_form.Height));
         }
 
         System.Windows.GridLength column_width_old;

@@ -21,7 +21,7 @@ using LDZ_Code;
 using System.Windows.Threading;
 using System.Windows.Media.Animation;
 
-namespace IC_EasyStart_WPF
+namespace Medical_Studio
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
@@ -34,7 +34,6 @@ namespace IC_EasyStart_WPF
         private VCDSimpleProperty vcdProp = null;
         private VCDAbsoluteValueProperty AbsValExp = null;// специально для времени экспонирования [c]
 
-        string Version = "2.51";
         string Config_tag = "0_0"; //0_0 - default
         string LastConfig_tag = "0_0";
         string SaveVid_dir = "Video";
@@ -112,7 +111,7 @@ namespace IC_EasyStart_WPF
 
         public MainWindow()
         {
-            this.Title = "IC EasyStart v" + Version;
+           // this.Title = "IC EasyStart v" + Version; //20022021. Moved to MainViewModel and binded
            
             Directory.CreateDirectory("Logs");
             FLog = new ServiceFunctions.UI.Log.FileLogger("Logs\\Log_" + ServiceFunctions.UI.Get_TimeNow_String() + ".txt");
@@ -428,7 +427,7 @@ namespace IC_EasyStart_WPF
         {
             double resHeight = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;  // 1440
             double actualHeight = SystemParameters.PrimaryScreenHeight;  // 960
-            return (resHeight / actualHeight);            
+            return (resHeight / actualHeight);
         }
         private void IC_Control_Invalidated(object sender, System.Windows.Forms.InvalidateEventArgs e)
         {
@@ -888,12 +887,17 @@ namespace IC_EasyStart_WPF
                 CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
             }
         }
-
+        int datacounter = 0;
         private void AdaptViewportControl()
         {
+            datacounter++;
+            if(datacounter >= 6)
+            {
+                int a = 0;
+            }
             double zf = mainViewModel.Scale;
 
-            Rect rectHost = new Rect(0,0,Host.ActualWidth, Host.ActualHeight);
+            Rect rectHost = new Rect(0,0,Host.ActualWidth*Scaling_of_monitor, Host.ActualHeight* Scaling_of_monitor);
             Rect imageRect = new Rect(0, 0, IC_Control.ImageWidth, IC_Control.ImageHeight);
             imageRect.Scale(zf, zf);
             imageRect.Offset((rectHost.Width - imageRect.Width) * 0.5d, (rectHost.Height - imageRect.Height) * 0.5d);

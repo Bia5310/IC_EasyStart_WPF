@@ -5,18 +5,26 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace IC_EasyStart_WPF.ViewModels
+namespace Medical_Studio.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private const string NameOfApplication = "Medical Studio";
+        private const string AppVersion = "2.6 Beta";
+
+        public string WindowTitle
+        {
+            get => String.Format("{0} {1}", NameOfApplication, AppVersion);
+        }
 
         public void OnPropertyChanged(/*[CallerMemberName]*/string prop = "")
         {
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(prop));
         }
-
+        
         private double scale = 1;
         public double Scale
         {

@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Data;
 
-namespace IC_EasyStart_WPF.Converters
+namespace Medical_Studio.Converters
 {
     public class BoolVisibilityConverter : IValueConverter
     {

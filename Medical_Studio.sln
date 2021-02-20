@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.1082
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IC_EasyStart_WPF", "IC_EasyStart_WPF\IC_EasyStart_WPF.csproj", "{46AE59DC-385A-44EF-8E3D-8EF9C3D84105}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medical_Studio", "IC_EasyStart_WPF\Medical_Studio.csproj", "{46AE59DC-385A-44EF-8E3D-8EF9C3D84105}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "WIX_Install_test1", "WIX_Install_test1\WIX_Install_test1.wixproj", "{A3708694-50FC-4904-8215-BEE3E5D8429A}"
 EndProject

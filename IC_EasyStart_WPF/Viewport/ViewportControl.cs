@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace IC_EasyStart_WPF.Viewport
+namespace Medical_Studio.Viewport
 {
     public class ViewportControl : FrameworkElement
     {

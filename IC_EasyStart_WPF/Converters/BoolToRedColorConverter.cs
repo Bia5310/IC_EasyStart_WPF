@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace IC_EasyStart_WPF.Converters
+namespace Medical_Studio.Converters
 {
     public class BoolToRedColorConverter : IValueConverter
     {

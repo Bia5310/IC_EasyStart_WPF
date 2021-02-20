@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace IC_EasyStart_WPF
+namespace Medical_Studio
 {
     public class TextBoxWatermark : TextBox
     {
