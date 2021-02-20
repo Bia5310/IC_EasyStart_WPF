@@ -357,7 +357,8 @@ namespace Medical_Studio
                 FLog.Log("Stage 7 of loading is completed");
                 try
                 {
-                    Prepare_encoder2("Video\\video.avi", (int)IC_Control.DeviceFrameRate, 25000 * 1000);
+                    Prepare_encoder2("Video\\video.avi", (int)IC_Control.DeviceFrameRate, 20000 * 1000);
+                    writer_ffmpeg.Close();
                     B_StopCapture.IsEnabled = false;
                     FLog.Log("Encoder preparing is succesful");
                 }
