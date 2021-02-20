@@ -1116,7 +1116,7 @@ namespace Medical_Studio
 
                         // using (var final = new Bitmap(ImgBuffer_RGB.Bitmap))
                         //{
-                        writer_ffmpeg.WriteVideoFrame(ImgBuffer_RGB.Bitmap);
+                        writer_ffmpeg.WriteVideoFrame(ImgBuffer_RGB.Bitmap, DateTime.Now.Subtract(videoStartTime));
 
                         if (frames % 30 == 0) this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("+30 frames recorded")));
                         if ((!RecordingNeeded) && (writer_ffmpeg.IsOpen))

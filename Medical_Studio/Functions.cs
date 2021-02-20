@@ -762,6 +762,7 @@ namespace Medical_Studio
         }
 
         VideoFileWriter writer_ffmpeg;
+        private DateTime videoStartTime = DateTime.Now;
 
         private void Prepare_encoder2(string path, int pFPS, int BitsPerSecond)
         {
@@ -769,6 +770,7 @@ namespace Medical_Studio
             int b = a + 3;
             writer_ffmpeg = new VideoFileWriter();
             writer_ffmpeg.Open(path, IMG_W_now, IMG_H_now, pFPS, VideoCodec.MPEG4, BitsPerSecond);
+            videoStartTime = DateTime.Now;
         }
         private int Get_WB_Sum()
         {
