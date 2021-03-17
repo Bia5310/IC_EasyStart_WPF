@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1082
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "WIX_Install_test1", "WIX_Install_test1\WIX_Install_test1.wixproj", "{A3708694-50FC-4904-8215-BEE3E5D8429A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medical_Studio", "Medical_Studio\Medical_Studio.csproj", "{46AE59DC-385A-44EF-8E3D-8EF9C3D84105}"
 EndProject
 Global
@@ -17,14 +15,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A3708694-50FC-4904-8215-BEE3E5D8429A}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{A3708694-50FC-4904-8215-BEE3E5D8429A}.Debug|x64.ActiveCfg = Debug|x86
-		{A3708694-50FC-4904-8215-BEE3E5D8429A}.Debug|x86.ActiveCfg = Debug|x86
-		{A3708694-50FC-4904-8215-BEE3E5D8429A}.Debug|x86.Build.0 = Debug|x86
-		{A3708694-50FC-4904-8215-BEE3E5D8429A}.Release|Any CPU.ActiveCfg = Release|x86
-		{A3708694-50FC-4904-8215-BEE3E5D8429A}.Release|x64.ActiveCfg = Release|x86
-		{A3708694-50FC-4904-8215-BEE3E5D8429A}.Release|x86.ActiveCfg = Release|x86
-		{A3708694-50FC-4904-8215-BEE3E5D8429A}.Release|x86.Build.0 = Release|x86
 		{46AE59DC-385A-44EF-8E3D-8EF9C3D84105}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{46AE59DC-385A-44EF-8E3D-8EF9C3D84105}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46AE59DC-385A-44EF-8E3D-8EF9C3D84105}.Debug|x64.ActiveCfg = Debug|x64
