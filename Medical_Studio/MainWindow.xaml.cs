@@ -738,7 +738,7 @@ namespace Medical_Studio
             
             try
             {
-                Refresh_Values_on_Trackbars();
+                Refresh_Values_on_Trackbars(false,true);
                 FLog.Log("Scrollbars values refreshed!");
             }
             catch
@@ -1266,7 +1266,7 @@ namespace Medical_Studio
             {                
                 Init_Sliders(IC_Control);
                 Load_ic_cam_easy(IC_Control);
-                Refresh_Values_on_Trackbars();
+                Refresh_Values_on_Trackbars(true);
                 if (wasrecording) StartRecording();
 
                 Enable_AutoExposure_ctrl(Exposure_Auto);
@@ -1401,15 +1401,14 @@ namespace Medical_Studio
                 IC_Control.LiveStop();
                 try { Save_cfg(LastConfig_tag); } catch { }
                 Load_cfg(Config_tag);
+
                /* NUD_Gain.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
                 TrB_GainVal.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain];*/
 
                 Load_ic_cam_easy(IC_Control);
                 IMG_H_now = IC_Control.ImageHeight;
                 IMG_W_now = IC_Control.ImageWidth;
-                //ВРЕМЕННО
-                /*Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
-                FormatAdaptation(IMG_W_now, IMG_H_now);*/
+
                 if (mainViewModel.ScaleAuto)
                     CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
                 else
@@ -1417,7 +1416,7 @@ namespace Medical_Studio
 
                 IC_Control.LiveStart();
 
-                LastConfig_tag = Config_tag;
+                LastConfig_tag = Config_tag; // присваиваем последнему загруженному тегу тот, который загружен сейчас
                 try { Refresh_Values_on_Trackbars(); }
                 catch
                 {

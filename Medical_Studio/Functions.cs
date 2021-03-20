@@ -310,7 +310,7 @@ namespace Medical_Studio
         }
 
         [HandleProcessCorruptedStateExceptions]
-        private void Refresh_Values_on_Trackbars()
+        private void Refresh_Values_on_Trackbars(bool resuming_after_crash = false, bool just_scrolls = false)
         {
             try
             {
@@ -318,15 +318,26 @@ namespace Medical_Studio
                 {
                     NUD_Exposure.Value = AbsValExp.Value;
                     TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value);
-                    vcdProp.Automation[VCDIDs.VCDID_Exposure] = Exposure_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
-                    ChB_ExposureAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Exposure];
+                    // var a = vcdProp.Automation[VCDIDs.VCDID_Exposure];
+                    if (!just_scrolls)
+                    {
+                        if (resuming_after_crash)
+                            vcdProp.Automation[VCDIDs.VCDID_Exposure] = Exposure_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
+                        ChB_ExposureAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Exposure];
+                    }
                 }
                 if (NUD_Gain.Value != null)
                 {
                     NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
                     TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
-                    vcdProp.Automation[VCDIDs.VCDID_Gain] = Gain_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
-                    ChB_GainAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Gain];
+                    // var a = vcdProp.Automation[VCDIDs.VCDID_Gain];
+                    if (!just_scrolls)
+                    {
+                        if (resuming_after_crash)
+                            vcdProp.Automation[VCDIDs.VCDID_Gain] = Gain_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
+                        var a = vcdProp.Automation[VCDIDs.VCDID_Gain];
+                        ChB_GainAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Gain];
+                    }
                 }
               /*  if (NUD_Brightness.Value != null)
                 {
@@ -732,6 +743,7 @@ namespace Medical_Studio
             string CFG_name = "Config_" + CFG_tag + ".xml";
             bool isDataSaved = true;
             try { IC_Control.SaveDeviceStateToFile("data.xml"); } catch { isDataSaved = false; }
+
             if (System.IO.File.Exists(CFG_name))
             {
                 try
