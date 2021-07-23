@@ -139,6 +139,10 @@
     <Compile Include="Viewport\ViewportControl.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Viewport\ViewportDrawingVisual.cs" />
+    <Page Include="DoubleUpDownStyle.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RenameableToggleButton.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -1,0 +1,138 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Medical_Studio"
+                    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
+
+    <Style TargetType="xctk:DoubleUpDown" BasedOn="{StaticResource {x:Type xctk:DoubleUpDown}}">
+        <Style.Setters>
+            <Setter Property="BorderBrush" Value="{DynamicResource BrushNUD_Borders}"/>
+            <Setter Property="Background" Value="{DynamicResource BrushNUD_BackgroundStock}"/>
+            <Setter Property="Foreground" Value="{DynamicResource BrushNUD_Foreground}"/>
+            <Setter Property="WatermarkTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <ContentControl Content="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Focusable="False" Margin="0,0,3,0"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type xctk:DoubleUpDown}">
+                        <xctk:ButtonSpinner x:Name="PART_Spinner" Background="{TemplateBinding Background}" Foreground="{TemplateBinding Foreground}"
+                                            BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                            Opacity="{TemplateBinding Opacity}">
+                            
+                            <xctk:ButtonSpinner.Style>
+                                <Style TargetType="{x:Type xctk:ButtonSpinner}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type xctk:ButtonSpinner}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="22"/>
+                                                        <ColumnDefinition Width="22"/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <RepeatButton x:Name="PART_DecreaseButton" Grid.Column="0" Margin="0 0 1 0"
+                                                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" 
+                                                                  Style="{DynamicResource repeatButtons}">
+                                                        <Viewbox>
+                                                            <Path Data="M 0 1 L 2 1 Z" Margin="13" Stroke="{DynamicResource BrushNUD_Signes}" StrokeThickness="2"
+                                                                  Stretch="Fill"/>
+                                                        </Viewbox>
+
+                                                    </RepeatButton>
+                                                    <RepeatButton x:Name="PART_IncreaseButton" Grid.Column="1"
+                                                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0 0 1 0"
+                                                                  Style="{DynamicResource repeatButtons}">
+                                                        <Viewbox>
+                                                            <Path Data="M 0 1 L 2 1 Z M 1 0 L 1 2 Z" Stroke="{DynamicResource BrushNUD_Signes}" HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center" StrokeThickness="2" Stretch="Fill" Margin="13"/>
+                                                        </Viewbox>
+
+                                                    </RepeatButton>
+
+                                                    <Border Grid.Column="2"  x:Name="Border"
+                                                                Background="{TemplateBinding Background}"
+                                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                                CornerRadius="2">
+                                                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                          TextBlock.Foreground="{TemplateBinding Foreground}"
+                                                                          TextBlock.FontSize="{TemplateBinding FontSize}"
+                                                                          TextBlock.FontStretch="{TemplateBinding FontStretch}"
+                                                                          TextBlock.FontStyle="{TemplateBinding FontStyle}"
+                                                                          Opacity="{TemplateBinding Opacity}"/>
+                                                    </Border>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </xctk:ButtonSpinner.Style>
+                            <xctk:WatermarkTextBox x:Name="PART_TextBox" AutoMoveFocus="{Binding AutoMoveFocus, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                               AutoSelectBehavior="{Binding AutoSelectBehavior, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                               AcceptsReturn="False" BorderThickness="0" Background="Transparent"
+                                                                               ContextMenu="{TemplateBinding ContextMenu}" Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}" FontStyle="{TemplateBinding FontStyle}" FontStretch="{TemplateBinding FontStretch}"
+                                                                               FontSize="{TemplateBinding FontSize}" FontFamily="{TemplateBinding FontFamily}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                               IsTabStop="{TemplateBinding IsTabStop}" IsUndoEnabled="True" MinWidth="20" Padding="{TemplateBinding Padding}"
+                                                                               CaretBrush="White"
+                                                                               TextAlignment="{Binding TextAlignment, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="NoWrap"
+                                                                               TabIndex="{TemplateBinding TabIndex}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                               Watermark="{Binding Watermark, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        </xctk:ButtonSpinner>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+
+    <Style x:Key="repeatButtons" TargetType="{x:Type RepeatButton}">
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Grid x:Name="grid">
+                        <Border x:Name="border" CornerRadius="3" BorderBrush="{DynamicResource BrushButtonBorderStock}" BorderThickness="1" Background="{DynamicResource GradientStockBrushButton}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextElement.Foreground="White"
+                                          TextElement.FontSize="14"
+                                          x:Name="content">
+                            </ContentPresenter>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.Setters>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FFBF00"/>
+                                <Setter Property="BorderThickness" TargetName="border" Value="1"/>
+                                <Setter Property="Background" TargetName="border" Value="{DynamicResource GradientMouseOverBrushButton}"/>
+                            </Trigger.Setters>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="BorderBrush" TargetName="border" Value="#FFBF00"/>
+                            <Setter Property="Background" TargetName="border" Value="#FFFFD556"/>
+                            <Setter Property="TextElement.Foreground" TargetName="content" Value="#345BBC"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" TargetName="grid" Value="0.35"/>
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Foreground" Value="#345BBC"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    
+</ResourceDictionary>

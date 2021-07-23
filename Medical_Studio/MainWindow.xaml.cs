@@ -282,7 +282,7 @@ namespace Medical_Studio
                         {
                             MessageBox.Show("Не было выбрано ни одного устройства", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information);
                             FLog.Log("No devices selected by user or loaded");
-                            Application.Current.Shutdown();
+                            //Application.Current.Shutdown();
                         }
                     }
                     catch { Config_tag = "0_0"; renameableButtonsConfigs[0].IsChecked = true; }

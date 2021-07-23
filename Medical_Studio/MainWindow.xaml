@@ -100,23 +100,7 @@
             </Setter>
         </Style>
 
-        <Style TargetType="xctk:DoubleUpDown" BasedOn="{StaticResource {x:Type xctk:DoubleUpDown}}">
-            <Style.Setters>
-                <Setter Property="BorderBrush" Value="{DynamicResource BrushNUD_Borders}"/>
-                <Setter Property="Background" Value="{DynamicResource BrushNUD_BackgroundStock}"/>
-                <Setter Property="Foreground" Value="{DynamicResource BrushNUD_Foreground}"/>
-                <!--<Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type xctk:DoubleUpDown}">
-                            <Border x:Name="Border" Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    CornerRadius="4"/>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>-->
-            </Style.Setters>
-        </Style>
+        
 
         <!--<Style TargetType="{x:Type local:RenameableToggleButton}" BasedOn="{StaticResource ToggleButtonSimpleStyle}"
                x:Key="ToggleButtonRenameableStyle">
@@ -311,7 +295,7 @@
                         </Grid.RowDefinitions>
 
                         <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Экспозиция" Margin="2"/>
-                        <xctk:DoubleUpDown Grid.Row="0" Grid.Column="1" Margin="2" Maximum="10000" Increment="0.001"
+                        <xctk:DoubleUpDown Grid.Row="0" Grid.Column="1" Margin="2" Maximum="10000" Increment="0.001" Height="25"
                                            x:Name="NUD_Exposure" MaxWidth="120" ValueChanged="NUD_Exposure_ValueChanged">
                         </xctk:DoubleUpDown>
                         <CheckBox Grid.Row="0" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" 
@@ -324,7 +308,8 @@
                                 Style="{DynamicResource SliderStyle}" Minimum="10" Value="500000" LargeChange="100000" SmallChange="10000"/>
 
                         <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Усиление" Margin="2"/>
-                        <xctk:DoubleUpDown Grid.Row="2" Grid.Column="1" Margin="2" Maximum="10000" Increment="0.001" x:Name="NUD_Gain" MaxWidth="120" ValueChanged="NUD_Gain_ValueChanged"/>
+                        <xctk:DoubleUpDown Grid.Row="2" Grid.Column="1" Margin="2" Maximum="10000" Increment="0.001" Height="25"
+                                           x:Name="NUD_Gain" MaxWidth="120" ValueChanged="NUD_Gain_ValueChanged"/>
                         <CheckBox Grid.Row="2" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center"
                                   Style="{DynamicResource CheckBoxSimpleStyle}" 
                                   x:Name="ChB_GainAuto"
@@ -344,7 +329,7 @@
                                 Style="{DynamicResource SliderStyle}" Visibility="Collapsed"/>
 
                         <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Text="Масштаб" Margin="2"/>
-                        <xctk:DoubleUpDown Grid.Row="6" Grid.Column="1" Margin="2"  x:Name="NUD_Scale" MaxWidth="120" ValueChanged="NUD_Scale_ValueChanged"
+                        <xctk:DoubleUpDown Grid.Row="6" Grid.Column="1" Margin="2" Height="25" x:Name="NUD_Scale" MaxWidth="120" ValueChanged="NUD_Scale_ValueChanged"
                                            Value="{Binding Scale, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
                                            Maximum="{Binding ScaleMax, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
                                            Minimum="{Binding ScaleMin, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"
@@ -434,9 +419,6 @@
                                 <Image Source="Folder_img.png" Height="16"/>
                             </Button.Content>
                         </Button>
-                        <Button Style="{DynamicResource ButtonStyle}" Grid.Row="2" Grid.ColumnSpan="4" Margin="2" Content="Сделать фото" 
-                                x:Name="B_Snapshot"
-                                Click="B_Snapshot_Click"/>
 
                         <TextBlock Grid.Row="4" Grid.ColumnSpan="4" Margin="2" Text="Сохранение видео"/>
                         <TextBox Grid.Row="5" Grid.ColumnSpan="3" Margin="2" VerticalContentAlignment="Center"
@@ -447,16 +429,7 @@
                                 Style="{DynamicResource ButtonStyle}" 
                                 x:Name="B_Browse_Vid"
                                 Click="B_Browse_Vid_Click"/>
-                        <UniformGrid Grid.Row="6" Grid.ColumnSpan="4" Rows="1" Columns="2">
-                            <Button Margin="2" Content="Старт" 
-                                    Style="{DynamicResource ButtonStyle}" 
-                                    x:Name="B_StartCapture"
-                                    Click="B_StartCapture_Click"/>
-                            <Button Margin="2" Content="Стоп" 
-                                    Style="{DynamicResource ButtonStyle}" 
-                                    x:Name="B_StopCapture"
-                                    Click="B_StopCapture_Click"/>
-                        </UniformGrid>
+
                     </Grid>
                 </Expander>
             </StackPanel>
@@ -506,26 +479,64 @@
                       x:Name="gridSplitter_left"/>
 
         <Border x:Name="toolBar" Grid.Row="1" Grid.ColumnSpan="3" Style="{DynamicResource BorderDownStyle}" BorderThickness="0 2 0 0">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Тема" VerticalAlignment="Center" FontSize="16" Margin="10 2 2 2"/>
-                <ToggleButton ToolBar.OverflowMode="Never" x:Name="toggleTheme" Margin="2" Style="{StaticResource ToggleButtonSwitchStyle}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Checked"/>
-                <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Видеозапись" VerticalAlignment="Center" FontSize="16" Margin="100 2 2 2"
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Тема" VerticalAlignment="Center" FontSize="16" Margin="10 2 2 2"/>
+                    <ToggleButton ToolBar.OverflowMode="Never" x:Name="toggleTheme" Margin="2" Style="{StaticResource ToggleButtonSwitchStyle}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Checked"/>
+                </StackPanel>
+
+                <Grid Grid.Column="1" HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Style="{DynamicResource ButtonStyle}" Grid.Column="1" Margin="2" Content="Сделать фото" 
+                                x:Name="B_Snapshot" HorizontalAlignment="Center"
+                                Click="B_Snapshot_Click"/>
+
+                    <TextBlock Text="Видео:" Grid.Column="2" HorizontalAlignment="Right"
+                               Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never"
+                               VerticalAlignment="Center" FontSize="16" Margin="10 2 4 2"/>
+                    <UniformGrid Grid.Column="3" Rows="1" Columns="2" HorizontalAlignment="Center">
+                        <Button Margin="2" Content="Старт" 
+                                    Style="{DynamicResource ButtonStyle}" 
+                                    x:Name="B_StartCapture"
+                                    Click="B_StartCapture_Click"/>
+                        <Button Margin="2" Content="Стоп" 
+                                    Style="{DynamicResource ButtonStyle}" 
+                                    x:Name="B_StopCapture"
+                                    Click="B_StopCapture_Click"/>
+                    </UniformGrid>
+                    <StackPanel Orientation="Horizontal" Grid.Column="4">
+                        <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Видеозапись" VerticalAlignment="Center" FontSize="16" Margin="100 2 2 2"
                            Visibility="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolVisibilityConvertery}}"/>
 
-                <Ellipse Width="22" Height="22" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 0 0 0"
+                        <Ellipse Width="22" Height="22" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 0 0 0"
                          StrokeThickness="1" Stroke="Gray"
                          Visibility="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolVisibilityConvertery}}">
-                    <Ellipse.Fill>
-                        <SolidColorBrush Color="Red"/>
-                    </Ellipse.Fill>
-                    <Ellipse.Triggers>
-                        <EventTrigger RoutedEvent="Loaded">
-                            <BeginStoryboard Storyboard="{StaticResource AnimateFlicker}" />
-                        </EventTrigger>
-                    </Ellipse.Triggers>
-                </Ellipse>
+                            <Ellipse.Fill>
+                                <SolidColorBrush Color="Red"/>
+                            </Ellipse.Fill>
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard Storyboard="{StaticResource AnimateFlicker}" />
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+                    </StackPanel>
 
-            </StackPanel>
+                </Grid>
+            </Grid>
         </Border>
 
         <!--<ToolBarTray Grid.Row="1" Grid.ColumnSpan="3" x:Name="toolBar" Style="{DynamicResource ToolBarStyle}">

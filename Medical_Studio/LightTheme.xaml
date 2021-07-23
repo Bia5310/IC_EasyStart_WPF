@@ -27,6 +27,8 @@
 
     <Color x:Key="DarkBlue1Color">#FF4FA7DE</Color>
     <Color x:Key="DarkBlue2Color">#FF0077C1</Color>
+
+    <SolidColorBrush x:Key="BrushNUD_Signes" Color="#FF0042A2"/>
     <SolidColorBrush x:Key="BrushNUD_Borders" Color="Gray"/>
     <SolidColorBrush x:Key="BrushNUD_BackgroundStock" Color="WhiteSmoke"/>
     <SolidColorBrush x:Key="BrushNUD_BackgroundSelected" Color="LightGray"/>

@@ -15,6 +15,7 @@
         <Setter Property="BorderBrush" Value="#FF095278"/>
     </Style>
 
+    <SolidColorBrush x:Key="BrushNUD_Signes" Color="White"/>
     <SolidColorBrush x:Key="BrushNUD_Borders" Color="White"/>
     <SolidColorBrush x:Key="BrushNUD_BackgroundStock" Color="{StaticResource DarkBlue1Color}"/>
     <SolidColorBrush x:Key="BrushNUD_BackgroundSelected" Color="{StaticResource DarkBlue2Color}"/>
@@ -111,7 +112,7 @@
         </Style.Triggers>
     </Style>
 
-    <ControlTemplate x:Key="DarkButtonTemplate" TargetType="{x:Type Button}">
+    <ControlTemplate x:Key="DarkButtonTemplate" TargetType="{x:Type ButtonBase}">
         <Grid x:Name="grid">
             <Border x:Name="border" CornerRadius="3" BorderBrush="{DynamicResource BrushButtonBorderStock}" BorderThickness="1" Background="{DynamicResource GradientStockBrushButton}">
                 <ContentPresenter HorizontalAlignment="Center"
