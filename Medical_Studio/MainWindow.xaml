@@ -299,6 +299,7 @@
                                            x:Name="NUD_Exposure" MaxWidth="120" ValueChanged="NUD_Exposure_ValueChanged">
                         </xctk:DoubleUpDown>
                         <CheckBox Grid.Row="0" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center" 
+                                  Height="25"
                                   Style="{DynamicResource CheckBoxSimpleStyle}"
                                   x:Name="ChB_ExposureAuto" 
                                   Checked="ChB_ExposureAuto_CheckedChanged"
@@ -312,6 +313,7 @@
                                            x:Name="NUD_Gain" MaxWidth="120" ValueChanged="NUD_Gain_ValueChanged"/>
                         <CheckBox Grid.Row="2" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center"
                                   Style="{DynamicResource CheckBoxSimpleStyle}" 
+                                  Height="25"
                                   x:Name="ChB_GainAuto"
                                   Checked="ChB_GainAuto_CheckedChanged"
                                   Unchecked="ChB_GainAuto_CheckedChanged"/>
@@ -339,6 +341,7 @@
                         <!--Increment="{Binding ScaleIncrement, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myPercentConverter}}"-->
                         <CheckBox Grid.Row="6" Grid.Column="2" Margin="2" Content="Auto" VerticalAlignment="Center"
                                   Style="{DynamicResource CheckBoxSimpleStyle}" 
+                                  Height="25"
                                   x:Name="ChB_AutoScale"
                                   Checked="ChB_ScaleAuto_CheckedChanged"
                                   Unchecked="ChB_ScaleAuto_CheckedChanged"

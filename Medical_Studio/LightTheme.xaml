@@ -71,6 +71,74 @@
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="4 0 4 0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <BulletDecorator>
+                            <BulletDecorator.Bullet>
+                                <Grid>
+                                    <Border x:Name="Border" CornerRadius="2"
+                                        BorderThickness="1"
+                                        Height="{TemplateBinding Height}"
+                                        Width="{TemplateBinding Width}"
+                                        Background="{DynamicResource GradientStockBrushButton}"
+                                        BorderBrush="Gray">
+                                        <ContentPresenter x:Name="content"
+                                                      Content="{TemplateBinding Content}"
+                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                      Margin="{TemplateBinding Padding}"
+                                                      TextBlock.Foreground="{TemplateBinding Foreground}"
+                                                      TextBlock.FontSize="{TemplateBinding FontSize}"
+                                                      TextBlock.FontStretch="{TemplateBinding FontStretch}"
+                                                      Opacity="{TemplateBinding Opacity}">
+                                        </ContentPresenter>
+                                    </Border>
+                                </Grid>
+                            </BulletDecorator.Bullet>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.Setters>
+                                    <Setter Property="BorderThickness" TargetName="Border" Value="1"/>
+                                    <Setter Property="Background" TargetName="Border">
+                                        <Setter.Value>
+                                            <RadialGradientBrush GradientOrigin="0.5,1.5">
+                                                <RadialGradientBrush.RelativeTransform>
+                                                    <TransformGroup>
+                                                        <ScaleTransform CenterX="0.5" CenterY="0.5" ScaleX="1.5" ScaleY="1.5"/>
+                                                        <TranslateTransform X="0.02" Y="0.3"/>
+                                                    </TransformGroup>
+                                                </RadialGradientBrush.RelativeTransform>
+                                                <GradientStop Offset="1" Color="#FFE5F5FF"/>
+                                                <GradientStop Offset="0" Color="#FF74A1BD"/>
+                                            </RadialGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="TextElement.Foreground" Value="Black"/>
+                                </Trigger.Setters>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="BorderBrush" TargetName="Border" Value="#FF0041B4"/>
+                                <Setter Property="Background" TargetName="Border" Value="#FF419FD9"/>
+                                <Setter Property="TextElement.Foreground" TargetName="content" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="BorderBrush" TargetName="Border" Value="#FF0041B4"/>
+                                <Setter Property="Background" TargetName="Border" Value="#419FD9"/>
+                                <Setter Property="TextElement.Foreground" TargetName="content" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" TargetName="Border" Value="0.35"/>
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style.Setters>
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
