@@ -20,6 +20,7 @@ using TIS.Imaging;
 using LDZ_Code;
 using System.Windows.Threading;
 using System.Windows.Media.Animation;
+using System.Runtime.ExceptionServices;
 
 namespace Medical_Studio
 {
@@ -186,47 +187,61 @@ namespace Medical_Studio
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            FLog.Log("Stage 0 of loading is completed");
-            IC_Control = new ICImagingControl();
-            Host.Child.Controls.Add(IC_Control);
+            try
+            {
+                FLog.Log("Stage 0 of loading is completed");
+                IC_Control = new ICImagingControl();
+                Host.Child.Controls.Add(IC_Control);
 
-            FLog.Log("Stage 0.2 of loading is completed");
-            IC_Control.SendToBack();
-            IC_Control.Paint += IC_Control_Paint;
-            FLog.Log("Stage 0.4 of loading is completed");
-            //IC_Control.OverlayBitmapPosition = PathPositions.Display;
-            IC_Control.OverlayBitmapAtPath[PathPositions.Display].Enable = true;
-            //IC_Control.OverlayBitmap.Enable = true;
-            IC_Control.LiveCaptureContinuous = true;
+                FLog.Log("Stage 0.2 of loading is completed");
+                IC_Control.SendToBack();
+                IC_Control.Paint += IC_Control_Paint;
+                FLog.Log("Stage 0.4 of loading is completed");
+                //IC_Control.OverlayBitmapPosition = PathPositions.Display;
+                IC_Control.OverlayBitmapAtPath[PathPositions.Display].Enable = true;
+                //IC_Control.OverlayBitmap.Enable = true;
+                IC_Control.LiveCaptureContinuous = true;
 
-            FLog.Log("Stage 0.6 of loading is completed");
-            IC_Control.ImageAvailable += IC_Control_ImageAvailable;
-            IC_Control.Invalidated += IC_Control_Invalidated;
-            //IC_Control.LiveDisplay = false;
-            FLog.Log("Stage 0.8 of loading is completed");
-            Panel = Host.Child as System.Windows.Forms.Panel;
-            FLog.Log("Stage 1 of loading is completed");
-            //IC_Control.Anchor = System.Windows.Forms.AnchorStyles.Left|System.Windows.Forms.AnchorStyles.Right| System.Windows.Forms.AnchorStyles.Top| System.Windows.Forms.AnchorStyles.Bottom;
-            //B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("B_FS_");//System.Drawing.Color.FromArgb(0, System.Drawing.Color.White);
-            Refresh_IC_BackColor();
+                FLog.Log("Stage 0.6 of loading is completed");
+                IC_Control.ImageAvailable += IC_Control_ImageAvailable;
+                IC_Control.Invalidated += IC_Control_Invalidated;
+                //IC_Control.LiveDisplay = false;
+                FLog.Log("Stage 0.8 of loading is completed");
+                Panel = Host.Child as System.Windows.Forms.Panel;
+                FLog.Log("Stage 1 of loading is completed");
+            }
+            catch(Exception exc)
+            {
+                FLog.Log("ERROR:" + exc.Message);
+            }
+            try
+            {
+                //IC_Control.Anchor = System.Windows.Forms.AnchorStyles.Left|System.Windows.Forms.AnchorStyles.Right| System.Windows.Forms.AnchorStyles.Top| System.Windows.Forms.AnchorStyles.Bottom;
+                //B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("B_FS_");//System.Drawing.Color.FromArgb(0, System.Drawing.Color.White);
+                Refresh_IC_BackColor();
 
-            B_FS_Switcher_form.UseVisualStyleBackColor = true;
-            B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
-            Init_ListOf_CheckButtons();
+                B_FS_Switcher_form.UseVisualStyleBackColor = true;
+                B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
+                Init_ListOf_CheckButtons();
 
 
-            Scaling_of_monitor = GetScalingFactor_ofMonitor();
-            /*IC_Control.ShowDeviceSettingsDialog();
-            if (IC_Control.DeviceValid) IC_Control.LiveStart();*/
+                Scaling_of_monitor = GetScalingFactor_ofMonitor();
+                /*IC_Control.ShowDeviceSettingsDialog();
+                if (IC_Control.DeviceValid) IC_Control.LiveStart();*/
 
-            //SetDecimalPlaces(NUD_Exposure, 4);
+                //SetDecimalPlaces(NUD_Exposure, 4);
 
-            TB_CurrentDate.Text = ServiceFunctions.UI.GetDateString();
-            TIS.Imaging.LibrarySetup.SetLocalizationLanguage("ru");
-            //this.KeyPreview = true;
-            FLog.Log("Stage 2 of loading is completed");
+                TB_CurrentDate.Text = ServiceFunctions.UI.GetDateString();
+                TIS.Imaging.LibrarySetup.SetLocalizationLanguage("ru");
+                //this.KeyPreview = true;
+                FLog.Log("Stage 2 of loading is completed");
 
-            mainViewModel.VideoCapturing = false;
+                mainViewModel.VideoCapturing = false;
+            }
+            catch (Exception exc)
+            {
+                FLog.Log("ERROR:" + exc.Message);
+            }
 
             try
             {
@@ -392,14 +407,6 @@ namespace Medical_Studio
                 FLog.Log("Stage 9 of loading is completed");
             }
 
-            var ov = IC_Control.OverlayBitmapAtPath[PathPositions.Display];
-            ov.Enable = true;
-            ov.ColorMode = OverlayColorModes.Color;
-            ov.DropOutColor = System.Drawing.Color.Magenta;
-            ov.Fill(IC_Control.OverlayBitmap.DropOutColor);
-            ov.FontTransparent = true;
-            ov.DrawText(System.Drawing.Color.Red, 10, 10, "IC Imaging Control 2.0");
-            ov.DrawSolidRect(System.Drawing.Color.FromArgb(187, 100, 0, 0), 10, 10, 100, 100);
 
             FLog.Log("Initialization end");
 
@@ -564,19 +571,28 @@ namespace Medical_Studio
             }
             catch (Exception ex) { }
         }
+
+        [HandleProcessCorruptedStateExceptions]
         private void NUD_Exposure_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            FLog.Log("NUD_Exposure_ValueChanged");
-            if ((!vcdProp.Automation[VCDIDs.VCDID_Exposure]))
+            try
             {
-                int toslide = 0;
-                toslide = Exposure_real2slide((float)NUD_Exposure.Value);
-                if ((toslide < (TrB_ExposureVal.Maximum + 1)) && (toslide > (TrB_ExposureVal.Minimum - 1)))
-                    TrB_ExposureVal.Value = toslide;
-                else
-                    TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Default);
+                FLog.Log("NUD_Exposure_ValueChanged");
+                if ((!vcdProp.Automation[VCDIDs.VCDID_Exposure]))
+                {
+                    int toslide = 0;
+                    toslide = Exposure_real2slide((float)NUD_Exposure.Value);
+                    if ((toslide < (TrB_ExposureVal.Maximum + 1)) && (toslide > (TrB_ExposureVal.Minimum - 1)))
+                        TrB_ExposureVal.Value = toslide;
+                    else
+                        TrB_ExposureVal.Value = Exposure_real2slide((AbsValExp?.Default) ?? 0.0333);
 
-                Device_state = IC_Control.SaveDeviceState();
+                    Device_state = IC_Control.SaveDeviceState();
+                }
+            }
+            catch
+            {
+                FLog.Log("Error during NUD_Exposure_ValueChanged");
             }
         }
 
@@ -663,15 +679,15 @@ namespace Medical_Studio
 
         private void TrB_Brightness_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            FLog.Log("TrB_Brightness_Scroll");
+           /* FLog.Log("TrB_Brightness_Scroll");
             vcdProp.RangeValue[VCDIDs.VCDID_Brightness] = (int)TrB_Brightness.Value;
             NUD_Brightness.Value = TrB_Brightness.Value;
-            Device_state = IC_Control.SaveDeviceState();
+            Device_state = IC_Control.SaveDeviceState();*/
         }
 
         private void NUD_Brightness_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            FLog.Log("NUD_Brightness_ValueChanged");
+           /* FLog.Log("NUD_Brightness_ValueChanged");
             if (vcdProp.AutoAvailable(VCDIDs.VCDID_Brightness))
             {
                 if ((!vcdProp.Automation[VCDIDs.VCDID_Brightness]))
@@ -695,7 +711,7 @@ namespace Medical_Studio
                     TrB_Brightness.Value = vcdProp.DefaultValue(VCDIDs.VCDID_Brightness);
 
             }
-            Device_state = IC_Control.SaveDeviceState();
+            Device_state = IC_Control.SaveDeviceState();*/
         }
 
         private void ChB_BrightnessAuto_CheckedChanged(object sender, RoutedEventArgs e)
@@ -722,7 +738,7 @@ namespace Medical_Studio
             
             try
             {
-                Refresh_Values_on_Trackbars();
+                Refresh_Values_on_Trackbars(false,true);
                 FLog.Log("Scrollbars values refreshed!");
             }
             catch
@@ -1075,6 +1091,8 @@ namespace Medical_Studio
         double curfps = 0;
         int frames2write = 50;
         System.Diagnostics.Stopwatch stw_frameproc = new System.Diagnostics.Stopwatch();
+        
+        [HandleProcessCorruptedStateExceptions]
         private void IC_Control_ImageAvailable(object sender, ICImagingControl.ImageAvailableEventArgs e)
         {
             frames++;
@@ -1248,7 +1266,7 @@ namespace Medical_Studio
             {                
                 Init_Sliders(IC_Control);
                 Load_ic_cam_easy(IC_Control);
-                Refresh_Values_on_Trackbars();
+                Refresh_Values_on_Trackbars(true);
                 if (wasrecording) StartRecording();
 
                 Enable_AutoExposure_ctrl(Exposure_Auto);
@@ -1383,15 +1401,14 @@ namespace Medical_Studio
                 IC_Control.LiveStop();
                 try { Save_cfg(LastConfig_tag); } catch { }
                 Load_cfg(Config_tag);
+
                /* NUD_Gain.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
                 TrB_GainVal.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain];*/
 
                 Load_ic_cam_easy(IC_Control);
                 IMG_H_now = IC_Control.ImageHeight;
                 IMG_W_now = IC_Control.ImageWidth;
-                //ВРЕМЕННО
-                /*Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
-                FormatAdaptation(IMG_W_now, IMG_H_now);*/
+
                 if (mainViewModel.ScaleAuto)
                     CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
                 else
@@ -1399,7 +1416,7 @@ namespace Medical_Studio
 
                 IC_Control.LiveStart();
 
-                LastConfig_tag = Config_tag;
+                LastConfig_tag = Config_tag; // присваиваем последнему загруженному тегу тот, который загружен сейчас
                 try { Refresh_Values_on_Trackbars(); }
                 catch
                 {

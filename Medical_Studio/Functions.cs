@@ -11,6 +11,7 @@ using LDZ_Code;
 using AForge.Video;
 using AForge.Video.FFMPEG;
 using System.Windows.Media;
+using System.Runtime.ExceptionServices;
 
 namespace Medical_Studio
 {
@@ -271,9 +272,12 @@ namespace Medical_Studio
 
         private static void LoadExposure_ToCam(ref VCDAbsoluteValueProperty var, double pvalue)
         {
-            if (pvalue < var.RangeMin) var.Value = var.RangeMin;
-            else if (pvalue > var.RangeMax) var.Value = var.RangeMax;
-            else var.Value = pvalue;
+            if (var != null)
+            {
+                if (pvalue < var.RangeMin) var.Value = var.RangeMin;
+                else if (pvalue > var.RangeMax) var.Value = var.RangeMax;
+                else var.Value = pvalue;
+            }
         }
 
         private void Load_ic_cam_easy(ICImagingControl ic)
@@ -305,26 +309,45 @@ namespace Medical_Studio
            
         }
 
-        private void Refresh_Values_on_Trackbars()
+        [HandleProcessCorruptedStateExceptions]
+        private void Refresh_Values_on_Trackbars(bool resuming_after_crash = false, bool just_scrolls = false)
         {
-            if (NUD_Exposure.Value != null)
+            try
             {
-                NUD_Exposure.Value = AbsValExp.Value;
-                TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value);
-                vcdProp.Automation[VCDIDs.VCDID_Exposure] = Exposure_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
-                ChB_ExposureAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Exposure];
+                if (NUD_Exposure.Value != null && AbsValExp != null)
+                {
+                    NUD_Exposure.Value = AbsValExp.Value;
+                    TrB_ExposureVal.Value = Exposure_real2slide(AbsValExp.Value);
+                    // var a = vcdProp.Automation[VCDIDs.VCDID_Exposure];
+                    if (!just_scrolls)
+                    {
+                        if (resuming_after_crash)
+                            vcdProp.Automation[VCDIDs.VCDID_Exposure] = Exposure_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
+                        ChB_ExposureAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Exposure];
+                    }
+                }
+                if (NUD_Gain.Value != null)
+                {
+                    NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
+                    TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
+                    // var a = vcdProp.Automation[VCDIDs.VCDID_Gain];
+                    if (!just_scrolls)
+                    {
+                        if (resuming_after_crash)
+                            vcdProp.Automation[VCDIDs.VCDID_Gain] = Gain_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
+                        var a = vcdProp.Automation[VCDIDs.VCDID_Gain];
+                        ChB_GainAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Gain];
+                    }
+                }
+              /*  if (NUD_Brightness.Value != null)
+                {
+                    NUD_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
+                    TrB_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
+                }*/
             }
-            if (NUD_Gain.Value != null)
+            catch
             {
-                NUD_Gain.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
-                TrB_GainVal.Value = vcdProp.RangeValue[VCDIDs.VCDID_Gain];
-                vcdProp.Automation[VCDIDs.VCDID_Gain] = Gain_Auto; //добавлено 05022021. После перезапуска необходимо вручную восстанавливать значения 
-                ChB_GainAuto.IsChecked = vcdProp.Automation[VCDIDs.VCDID_Gain];
-            }
-            if (NUD_Brightness.Value != null)
-            {
-                NUD_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
-                TrB_Brightness.Value = vcdProp.RangeValue[VCDIDs.VCDID_Brightness];
+                FLog.Log("Error while refrashing of values on TrackBars (gain-exposure)");
             }
         }
 
@@ -616,6 +639,7 @@ namespace Medical_Studio
             }
             return System.IO.Path.Combine(PhotoPathName, dataName);
         }
+        [HandleProcessCorruptedStateExceptions]
         private void StartRecording()
         {
             if (IC_Control.DeviceValid)
@@ -643,6 +667,8 @@ namespace Medical_Studio
                 }
              }   
         }
+
+        [HandleProcessCorruptedStateExceptions]
         private void StopRecording()
         {
             
@@ -652,13 +678,15 @@ namespace Medical_Studio
             // System.Threading.Thread.Sleep((int)(2 * NUD_Exposure.Value*1000)+100);
             try
             {
-                System.Threading.Thread.Sleep((int)(2 * AbsValExp.Value * 1000) + 100);
+                //System.Threading.Thread.Sleep((int)(2 * (AbsValExp?.Value ?? 0) * 1000) + 100);
+                System.Threading.Thread.Sleep(500);
             }
             catch
             {
                 System.Threading.Thread.Sleep(500);
                 FLog.Log("Can't read exposure...");
             }
+
             FLog.Log("L2 of stop....");
             if (writer_ffmpeg!=null)
                 if (writer_ffmpeg.IsOpen) //запись закрывается в ImageAvalible, но если вдруг не закрылась, то тут
@@ -715,6 +743,7 @@ namespace Medical_Studio
             string CFG_name = "Config_" + CFG_tag + ".xml";
             bool isDataSaved = true;
             try { IC_Control.SaveDeviceStateToFile("data.xml"); } catch { isDataSaved = false; }
+
             if (System.IO.File.Exists(CFG_name))
             {
                 try
