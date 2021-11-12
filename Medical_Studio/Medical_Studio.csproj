@@ -225,5 +225,14 @@
     <Folder Include="Images\" />
     <Folder Include="UserControls\" />
   </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VideoWriterNET\VideoWriterNET.vcxproj">
+      <Project>{ee7556bd-b29c-4d26-8522-b9313af0d0c1}</Project>
+      <Name>VideoWriterNET</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

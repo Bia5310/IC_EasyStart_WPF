@@ -112,8 +112,8 @@ namespace Medical_Studio
 
         public MainWindow()
         {
-           // this.Title = "IC EasyStart v" + Version; //20022021. Moved to MainViewModel and binded
-           
+            // this.Title = "IC EasyStart v" + Version; //20022021. Moved to MainViewModel and binded
+
             Directory.CreateDirectory("Logs");
             FLog = new ServiceFunctions.UI.Log.FileLogger("Logs\\Log_" + ServiceFunctions.UI.Get_TimeNow_String() + ".txt");
             FLog.Log("Programm started...");
@@ -907,32 +907,37 @@ namespace Medical_Studio
         int datacounter = 0;
         private void AdaptViewportControl()
         {
-            datacounter++;
-            if(datacounter >= 6)
+            try
             {
-                int a = 0;
+                datacounter++;
+                if (datacounter >= 6)
+                {
+                    int a = 0;
+                }
+                double zf = mainViewModel.Scale;
+
+                Rect rectHost = new Rect(0, 0, Host.ActualWidth * Scaling_of_monitor, Host.ActualHeight * Scaling_of_monitor);
+                Rect imageRect = new Rect(0, 0, IC_Control.ImageWidth, IC_Control.ImageHeight);
+                imageRect.Scale(zf, zf);
+                imageRect.Offset((rectHost.Width - imageRect.Width) * 0.5d, (rectHost.Height - imageRect.Height) * 0.5d);
+
+                Rect controlRect = Rect.Intersect(rectHost, imageRect);
+
+                IC_Control.Width = (int)controlRect.Width;
+                IC_Control.Height = (int)controlRect.Height;
+                IC_Control.Left = (int)controlRect.Left;
+                IC_Control.Top = (int)controlRect.Top;
+
+
+                if (imageRect.Width > IC_Control.Width || imageRect.Height > IC_Control.Height)
+                    IC_Control.ScrollbarsEnabled = true;
+                else
+                    IC_Control.ScrollbarsEnabled = false;
+
+                ChangePos_of_FSBut();
             }
-            double zf = mainViewModel.Scale;
-
-            Rect rectHost = new Rect(0,0,Host.ActualWidth*Scaling_of_monitor, Host.ActualHeight* Scaling_of_monitor);
-            Rect imageRect = new Rect(0, 0, IC_Control.ImageWidth, IC_Control.ImageHeight);
-            imageRect.Scale(zf, zf);
-            imageRect.Offset((rectHost.Width - imageRect.Width) * 0.5d, (rectHost.Height - imageRect.Height) * 0.5d);
+            catch (Exception) { }
             
-            Rect controlRect = Rect.Intersect(rectHost, imageRect);
-
-            IC_Control.Width = (int)controlRect.Width;
-            IC_Control.Height = (int)controlRect.Height;
-            IC_Control.Left = (int)controlRect.Left;
-            IC_Control.Top = (int)controlRect.Top;
-
-
-            if (imageRect.Width > IC_Control.Width || imageRect.Height > IC_Control.Height)
-                IC_Control.ScrollbarsEnabled = true;
-            else
-                IC_Control.ScrollbarsEnabled = false;
-
-            ChangePos_of_FSBut();
         }
 
         private void CalculateZoomFactor(int panelWidth, int panelHeight, int IMG_Width, int IMG_Height)
