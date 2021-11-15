@@ -27,6 +27,7 @@ namespace Medical_Studio
             textBox.KeyDown += TextBox_KeyDown1;
             textBox.LostFocus += TextBox_LostFocus;
             textBox.MouseDown += TextBox_MouseDown;
+            
             MouseDown += TextBox_MouseDown;
             MouseDoubleClick += RenameableToggleButton_MouseDoubleClick;
         }
