@@ -16,7 +16,7 @@
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
         Width="1280"
-        Height="1015"
+        Height="1117"
         Closing="Form1_FormClosing"
         Style="{DynamicResource WindowStyle}">
 

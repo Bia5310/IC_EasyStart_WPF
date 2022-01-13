@@ -42,6 +42,11 @@ namespace VideoWriterWMF
             memcpy(pDestBuffer, pcbSrcBuffer, len);
         }
 
+        if (SUCCEEDED(hr))
+        {
+            hr = m_pMediaBuffer->Unlock();
+        }
+
         IMFSample* pSample = NULL;
 
         if (SUCCEEDED(hr))

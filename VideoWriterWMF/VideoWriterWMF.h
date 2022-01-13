@@ -16,7 +16,6 @@ namespace VideoWriterWMF
 	{
 	public:
 		VideoWriterWMF();
-		virtual ~VideoWriterWMF();
 
 		HRESULT Open(const WCHAR* pwszFileName, const EncodingParameters& params);
 		HRESULT Close();
@@ -24,6 +23,8 @@ namespace VideoWriterWMF
 		HRESULT WriteFrame(BYTE* pcbBuffer, UINT32 len, LONGLONG timestamp);
 
 	protected:
+		~VideoWriterWMF();
+
 		HRESULT ConfigureSinkWriter(const EncodingParameters& params);
 		HRESULT ConfigureEncoder(
 			const EncodingParameters& params,
