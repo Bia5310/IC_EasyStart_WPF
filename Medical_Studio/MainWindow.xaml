@@ -413,7 +413,8 @@
                         <TextBox Grid.Row="1" Grid.ColumnSpan="3" Margin="2" VerticalContentAlignment="Center" 
                                  Style="{DynamicResource TextBoxSytle}" 
                                  x:Name="TB_Directory_Photo"
-                                 PreviewTextInput="TB_Directory_PreviewTextInput"/>
+                                 PreviewTextInput="TB_Directory_PreviewTextInput"
+                                 Text="{Binding PhotoFileInfo.FullName, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Grid.Row="1" Grid.Column="3" Margin="2" 
                                 Style="{DynamicResource ButtonStyle}" 
                                 x:Name="B_Browse_Photo"
@@ -427,12 +428,17 @@
                         <TextBox Grid.Row="5" Grid.ColumnSpan="3" Margin="2" VerticalContentAlignment="Center"
                                  Style="{DynamicResource TextBoxSytle}"
                                  x:Name="TB_Directory_Vid"
-                                 PreviewTextInput="TB_Directory_PreviewTextInput"/>
+                                 PreviewTextInput="TB_Directory_PreviewTextInput"
+                                 Text="{Binding VideoFileInfo.FullName, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Content="{StaticResource folder_img}" Grid.Row="5" Grid.Column="3" Margin="2" 
                                 Style="{DynamicResource ButtonStyle}" 
                                 x:Name="B_Browse_Vid"
                                 Click="B_Browse_Vid_Click"/>
-
+                        <Button Content="Настройка кодека" Grid.Row="6" Grid.ColumnSpan="4" Margin="2"
+                                Style="{DynamicResource ButtonStyle}"
+                                x:Name="B_codecSettings"
+                                Click="B_codecSettings_Click">
+                        </Button>
                     </Grid>
                 </Expander>
             </StackPanel>
@@ -510,12 +516,16 @@
                     <TextBlock Text="Видео:" Grid.Column="2" HorizontalAlignment="Right"
                                Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never"
                                VerticalAlignment="Center" FontSize="16" Margin="10 2 4 2"/>
-                    <UniformGrid Grid.Column="3" Rows="1" Columns="2" HorizontalAlignment="Center">
+                    <UniformGrid Grid.Column="3" Rows="1" Columns="3" HorizontalAlignment="Center">
                         <Button Margin="2" Content="Старт" 
                                     Style="{DynamicResource ButtonStyle}" 
                                     x:Name="B_StartCapture"
                                     Click="B_StartCapture_Click"/>
-                        <Button Margin="2" Content="Стоп" 
+                        <Button Margin="2" Content="Пауза" IsEnabled="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged}"
+                                    Style="{DynamicResource ButtonStyle}" 
+                                    x:Name="B_PauseCapture"
+                                    Click="B_PauseCapture_Click"/>
+                        <Button Margin="2" Content="Стоп" IsEnabled="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged}"
                                     Style="{DynamicResource ButtonStyle}" 
                                     x:Name="B_StopCapture"
                                     Click="B_StopCapture_Click"/>

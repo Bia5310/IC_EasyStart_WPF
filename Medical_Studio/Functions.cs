@@ -285,7 +285,7 @@ namespace Medical_Studio
             ic.ScrollbarsEnabled = true;
             // ReadAllSettingsFromFile(false);
             //    TestAvailability(false);
-            bool liverun = ic.LiveVideoRunning;
+            //bool liverun = ic.LiveVideoRunning;
 
             /* try
             {
@@ -296,17 +296,18 @@ namespace Medical_Studio
             */
 
 
-            try { IC_Control.ImageRingBufferSize = 2; } catch { }; //на всякий случай
+            //try { IC_Control.ImageRingBufferSize = 2; } catch { }; //на всякий случай
 
             ic.LiveDisplayDefault = false; //если false, то позволяет изменения размеров окна
 
-            ic.LiveCaptureLastImage = true; // отображает и захватывает последний фрейм при LiveStop;
+            //ic.LiveCaptureLastImage = true; // отображает и захватывает последний фрейм при LiveStop;
 
-            ic.LiveCaptureContinuous = true; //нужно для FormatAdaptation и граба фреймов
+            //ic.LiveCaptureContinuous = true; //нужно для FormatAdaptation и граба фреймов
 
 
-            if(!ic.LiveVideoRunning) ic.LiveStart();
-           
+            //if(!ic.LiveVideoRunning) ic.LiveStart();
+
+            mainViewModel.IsLive = true;
         }
 
         [HandleProcessCorruptedStateExceptions]
@@ -356,8 +357,8 @@ namespace Medical_Studio
             List<string> Str_2_write = new List<string>();
             if (SaveVid_dir == "") SaveVid_dir = "Video";
             if (SavePhoto_dir == "") SaveVid_dir = "Photo";
-            Str_2_write.Add("<SaveVideo_dir>" + SaveVid_dir + "</SaveVideo_dir>");
-            Str_2_write.Add("<SavePhoto_dir>" + SavePhoto_dir + "</SavePhoto_dir>");
+            Str_2_write.Add("<SaveVideo_dir>" + mainViewModel.VideoFileInfo /*SaveVid_dir*/ + "</SaveVideo_dir>");
+            Str_2_write.Add("<SavePhoto_dir>" + mainViewModel.PhotoFileInfo /*SavePhoto_dir*/ + "</SavePhoto_dir>");
             Str_2_write.Add("<LastConfig_tag>" + Config_tag + "</LastConfig_tag>");
             
             ServiceFunctions.Files.Write_txt(MainConfigPath, Str_2_write);
@@ -426,8 +427,11 @@ namespace Medical_Studio
             {
                 Load_Default_Settings();
             }
-            TB_Directory_Vid.Text = SaveVid_dir;
-            TB_Directory_Photo.Text = SavePhoto_dir;
+            //TB_Directory_Vid.Text = SaveVid_dir;
+            //TB_Directory_Photo.Text = SavePhoto_dir;
+
+            mainViewModel.PhotoFileInfo = SavePhoto_dir;
+            mainViewModel.VideoFileInfo = SaveVid_dir;
         }
         private void Dictionary_Load()
         {
