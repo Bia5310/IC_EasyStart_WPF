@@ -413,7 +413,8 @@
                         <TextBox Grid.Row="1" Grid.ColumnSpan="3" Margin="2" VerticalContentAlignment="Center" 
                                  Style="{DynamicResource TextBoxSytle}" 
                                  x:Name="TB_Directory_Photo"
-                                 PreviewTextInput="TB_Directory_PreviewTextInput"/>
+                                 PreviewTextInput="TB_Directory_PreviewTextInput"
+                                 Text="{Binding PhotoFileInfo.FullName, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Grid.Row="1" Grid.Column="3" Margin="2" 
                                 Style="{DynamicResource ButtonStyle}" 
                                 x:Name="B_Browse_Photo"
@@ -427,7 +428,8 @@
                         <TextBox Grid.Row="5" Grid.ColumnSpan="3" Margin="2" VerticalContentAlignment="Center"
                                  Style="{DynamicResource TextBoxSytle}"
                                  x:Name="TB_Directory_Vid"
-                                 PreviewTextInput="TB_Directory_PreviewTextInput"/>
+                                 PreviewTextInput="TB_Directory_PreviewTextInput"
+                                 Text="{Binding VideoFileInfo.FullName, UpdateSourceTrigger=PropertyChanged}"/>
                         <Button Content="{StaticResource folder_img}" Grid.Row="5" Grid.Column="3" Margin="2" 
                                 Style="{DynamicResource ButtonStyle}" 
                                 x:Name="B_Browse_Vid"

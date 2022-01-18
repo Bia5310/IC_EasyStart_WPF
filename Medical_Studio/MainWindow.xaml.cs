@@ -469,19 +469,16 @@ namespace Medical_Studio
             e.Graphics.FillRectangle(System.Drawing.Brushes.Red, 0, 0, width, height);*/
         }
 
-
         private void B_Browse_Vid_Click(object sender, RoutedEventArgs e)
         {
             FLog.Log("B_Browse_Vid_Click");
-            SaveVid_dir = ServiceFunctions.Files.OpenDirectory(SaveVid_dir);
-            TB_Directory_Vid.Text = SaveVid_dir;
+            mainViewModel.VideoFileInfo = ServiceFunctions.Files.OpenDirectory(mainViewModel.VideoFileInfo);
         }
 
         private void B_Browse_Photo_Click(object sender, RoutedEventArgs e)
         {
             FLog.Log("B_Browse_Photo_Click");
-            SavePhoto_dir = ServiceFunctions.Files.OpenDirectory(SavePhoto_dir);
-            TB_Directory_Photo.Text = SavePhoto_dir;
+            mainViewModel.PhotoFileInfo = ServiceFunctions.Files.OpenDirectory(mainViewModel.PhotoFileInfo);
         }
 
         private void Form1_FormClosing(object sender, CancelEventArgs e)

@@ -83,8 +83,8 @@ namespace Medical_Studio.ViewModels
             }
         }
 
-        private FileInfo videoFileInfo = null;
-        public FileInfo VideoFileInfo
+        private string videoFileInfo = null;
+        public string VideoFileInfo
         {
             get => videoFileInfo;
             set
@@ -94,8 +94,8 @@ namespace Medical_Studio.ViewModels
             }
         }
 
-        private FileInfo photoFileInfo = null;
-        public FileInfo PhotoFileInfo
+        private string photoFileInfo = null;
+        public string PhotoFileInfo
         {
             get => photoFileInfo;
             set
@@ -284,7 +284,7 @@ namespace Medical_Studio.ViewModels
 
         public MediaStreamSink PrepareVideoSink()
         {
-            MediaStreamSink mediaStreamSink = new MediaStreamSink(mediaStreamContainer, aviCompressor, videoFileInfo.FullName);
+            MediaStreamSink mediaStreamSink = new MediaStreamSink(mediaStreamContainer, aviCompressor, videoFileInfo);
             return mediaStreamSink;
         }
 
