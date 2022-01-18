@@ -181,7 +181,7 @@ namespace VideoWriterWMF
 
         if (SUCCEEDED(hr))
         {
-            //hr = MFGetAttributeUINT32(pType2, MF_MT_FRAME_RATE, params.fps);
+            hr = MFGetAttributeUINT32(pType2, MF_MT_FRAME_RATE, params.fps);
         }
 
         if (SUCCEEDED(hr))

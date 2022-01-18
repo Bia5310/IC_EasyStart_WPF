@@ -209,6 +209,8 @@ namespace Medical_Studio
                 FLog.Log("Stage 0.8 of loading is completed");
                 Panel = Host.Child as System.Windows.Forms.Panel;
                 FLog.Log("Stage 1 of loading is completed");
+
+                mainViewModel.ICImagingControl = IC_Control;
             }
             catch(Exception exc)
             {
@@ -755,6 +757,15 @@ namespace Medical_Studio
 
             try
             {
+                mainViewModel.StartVideoCapturing();
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+            /*try
+            {
                 if (!isRecording)
                 {
                     AutoExp_wasEnabled_beforeRecording = Disable_AutoExposure_ctrl();
@@ -764,7 +775,7 @@ namespace Medical_Studio
             catch (Exception exc)
             {
                 MessageBox.Show(exc.Message, "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            }*/
         }
         private void B_StopCapture_Click(object sender, RoutedEventArgs e)
         {
@@ -1464,6 +1475,36 @@ namespace Medical_Studio
         private void RenameableToggleButton_Loaded_1(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void B_PauseCapture_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                mainViewModel.VideoOnPause = !mainViewModel.VideoOnPause;
+            }
+            catch(Exception ex) { }
+        }
+
+        private void B_codecSettings_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                
+            }
+            catch(Exception ex) { }
+        }
+
+        private void ToggleVideoCapturing()
+        {
+            try
+            {
+                mainViewModel.VideoCapturing = !mainViewModel.VideoCapturing;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private void Refresh_IC_BackColor()
