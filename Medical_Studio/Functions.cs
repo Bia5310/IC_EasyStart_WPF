@@ -364,6 +364,7 @@ namespace Medical_Studio
             ServiceFunctions.Files.Write_txt(MainConfigPath, Str_2_write);
             
         }
+
         private void Load_AppSettings()
         {
             try

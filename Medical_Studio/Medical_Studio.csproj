@@ -94,10 +94,7 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="TIS.Imaging.ICImagingControl34, Version=3.4.4.2744, Culture=neutral, PublicKeyToken=257805929e8b7928, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\Ladez\Documents\IC Imaging Control 3.4\redist\dotnet\v4.0.30319\x86\TIS.Imaging.ICImagingControl34.dll</HintPath>
-    </Reference>
+    <Reference Include="TIS.Imaging.ICImagingControl35, Version=3.5.6.4008, Culture=neutral, PublicKeyToken=257805929e8b7928, processorArchitecture=AMD64" />
     <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -127,12 +124,19 @@
     <Compile Include="AVI\AviWriter.cs" />
     <Compile Include="AVI\H264Writer.cs" />
     <Compile Include="AVI\RiffFile.cs" />
+    <Compile Include="ConfigElement.cs" />
     <Compile Include="Converters\BoolToRedColorConverter.cs" />
     <Compile Include="Converters\BoolVisibilityConverter.cs" />
+    <Compile Include="Converters\ConverterLogarithm.cs" />
     <Compile Include="Converters\InverseBoolConverter.cs" />
     <Compile Include="Converters\PercentConverter.cs" />
     <Compile Include="RenameableToggleButton.xaml.cs">
       <DependentUpon>RenameableToggleButton.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="SpeciallClasses.cs" />
     <Compile Include="TextBoxWatermark.cs" />
@@ -167,7 +171,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Functions.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -197,6 +200,10 @@
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Settings.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>

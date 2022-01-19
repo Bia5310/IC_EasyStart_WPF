@@ -711,7 +711,7 @@
                         <Border x:Name="Border"
                                 Grid.Row="1"
                                 BorderThickness="0"
-                                Background="White"
+                                Background="Transparent"
                                 BorderBrush="White"
                                 CornerRadius="0 0 3 3"
                                 Margin="0"
@@ -801,7 +801,7 @@
     </Style>
 
     <!-- SCROLL BAR -->
-
+    
     <Style x:Key="ScrollBarLineButton" TargetType="{x:Type RepeatButton}">
         <Setter Property="Visibility" Value="Hidden"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>

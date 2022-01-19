@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Medical_Studio" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="VideoPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="PhotoPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="Date" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="FIO" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="HistoryNumber" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="AviCompressorName" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="MediaContainerID" Type="System.Guid" Scope="User">
+      <Value Profile="(Default)">00000000-0000-0000-0000-000000000000</Value>
+    </Setting>
+    <Setting Name="LastConfigKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)">0_0</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

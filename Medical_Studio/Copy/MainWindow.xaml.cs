@@ -21,7 +21,6 @@ using LDZ_Code;
 using System.Windows.Threading;
 using System.Windows.Media.Animation;
 using System.Runtime.ExceptionServices;
-using System.Windows.Interop;
 
 namespace Medical_Studio
 {
@@ -31,15 +30,25 @@ namespace Medical_Studio
     public partial class MainWindow : Window
     {
         ICImagingControl IC_Control = null;
+        string MainConfigPath = null;
+
+        private VCDSimpleProperty vcdProp = null;
+        private VCDAbsoluteValueProperty AbsValExp = null;// специально для времени экспонирования [c]
 
         string Config_tag = "0_0"; //0_0 - default
         string LastConfig_tag = "0_0";
+        string SaveVid_dir = "Video";
+        string SavePhoto_dir = "Photo";
 
         string App_cfg_name = "App_prop.cfg";
         string ConfigNames_filename = "ConfigNames.xml";
 
         int IMG_W_now = 0;
         int IMG_H_now = 0;
+        bool Exposure_Auto = false;
+        bool Gain_Auto = false;
+        //WB
+        int WB_FinalSum = 0;
 
         //FS mode
         List<float> Widths_Cols = new List<float>();
@@ -101,8 +110,6 @@ namespace Medical_Studio
 
         private Dictionary<string, string> ConfigsNamesDictionary = new Dictionary<string, string>();
 
-        IntPtr windowHandle = IntPtr.Zero;
-
         public MainWindow()
         {
             Directory.CreateDirectory("Logs");
@@ -133,7 +140,7 @@ namespace Medical_Studio
             Timer_camera_checker = new DispatcherTimer();
             Timer_camera_checker.Interval = new TimeSpan(0, 0, 0, 0, 100);
             Timer_camera_checker.Tick += Timer_camera_checker_Tick;
-            Timer_camera_checker.IsEnabled = false;// true;
+            Timer_camera_checker.IsEnabled = true;
 
             BGW_LiveVideoRecording = new BackgroundWorker();
             BGW_LiveVideoRecording.DoWork += BGW_LiveVideoRecording_DoWork;
@@ -141,14 +148,11 @@ namespace Medical_Studio
             BGW_LiveVideoRecording.WorkerReportsProgress = false;
 
             BGW_CamRestarter = new BackgroundWorker();
-            //BGW_CamRestarter.DoWork += BGW_CamRestarter_DoWork;
-            //BGW_CamRestarter.WorkerSupportsCancellation = false;
-            //BGW_CamRestarter.WorkerReportsProgress = false;
+            BGW_CamRestarter.DoWork += BGW_CamRestarter_DoWork;
+            BGW_CamRestarter.WorkerSupportsCancellation = false;
+            BGW_CamRestarter.WorkerReportsProgress = false;
 
             InitializeComponent();
-
-            windowHandle = new WindowInteropHelper(this).EnsureHandle();
-
             //Set main view model
             mainViewModel = new ViewModels.MainViewModel();
             DataContext = mainViewModel;
@@ -177,22 +181,10 @@ namespace Medical_Studio
                 //Set Zoom Factor
                 SetLiveDisplayZoomFactor((float)mainViewModel.Scale);
             }
-            if(e.PropertyName == nameof(mainViewModel.ConfigKey))
-            {
-                mainViewModel.LoadCurrentConfig();
-            }
-        }
-
-        private void SetLiveDisplayZoomFactor(float zoomFactor)
-        {
-            IC_Control.LiveDisplayZoomFactor = zoomFactor;
-            AdaptViewportControl();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.WindowState = WindowState.Maximized;//  FormWindowState.Maximized;
-
             try
             {
                 InitICCaptureControl();
@@ -218,6 +210,10 @@ namespace Medical_Studio
                 Init_ListOf_CheckButtons();
 
                 Scaling_of_monitor = GetScalingFactor_ofMonitor();
+
+                TB_CurrentDate.Text = ServiceFunctions.UI.GetDateString();
+
+                FLog.Log("Stage 2 of loading is completed");
             }
             catch (Exception exc)
             {
@@ -226,14 +222,168 @@ namespace Medical_Studio
 
             try
             {
-                TryOpenCamera();
+                try
+                {
+                    Dictionary_Load();
+                    FLog.Log("Dictionary loading is successful");
+                }
+                catch
+                {
+                    FLog.Log("Dictionary loading fault");
+                }
+                
+                try
+                {
+                    MainConfigPath = System.AppDomain.CurrentDomain.BaseDirectory + "\\" + App_cfg_name;
+                    Load_AppSettings();
+                    FLog.Log("Load_AppSettings() call finished succesfully");
+                }
+                catch { FLog.Log("ERROR - Load_AppSettings() error"); }
+                FLog.Log("Stage 3 of loading is completed");
+                try //Комплексная проверка. Если конфиг не дефолт, то пытаемся его загрузить. В противном случае просим у юзера
+                {
+                    if(Config_tag!= "default")
+                    {
+                        if (!File.Exists("Config_" + Config_tag + ".xml")) Config_tag = "default";
+                    }
+                    if (Config_tag == "default")
+                    {
+                        if (!IC_Control.DeviceValid)
+                        {
+                            IC_Control.ShowDeviceSettingsDialog();
+                            if (!IC_Control.DeviceValid)
+                            {
+                                MessageBox.Show("Не было выбрано ни одного устройства", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information);
+                                FLog.Log("No devices selected by user or loaded");
+                                //Application.Current.Shutdown();
+                            }    
+                        }
+                    }
+                    
+
+                    if(Config_tag == "default")
+                    {
+                        Set_appropriate_params();
+                        Save_AllTheConfigs();
+                    }
+
+                    try
+                    {
+                        Find_RenameableBut_byTag(Config_tag).IsChecked = true;
+                        if (!IC_Control.DeviceValid)
+                        {
+                            MessageBox.Show("Не было выбрано ни одного устройства", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Information);
+                            FLog.Log("No devices selected by user or loaded");
+                            //Application.Current.Shutdown();
+                        }
+                    }
+                    catch { Config_tag = "0_0"; renameableButtonsConfigs[0].IsChecked = true; }
+                    FLog.Log("Check configs function call finished succesfully");
+                    
+                }
+                catch
+                {
+                    FLog.Log("ERROR - Check configs error");
+                }
+
+                FLog.Log("Stage 4 of loading is completed");
+                try
+                {
+                    Init_Sliders(IC_Control);
+                    FLog.Log("Init_Sliders() call finished succesfully");
+                }
+                catch(Exception exc)
+                {
+
+                    FLog.Log("ERROR - Init_Sliders or Load_ic_cam_easy  error");
+                    FLog.Log("ORIGINAL:" + exc.Message);
+                }
+
+                try
+                {
+                    Load_ic_cam_easy(IC_Control);
+                    FLog.Log("Load_ic_cam_easy() call finished succesfully");
+                }
+                catch(Exception exc)
+                {
+                    FLog.Log("ERROR - Init_Sliders or Load_ic_cam_easy  error");
+                    FLog.Log("ORIGINAL:" + exc.Message);
+                }
+
+                FLog.Log("Stage 5 of loading is completed");
+                try
+                {
+                    IMG_H_now = IC_Control.ImageHeight;
+                    IMG_W_now = IC_Control.ImageWidth;
+                    this.WindowState = WindowState.Maximized;//  FormWindowState.Maximized;
+                    //ВРЕМЕННО
+                    //Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); //on load
+                    //FLog.Log("Adapt_Size_ofCont() call finished succesfully");
+                    //FormatAdaptation(IMG_W_now, IMG_H_now);
+                    //FLog.Log("FormatAdaptation() call finished succesfully");
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                }
+                catch
+                {
+                    FLog.Log("ERROR - Format adaptation error");
+                }
+                FLog.Log("Stage 6 of loading is completed");
+                try
+                {
+                    Load_FlipState();
+                    FLog.Log("Load_FlipState() call finished succesfully");
+                }
+                catch (Exception exc)
+                { FLog.Log("ERROR - Load_flipstate error "); }
+
+                
+
+                if (vcdProp.AutoAvailable(VCDIDs.VCDID_WhiteBalance))
+                    vcdProp.Automation[VCDIDs.VCDID_WhiteBalance] = false;
+
+                //Prepare_encoder();
+
+                try { Refresh_Values_on_Trackbars(); FLog.Log("Refresh_Values_on_Trackbars() call finished succesfully"); }
+                catch { FLog.Log("ERROR - Refreshing Values on TrB error"); }
+
+                FLog.Log("Stage 7 of loading is completed");
+                try
+                {
+                    Prepare_encoder2("Video\\video.avi", (int)IC_Control.DeviceFrameRate, 20000 * 1000);
+                    writer_ffmpeg.Close();
+                    B_StopCapture.IsEnabled = false;
+                    FLog.Log("Encoder preparing is succesful");
+                }
+                catch (Exception exc)
+                {
+                    B_StartCapture.IsEnabled = false;
+                    B_StopCapture.IsEnabled = false;
+                    FLog.Log("ERROR - Encoder preparing finished this error: " + exc.Message);
+                }
+                Device_name = IC_Control.Device;
+                Timer_camera_checker.Start();
+                STW_fps.Start();
+                FLog.Log("Stage 8 of loading is completed");
+                Everything_loaded = true;
             }
-            catch(Exception ex)
+            catch (Exception ext)
             {
-                MessageBox.Show(ex.ToString());
+                FLog.Log("ERROR - Form_Load() error");
+                MessageBox.Show(ext.Message);
+                Everything_loaded = true;
+            }
+            finally
+            {
+                if (IC_Control.DeviceValid)
+                {
+                    IC_Control.LiveStart();
+                    //ВРЕМЕННО
+                    //Adapt_Size_ofCont(IC_Control as System.Windows.Forms.Control, IC_Control.ImageWidth, IC_Control.ImageHeight, 0.8, 1);
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                }
+                FLog.Log("Stage 9 of loading is completed");
             }
 
-            Everything_loaded = true;
             FLog.Log("Initialization end");
         }
 
@@ -243,89 +393,34 @@ namespace Medical_Studio
             {
                 TIS.Imaging.LibrarySetup.SetLocalizationLanguage("ru");
 
+                FLog.Log("Stage 0 of loading is completed");
                 IC_Control = new ICImagingControl();
                 Host.Child.Controls.Add(IC_Control);
 
+                FLog.Log("Stage 0.2 of loading is completed");
                 IC_Control.SendToBack();
+                IC_Control.Paint += IC_Control_Paint;
+                FLog.Log("Stage 0.4 of loading is completed");
+                //IC_Control.OverlayBitmapPosition = PathPositions.Display;
                 IC_Control.OverlayBitmapAtPath[PathPositions.Display].Enable = true;
+                //IC_Control.OverlayBitmap.Enable = true;
+                //IC_Control.LiveCaptureContinuous = true;
+
+                FLog.Log("Stage 0.6 of loading is completed");
+                IC_Control.ImageAvailable += IC_Control_ImageAvailable;
+                IC_Control.Invalidated += IC_Control_Invalidated;
+                //IC_Control.LiveDisplay = false;
+                FLog.Log("Stage 0.8 of loading is completed");
                 Panel = Host.Child as System.Windows.Forms.Panel;
-                Refresh_IC_BackColor();
+                FLog.Log("Stage 1 of loading is completed");
 
                 mainViewModel.ICImagingControl = IC_Control;
-
-                mainViewModel.ICImagingControl.ScrollbarsEnabled = true;
-                mainViewModel.ICImagingControl.LiveDisplayDefault = false; //если false, то позволяет изменения размеров окна
-
-                mainViewModel.IsLive = true;
+                Refresh_IC_BackColor();
             }
             catch (Exception exc)
             {
                 FLog.Log("ERROR:" + exc.Message);
             }
-        }
-
-        private void TryOpenCamera()
-        {
-            var devices = IC_Control.Devices;
-            
-            if(devices.Length == 0)
-            {
-                mainViewModel.OpenCamera("");
-            }
-            else
-            {
-                mainViewModel.OpenCamera(devices[0].Name);
-            }
-
-            if(IC_Control.DeviceValid)
-            {
-                WhenDeviceOpened();
-            }
-        }
-
-        private void ChooseCameraDialog()
-        {
-            IC_Control.ShowDeviceSettingsDialog(windowHandle);
-        }
-
-        private void WhenDeviceOpened()
-        {
-            mainViewModel.LoadCurrentConfig();
-
-            try
-            {
-                /*try
-                {
-                    Load_FlipState();
-                    FLog.Log("Load_FlipState() call finished succesfully");
-                }
-                catch (Exception exc)
-                { FLog.Log("ERROR - Load_flipstate error "); }*/
-
-                try
-                {
-                    var frameType = IC_Control.VideoFormatCurrent.FrameType;
-                    IMG_W_now = frameType.Width;
-                    IMG_H_now = frameType.Height;
-                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
-                }
-                catch
-                {
-                    FLog.Log("ERROR - Format adaptation error");
-                }
-
-                Device_name = IC_Control.Device;
-                Timer_camera_checker.Start();
-                STW_fps.Start();
-            }
-            catch (Exception ext)
-            {
-                FLog.Log("ERROR - Form_Load() error");
-                MessageBox.Show(ext.Message);
-                Everything_loaded = true;
-            }
-
-
         }
 
         public void Init_ListOf_CheckButtons()
@@ -352,6 +447,35 @@ namespace Medical_Studio
             double actualHeight = SystemParameters.PrimaryScreenHeight;  // 960
             return (resHeight / actualHeight);
         }
+        private void IC_Control_Invalidated(object sender, System.Windows.Forms.InvalidateEventArgs e)
+        {
+            
+        }
+
+        private void IC_Control_ImageAvailable1(object sender, ICImagingControl.ImageAvailableEventArgs e)
+        {
+            /*int width = IC_Control.ImageWidth;
+            int height = IC_Control.ImageHeight;
+
+            Bitmap overlay = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Graphics g = Graphics.FromImage(overlay);
+
+            g.DrawImage(bmpFS_on, 10, 10, bmpFS_on.Width, bmpFS_on.Height);*/
+
+            //IC_Control.OverlayBitmap.D
+        }
+
+        private void IC_Control_Paint(object sender, System.Windows.Forms.PaintEventArgs e)
+        {
+            /*int width = IC_Control.Width;
+            int height = IC_Control.Height;
+
+            System.Drawing.Color colorBack = System.Drawing.Color.FromArgb(128, 128, 0, 0);
+            
+            System.Drawing.Pen pBack = new System.Drawing.Pen(colorBack);
+            e.Graphics.DrawRectangle(pBack, width - 120, height - 120, 80, 80);
+            e.Graphics.FillRectangle(System.Drawing.Brushes.Red, 0, 0, width, height);*/
+        }
 
         private void B_Browse_Vid_Click(object sender, RoutedEventArgs e)
         {
@@ -367,12 +491,18 @@ namespace Medical_Studio
 
         private void Form1_FormClosing(object sender, CancelEventArgs e)
         {
-            try
+            FLog.Log("Form1_FormClosing");
+            try { Save_cfg(Config_tag); } catch { }
+            try { if (isRecording) B_StopCapture_Click(null, null); } catch { }
+            if (IC_Control.LiveVideoRunning)
             {
-                mainViewModel.SaveCurrentConfig();
-                mainViewModel.SaveSettings();
+                IC_Control.LiveStop();
             }
-            catch(Exception ex) { }
+
+            try { Save_AppSettings(); } catch { }
+            try { Dictionary_Save(); } catch { }
+            try { Save_Flipstate(); } catch { }
+          //  try { Save_cfg(ConfigNames[LastConfig_num]); } catch { }
         }
 
         private void Load_FlipState()
@@ -434,32 +564,104 @@ namespace Medical_Studio
 
         private void TrB_ExposureVal_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            FLog.Log("TrB_ExposureVal_Scroll");
+            try
+            {
+                double value = Exposure_Slide2real(TrB_ExposureVal.Value);
+                LoadExposure_ToCam(ref AbsValExp, value);
+                Device_state = IC_Control.SaveDeviceState();
+                double promval = (Exposure_Slide2real(TrB_ExposureVal.Value));
+                if (promval > 1) NUD_Exposure.Value = promval;
+                else NUD_Exposure.Value = promval;
+                // ChangingActivatedTextBoxExp = true;
 
+            }
+            catch (Exception ex) { }
         }
 
+        [HandleProcessCorruptedStateExceptions]
         private void NUD_Exposure_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            try
+            {
+                FLog.Log("NUD_Exposure_ValueChanged");
+                if ((!vcdProp.Automation[VCDIDs.VCDID_Exposure]))
+                {
+                    int toslide = 0;
+                    toslide = Exposure_real2slide((float)NUD_Exposure.Value);
+                    if ((toslide < (TrB_ExposureVal.Maximum + 1)) && (toslide > (TrB_ExposureVal.Minimum - 1)))
+                        TrB_ExposureVal.Value = toslide;
+                    else
+                        TrB_ExposureVal.Value = Exposure_real2slide((AbsValExp?.Default) ?? 0.0333);
 
+                    Device_state = IC_Control.SaveDeviceState();
+                }
+            }
+            catch
+            {
+                FLog.Log("Error during NUD_Exposure_ValueChanged");
+            }
         }
 
         private void ChB_ExposureAuto_CheckedChanged(object sender, RoutedEventArgs e)
         {
-
+            FLog.Log("ChB_ExposureAuto_CheckedChanged");
+            vcdProp.Automation[VCDIDs.VCDID_Exposure] = ChB_ExposureAuto.IsChecked ?? false;
+            TrB_ExposureVal.IsEnabled = !(ChB_ExposureAuto.IsChecked ?? false);
+            if ((!(ChB_ExposureAuto.IsChecked ?? false)) && (!(ChB_GainAuto.IsChecked ?? false)) && (!(ChB_BrightnessAuto.IsChecked ?? false)))
+            {
+                TimerForRenew.Stop();
+                TimerForRenew.IsEnabled = false;
+            }
+            else
+            {
+                TimerForRenew.IsEnabled = true;
+                TimerForRenew.Start();
+            }
+            Exposure_Auto = vcdProp.Automation[VCDIDs.VCDID_Exposure];
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void TrB_GainVal_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-
+            FLog.Log("TrB_GainVal_Scroll");
+            vcdProp.RangeValue[VCDIDs.VCDID_Gain] = (int)TrB_GainVal.Value;
+            NUD_Gain.Value = TrB_GainVal.Value;
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         private void NUD_Gain_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-
+            FLog.Log("NUD_Gain_ValueChanged");
+            if ((!vcdProp.Automation[VCDIDs.VCDID_Gain]))
+            {
+                int toslide = 0;
+                toslide = Convert.ToInt32(NUD_Gain.Value);
+                if ((toslide < (TrB_GainVal.Maximum + 1)) && (toslide > (TrB_GainVal.Minimum - 1)))
+                    TrB_GainVal.Value = toslide;
+                else
+                    TrB_GainVal.Value = vcdProp.DefaultValue(VCDIDs.VCDID_Gain);
+                Device_state = IC_Control.SaveDeviceState();
+            }
         }
 
         private void ChB_GainAuto_CheckedChanged(object sender, RoutedEventArgs e)
         {
-
+            FLog.Log("ChB_GainAuto_CheckedChanged");
+            vcdProp.Automation[VCDIDs.VCDID_Gain] = ChB_GainAuto.IsChecked ?? false;
+            TrB_GainVal.IsEnabled = !(ChB_GainAuto.IsChecked ?? false);
+            if ((!(ChB_ExposureAuto.IsChecked ?? false)) && (!(ChB_GainAuto.IsChecked ?? false)) && (!(ChB_BrightnessAuto.IsChecked) ?? false))
+            {
+                TimerForRenew.Stop();
+                TimerForRenew.IsEnabled = false;
+            }
+            else
+            {
+                TimerForRenew.IsEnabled = true;
+                TimerForRenew.Start();
+            }
+            Gain_Auto = vcdProp.Automation[VCDIDs.VCDID_Gain];
+            Device_state = IC_Control.SaveDeviceState();
         }
 
         #region Scale
@@ -484,22 +686,72 @@ namespace Medical_Studio
 
         private void TrB_Brightness_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-
+           /* FLog.Log("TrB_Brightness_Scroll");
+            vcdProp.RangeValue[VCDIDs.VCDID_Brightness] = (int)TrB_Brightness.Value;
+            NUD_Brightness.Value = TrB_Brightness.Value;
+            Device_state = IC_Control.SaveDeviceState();*/
         }
 
         private void NUD_Brightness_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+           /* FLog.Log("NUD_Brightness_ValueChanged");
+            if (vcdProp.AutoAvailable(VCDIDs.VCDID_Brightness))
+            {
+                if ((!vcdProp.Automation[VCDIDs.VCDID_Brightness]))
+                {
+                    int toslide = 0;
+                    toslide = Convert.ToInt32(NUD_Brightness.Value);
+                    if ((toslide < (TrB_Brightness.Maximum + 1)) && (toslide > (TrB_Brightness.Minimum - 1)))
+                        TrB_Brightness.Value = toslide;
+                    else
+                        TrB_Brightness.Value = vcdProp.DefaultValue(VCDIDs.VCDID_Brightness);
+                }
+            }
+            else
+            {
 
+                int toslide = 0;
+                toslide = Convert.ToInt32(NUD_Brightness.Value);
+                if ((toslide < (TrB_Brightness.Maximum + 1)) && (toslide > (TrB_Brightness.Minimum - 1)))
+                    TrB_Brightness.Value = toslide;
+                else
+                    TrB_Brightness.Value = vcdProp.DefaultValue(VCDIDs.VCDID_Brightness);
+
+            }
+            Device_state = IC_Control.SaveDeviceState();*/
         }
 
         private void ChB_BrightnessAuto_CheckedChanged(object sender, RoutedEventArgs e)
         {
+            FLog.Log("ChB_BrightnessAuto_CheckedChanged");
+            vcdProp.Automation[VCDIDs.VCDID_Brightness] = ChB_BrightnessAuto.IsChecked ?? false;
+            TrB_Brightness.IsEnabled = !(ChB_BrightnessAuto.IsChecked ?? false);
+            if ((!(ChB_ExposureAuto.IsChecked ?? false)) && (!(ChB_GainAuto.IsChecked ?? false)) && (!(ChB_BrightnessAuto.IsChecked) ?? false))
+            {
+                TimerForRenew.Stop();
+                TimerForRenew.IsEnabled = false;
+            }
+            else
+            {
+                TimerForRenew.IsEnabled = true;
+                TimerForRenew.Start();
+            }
+            Device_state = IC_Control.SaveDeviceState();
 
         }
 
         private void TimerForRenew_Tick(object sender, EventArgs e)
         {
             
+            try
+            {
+                Refresh_Values_on_Trackbars(false,true);
+                FLog.Log("Scrollbars values refreshed!");
+            }
+            catch
+            {
+                FLog.Log("Error on scrollbars values refresh");
+            }
         }
         bool AutoExp_wasEnabled_beforeRecording = false;
         bool RecordingNeeded = false;
@@ -517,27 +769,77 @@ namespace Medical_Studio
                 MessageBox.Show(ex.ToString());
             }
 
+            /*try
+            {
+                if (!isRecording)
+                {
+                    AutoExp_wasEnabled_beforeRecording = Disable_AutoExposure_ctrl();
+                    StartRecording();
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }*/
         }
         private void B_StopCapture_Click(object sender, RoutedEventArgs e)
         {
+            FLog.Log("B_StopCapture_Click");
+            /*RecordingNeeded = false;
+            writer.Close();*/
 
+
+            try
+            {
+                if (isRecording)
+                {
+                    try { Enable_AutoExposure_ctrl(AutoExp_wasEnabled_beforeRecording); } 
+                    catch(Exception exc)
+                    {
+                        FLog.Log("Error on B_StopCapture_Click: error in Enable_AutoExposure_ctrl(). ORIGINAL: " + exc.Message);
+                    }
+                    StopRecording();
+                    FLog.Log("Recording stopped successfully");
+                    Enable_AutoExposure_ctrl(AutoExp_wasEnabled_beforeRecording);
+                }
+            }
+            catch (Exception exc)
+            {
+                FLog.Log("Error on record stop. ORIGINAL: " + exc.Message);
+                MessageBox.Show(exc.Message, "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void B_Properties_Click(object sender, RoutedEventArgs e)
         {
             FLog.Log("B_Properties_Click");
             IC_Control.ShowPropertyDialog();
+            Refresh_Values_on_Trackbars();
             Device_state = IC_Control.SaveDeviceState();
         }
 
         private void ChB_WhiteBalanceAuto_CheckedChanged(object sender, RoutedEventArgs e)
         {
-
+            FLog.Log("ChB_WhiteBalanceAuto_CheckedChanged");
+            if (ChB_WhiteBalanceAuto.IsChecked ?? false)
+            {
+                vcdProp.OnePush(VCDIDs.VCDID_WhiteBalance);
+                WhiteBalanceTimer.Start();
+                WB_FinalSum = 0;
+                Save_cfg(Config_tag);
+            }
         }
 
         private void WhiteBalanceTimer_Tick(object sender, EventArgs e)
         {
-
+            FLog.Log("WhiteBalanceTimer_Tick");
+            var Cur_WBSum = Get_WB_Sum();
+            if (WB_FinalSum != Cur_WBSum) WB_FinalSum = Cur_WBSum;
+            else
+            {
+                WhiteBalanceTimer.Stop();
+                ChB_WhiteBalanceAuto.IsChecked = false;
+            }
         }
 
         private void IC_Control_Resize(object sender, EventArgs e)
@@ -555,11 +857,11 @@ namespace Medical_Studio
 
         private void B_Snapshot_Click(object sender, RoutedEventArgs e)
         {
-            /*FLog.Log("B_Snapshot_Click");
+            FLog.Log("B_Snapshot_Click");
             string dataName = FindLast_Photo(SavePhoto_dir, (TB_FIO.Text + "_" + TB_CurrentDate.Text + "_" + TB_HistoryNumber.Text), ".tiff");
             string FullPathAndName = dataName;
-            IC_Control.MemorySaveImage(FullPathAndName);*/
-            
+            IC_Control.MemorySaveImage(FullPathAndName);
+
             //запустить анимаицю
             ThicknessAnimationUsingKeyFrames thicknessAnimationUsingKeyFrames = new ThicknessAnimationUsingKeyFrames();
             thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(0, 0, 0, 0), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 50))));
@@ -579,7 +881,30 @@ namespace Medical_Studio
 
         private void B_Cam_Select_Click(object sender, RoutedEventArgs e)
         {
+            FLog.Log("B_Cam_Select_Click");
+            try
+            {
+                Save_AppSettings();
+                if (isRecording) StopRecording();
+                if (IC_Control.LiveVideoRunning) IC_Control.LiveStop();
+                IC_Control.ShowDeviceSettingsDialog();
 
+                Init_Sliders(IC_Control);
+                Load_ic_cam_easy(IC_Control);
+
+                IMG_H_now = IC_Control.ImageHeight;
+                IMG_W_now = IC_Control.ImageWidth;
+                //ВРЕМЕННО
+                //Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1); // cam reselect
+                //FormatAdaptation(IMG_W_now, IMG_H_now);
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+
+                vcdProp.Automation[VCDIDs.VCDID_WhiteBalance] = false;
+                Load_AppSettings();
+                Device_state = IC_Control.SaveDeviceState();
+            }
+            catch (Exception exc)
+            { MessageBox.Show(exc.Message); }
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -661,6 +986,8 @@ namespace Medical_Studio
             mainViewModel.Scale = zoomFactor;
             
             AdaptViewportControl();
+            
+            Font_Adaptation();
         }
 
         private void B_CodecProp_Click(object sender, EventArgs e)
@@ -691,16 +1018,22 @@ namespace Medical_Studio
                 e.Handled = true;
 
             FLog.Log("TB_FIO_TextChanged");
+            VideoIndex = 0;
+            PhotoIndex = 0;
         }
 
         private void TB_CurrentDate_TextChanged(object sender, TextChangedEventArgs e)
         {
             FLog.Log("TB_CurrentDate_TextChanged");
+            VideoIndex = 0;
+            PhotoIndex = 0;
         }
 
         private void TB_HistoryNumber_TextChanged(object sender, TextChangedEventArgs e)
         {
             FLog.Log("TB_HistoryNumber_TextChanged");
+            VideoIndex = 0;
+            PhotoIndex = 0;
         }
 
         private void TB_FIO_KeyPress(object sender, KeyEventArgs e)
@@ -755,7 +1088,18 @@ namespace Medical_Studio
 
         private void BGW_LiveVideoRecording_DoWork(object sender, DoWorkEventArgs e)
         {
-
+            FLog.Log("BGW_LiveVideoRecording_DoWork");
+            System.Diagnostics.Stopwatch STWRec = new System.Diagnostics.Stopwatch();
+            STWRec.Start();
+            while (isRecording || !(sender as BackgroundWorker).CancellationPending)
+            {
+                if (STWRec.Elapsed.TotalMilliseconds > 300)
+                {
+                    STWRec.Restart();
+                    Action action = () => IC_Control.Display();
+                    IC_Control.BeginInvoke(action);
+                }
+            }
         }
 
         private void T1_Tick(object sender, EventArgs e)
@@ -769,6 +1113,77 @@ namespace Medical_Studio
         int frames2write = 50;
         System.Diagnostics.Stopwatch stw_frameproc = new System.Diagnostics.Stopwatch();
         
+
+        
+        [HandleProcessCorruptedStateExceptions]
+        private void IC_Control_ImageAvailable(object sender, ICImagingControl.ImageAvailableEventArgs e)
+        {
+            frames++;
+            STW_fps.Restart();
+            //this.BeginInvoke((Action)(() => this.Text = (frames.ToString()+" "+ Timer_camera_checker.Enabled.ToString()+" " + Timer_camera_checker.Interval.ToString())));
+
+            if (Everything_loaded)
+            {
+                try
+                {
+                    ImgBuffer_RGB = IC_Control.ImageActiveBuffer;
+
+                    /*unsafe
+                    {
+                        ImgBuffer_RGB.Lock();
+                        viewportControl.SetImageByBuffer(ImgBuffer_RGB.GetImageData(),
+                            ImgBuffer_RGB.BytesPerLine,
+                            IC_Control.ImageWidth,
+                            IC_Control.ImageHeight,
+                            ConvertPixelFormats(IC_Control.MemoryPixelFormat),
+                            this.Dispatcher);
+                        ImgBuffer_RGB.Unlock();
+                    }*/
+
+                    /*this.Dispatcher.Invoke((Action)(() =>
+                    {
+                        wb = viewportControl.WriteableBitmap;
+                        unsafe
+                        {
+                            ImgBuffer_RGB.Lock();
+                            viewportControl.SetImageByBuffer(ImgBuffer_RGB.GetImageData(), ImgBuffer_RGB.BytesPerLine, IC_Control.ImageWidth, IC_Control.ImageHeight, ConvertPixelFormats(IC_Control.MemoryPixelFormat));
+                            ImgBuffer_RGB.Unlock();
+                        }
+                    }));*/
+
+                    if (RecordingNeeded)
+                    {
+                        //this.BeginInvoke((Action)(() => FLog.Log("RECORDING NEEDED")));
+                        //5 attempt. ffmpeg
+
+                        // using (var final = new Bitmap(ImgBuffer_RGB.Bitmap))
+                        //{
+                        writer_ffmpeg.WriteVideoFrame(ImgBuffer_RGB.Bitmap, DateTime.Now.Subtract(videoStartTime));
+
+                        if (frames % 30 == 0) this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("+30 frames recorded")));
+                        if ((!RecordingNeeded) && (writer_ffmpeg.IsOpen))
+                            try { writer_ffmpeg.Close(); } catch { }
+
+
+                        // }
+
+                        // this.BeginInvoke((Action)(() => this.Text = (stw_frameproc.Elapsed.TotalMilliseconds).ToString()));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // An exception that occurs here cannot be handled elsewhere. 
+                    // Therefore, if you are using the ImageAvailable event, watch the debug
+                    // output window of your Visual Studio because the message (see below)
+                    // will appear there.
+                    //LogError(ex.Message);
+                    // MessageBox.Show(ex.Message);
+                    this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Frame record error: " + ex.Message)));
+                    IC_Control.LiveStop();
+                }
+
+            }
+        }
         private void ShowImage_only_invoke(Bitmap BMP)
         {
             //PB_Debug.Invoke(new ShowImage_only_del(ShowImage_only), BMP);
@@ -789,7 +1204,7 @@ namespace Medical_Studio
         {
             if (!Camera_restart_need)//даже если рестарт не нужен
             {
-                if ((STW_fps.Elapsed.TotalMilliseconds > 1000) && (STW_fps.Elapsed.TotalMilliseconds > 20 * (double)(mainViewModel.Exposure)))//но камера по непонятной причине отвалилась
+                if ((STW_fps.Elapsed.TotalMilliseconds > 1000) && (STW_fps.Elapsed.TotalMilliseconds > 20 * (double)(NUD_Exposure.Value??0)))//но камера по непонятной причине отвалилась
                 {
                     // Timer_camera_checker.Dispose(); 
                     Camera_restart_need = true;
@@ -826,6 +1241,9 @@ namespace Medical_Studio
 
         private void BGW_CamRestarter_DoWork(object sender, DoWorkEventArgs e)
         {
+            bool wasrecording = isRecording;
+            if (isRecording) this.Dispatcher.BeginInvoke((Action)(() => StopRecording()));
+
             while (!IC_Control.DeviceValid || 
                 (STW_fps.Elapsed.TotalMilliseconds > 1000))
             {
@@ -869,6 +1287,19 @@ namespace Medical_Studio
             this.Dispatcher.BeginInvoke((Action)(() => FLog.Log("Device state: " + (IC_Control.DeviceValid ? "valid" : "invalid"))));
             Camera_restart_need = false;
             STW_fps.Restart();
+
+            this.Dispatcher.BeginInvoke((Action)(() =>
+            {                
+                Init_Sliders(IC_Control);
+                Load_ic_cam_easy(IC_Control);
+                Refresh_Values_on_Trackbars(true);
+                if (wasrecording) StartRecording();
+
+                Enable_AutoExposure_ctrl(Exposure_Auto);
+                File.Delete("Config_" + LastConfig_tag + ".xml");
+                try { Save_cfg(LastConfig_tag); } catch { }
+            }));
+
         }
 
         /// <summary>
@@ -988,27 +1419,42 @@ namespace Medical_Studio
             //FLog.Log("ChB_Config_N_Checked");
             try
             {
-                //Timer_camera_checker.Stop();
+                Timer_camera_checker.Stop();
                 Config_tag = ((sender as RenameableToggleButton).Tag as string); //Вычленяем номер конфигурации
+
+                //IC_Control.SaveDeviceStateToFile(ConfigNames[LastConfig_num]);
+
+                IC_Control.LiveStop();
+                try { Save_cfg(LastConfig_tag); } catch { }
+                Load_cfg(Config_tag);
+
+               /* NUD_Gain.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain]; //Костыль. Почему-то именно усиление выставляется на неправильное значение. 
+                TrB_GainVal.Value = local_vcdprop.RangeValue[VCDIDs.VCDID_Gain];*/
+
+                Load_ic_cam_easy(IC_Control);
+                IMG_H_now = IC_Control.ImageHeight;
+                IMG_W_now = IC_Control.ImageWidth;
 
                 if (mainViewModel.ScaleAuto)
                     CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
                 else
                     AdaptViewportControl();
 
-                mainViewModel.SaveCurrentConfig();
-                mainViewModel.ConfigKey = Config_tag;
+                IC_Control.LiveStart();
 
-                //LastConfig_tag = Config_tag; // присваиваем последнему загруженному тегу тот, который загружен сейчас
+                LastConfig_tag = Config_tag; // присваиваем последнему загруженному тегу тот, который загружен сейчас
+                try { Refresh_Values_on_Trackbars(); }
+                catch
+                {
+                    FLog.Log("Не удалось обновить значения на ползунках");
+                }
+                Timer_camera_checker.Start();
 
-                //Timer_camera_checker.Start();
             }
             catch(Exception exc)
             {
                 FLog.Log("Ошибка при переключении конфигураций");
             }
-
-            //Uncheck prvious
             for (int i = 0; i < renameableButtonsConfigs.Count; i++)
             {
                 if(renameableButtonsConfigs[i] != toggleButton && renameableButtonsConfigs[i].toggleButon.IsChecked == true)
@@ -1027,11 +1473,8 @@ namespace Medical_Studio
         {
             string local_tag = (sender as RenameableToggleButton).Tag as string;
             string local_text = (sender as RenameableToggleButton).Text;
-
-            mainViewModel.ConfigsDictionary[local_tag].ConfigName = local_text;
-            mainViewModel.SaveCurrentConfig();
-
-            //ConfigsNamesDictionary[local_tag] = local_text;
+            ConfigsNamesDictionary[local_tag] = local_text;
+            Dictionary_Save();
         }
 
         private void RenameableToggleButton_Loaded(object sender, RoutedEventArgs e)
@@ -1079,88 +1522,6 @@ namespace Medical_Studio
             System.Windows.Media.Color windowColor = (this.Background as SolidColorBrush).Color;
             IC_Control.BackColor = System.Drawing.Color.FromArgb(windowColor.A, windowColor.R, windowColor.G, windowColor.B);
             Host.Background = new SolidColorBrush(windowColor);
-        }
-
-        private void ChangePos_of_FSBut()
-        {
-            //Point NewLocation_onPanel = (new Point(IC_Control.Location.X + IC_Control.Width, IC_Control.Location.Y + IC_Control.Height));
-            //B_FS_Switcher_form.Location = new Point((int)((double)NewLocation_onPanel.X-100), (int)((double)NewLocation_onPanel.Y-100));
-
-            B_FS_Switcher_form.Location = new System.Drawing.Point((int)(Host.ActualWidth * Scaling_of_monitor - 30 - B_FS_Switcher_form.Width),
-                                                     (int)(Host.ActualHeight * Scaling_of_monitor - 30 - B_FS_Switcher_form.Height));
-        }
-
-        System.Windows.GridLength column_width_old;
-        System.Windows.WindowState state_old;
-
-
-        System.Drawing.Size Size_was = new System.Drawing.Size(1280, 720);
-        System.Drawing.Point Location_was = new System.Drawing.Point(0, 0);
-
-        private void MaximizeWindow()
-        {
-            Size_was = new System.Drawing.Size((int)this.Width, (int)this.Height);
-            Location_was = new System.Drawing.Point((int)Left, (int)Top);
-            state_old = this.WindowState;
-
-            this.WindowStyle = System.Windows.WindowStyle.None;
-            this.WindowState = System.Windows.WindowState.Normal;
-            this.WindowState = System.Windows.WindowState.Maximized;
-            this.Top = 0;
-            this.Left = 0;
-            this.Width = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width;
-            this.Height = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;
-            toolBar.Visibility = System.Windows.Visibility.Collapsed;
-            scrollViewver_left.Visibility = System.Windows.Visibility.Collapsed;
-            gridSplitter_left.Visibility = System.Windows.Visibility.Collapsed;
-            column_width_old = grid_main.ColumnDefinitions[0].Width;
-            grid_main.ColumnDefinitions[0].Width = new System.Windows.GridLength(0, System.Windows.GridUnitType.Auto);
-
-            FullScrin = true;
-        }
-        private void MinimizeWindow()
-        {
-            this.WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
-            this.WindowState = state_old;
-            this.Left = Location_was.X;
-            this.Top = Location_was.Y;
-            this.Width = Size_was.Width;
-            this.Height = Size_was.Height;
-            toolBar.Visibility = System.Windows.Visibility.Visible;
-            scrollViewver_left.Visibility = System.Windows.Visibility.Visible;
-            gridSplitter_left.Visibility = System.Windows.Visibility.Visible;
-            grid_main.ColumnDefinitions[0].Width = column_width_old;
-
-            FullScrin = false;
-            //ВРЕМЕННО
-            CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
-        }
-
-        private void FormatAdaptation(int WidthOfImage = -1, int HeightOfImage = -1)
-        {
-            var ic = IC_Control;
-            if (WidthOfImage == -1) WidthOfImage = ic.ImageWidth;
-            if (HeightOfImage == -1) HeightOfImage = ic.ImageHeight;
-            int ControlWidth = ic.Width;
-            int ControlHeight = ic.Height;
-            float ZFactWidth = (float)ControlWidth / (float)WidthOfImage;
-            float ZFactHeight = (float)ControlHeight / (float)HeightOfImage;
-            float ZFactFinal = 100.0f;
-            if (ZFactWidth >= ZFactHeight) ZFactFinal = ZFactHeight;
-            else ZFactFinal = ZFactWidth;
-
-            if (ic.LiveDisplayDefault == false)
-            {
-                ic.LiveDisplayZoomFactor = ZFactFinal;
-
-                if (ic.LiveDisplayZoomFactor > 1.0) ic.ScrollbarsEnabled = true;
-                else ic.ScrollbarsEnabled = false;
-            }
-            else
-            {
-
-            }
-
         }
     }
 }
