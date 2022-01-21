@@ -124,6 +124,9 @@
     <Compile Include="AVI\AviWriter.cs" />
     <Compile Include="AVI\H264Writer.cs" />
     <Compile Include="AVI\RiffFile.cs" />
+    <Compile Include="CodecSettings.xaml.cs">
+      <DependentUpon>CodecSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ConfigElement.cs" />
     <Compile Include="Converters\BoolToRedColorConverter.cs" />
     <Compile Include="Converters\BoolVisibilityConverter.cs" />
@@ -143,6 +146,10 @@
     <Compile Include="Viewport\ViewportControl.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Viewport\ViewportDrawingVisual.cs" />
+    <Page Include="CodecSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DoubleUpDownStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

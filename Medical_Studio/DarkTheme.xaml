@@ -13,6 +13,7 @@
         <Setter Property="Background" Value="#213742"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="#FF095278"/>
+        <Setter Property="Foreground" Value="White"/>
     </Style>
 
     <SolidColorBrush x:Key="BrushNUD_Signes" Color="White"/>

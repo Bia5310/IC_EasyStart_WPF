@@ -162,7 +162,7 @@
                 <Expander Header="Режимы" Margin="3 5 3 3" BorderThickness="0 0 0 3" Padding="3" IsExpanded="True" Style="{DynamicResource ExpanderStyle}">
                     <StackPanel>
                         <TabControl Style="{DynamicResource TabControlStyle}">
-                            <TabItem>
+                            <TabItem x:Name="tabPhaco">
                                 <TabItem.Header>
                                     <Viewbox MaxHeight="42">
                                         <TextBlock Text="Phaco" Margin="2"/>
@@ -192,7 +192,7 @@
                                                                   Tag="0_3"/>
                                 </StackPanel>
                             </TabItem>
-                            <TabItem>
+                            <TabItem x:Name="tabVitreo">
                                 <TabItem.Header>
                                     <Viewbox MaxHeight="42">
                                         <TextBlock Text="Vitreo" Margin="2"/>
@@ -222,7 +222,7 @@
                                                                   Tag="1_3"/>
                                 </StackPanel>
                             </TabItem>
-                            <TabItem>
+                            <TabItem x:Name="tabUser">
                                 <TabItem.Header>
                                     <Viewbox MaxHeight="42">
                                         <TextBlock Text=" User " Margin="2"/>
@@ -310,7 +310,7 @@
                                            Value="{Binding Exposure, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                            Maximum="{Binding ExposureMax, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                            Minimum="{Binding ExposureMin, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                           Increment="0.1"
+                                           Increment="0.001"
                                            IsEnabled="{Binding ExposureAuto, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolInverterConverter}}"
                                            Height="25"
                                            MaxWidth="120" ValueChanged="NUD_Exposure_ValueChanged">
@@ -331,7 +331,7 @@
                                 Style="{DynamicResource SliderStyle}"/>
 
                             <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Усиление" Margin="2"/>
-                            <xctk:DoubleUpDown Grid.Row="2" Grid.Column="1" Margin="2" Increment="0.001" Height="25"
+                            <xctk:DoubleUpDown Grid.Row="2" Grid.Column="1" Margin="2" Increment="1" Height="25"
                                            x:Name="NUD_Gain" MaxWidth="120" ValueChanged="NUD_Gain_ValueChanged"
                                            Value="{Binding Gain, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                            Maximum="{Binding GainMax, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
@@ -395,7 +395,9 @@
                             <ToggleButton MaxHeight="42" Margin="2"
                                           Style="{DynamicResource ToggleButtonSimpleStyle}" 
                                           IsEnabled="{Binding DeviceValid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                          x:Name="ChB_WhiteBalanceAuto">
+                                          x:Name="ChB_WhiteBalanceAuto"
+                                          IsChecked="{Binding WhiteBalanceAuto, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    Click="ChB_WhiteBalanceAuto_Click">
                                 <ToggleButton.Content>
                                     <Viewbox MaxHeight="30">
                                         <TextBlock Height="22" Text="Автобаланс белого"/>
@@ -471,7 +473,7 @@
                                 Style="{DynamicResource ButtonStyle}" 
                                 x:Name="B_Browse_Vid"
                                 Click="B_Browse_Vid_Click"/>
-                        <Button Content="Настройка кодека" Grid.Row="6" Grid.ColumnSpan="4" Margin="2 4 2 2"
+                        <Button Content="Настройки видеозаписи" Grid.Row="6" Grid.ColumnSpan="4" Margin="2 4 2 2"
                                 Style="{DynamicResource ButtonStyle}"
                                 x:Name="B_codecSettings"
                                 Click="B_codecSettings_Click">
@@ -555,18 +557,29 @@
                                Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never"
                                VerticalAlignment="Center" FontSize="16" Margin="10 2 4 2"/>
                     <UniformGrid Grid.Column="3" Rows="1" Columns="3" HorizontalAlignment="Center">
-                        <Button Margin="2" Content="Старт" 
-                                    Style="{DynamicResource ButtonStyle}" 
-                                    x:Name="B_StartCapture"
-                                    Click="B_StartCapture_Click"/>
+                        <Button Margin="2" Content="Старт"
+                                      x:Name="B_StartPauseVideo"
+                                      Click="B_StartPauseVideo_Click" >
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" Value="True">
+                                            <Setter Property="Content" Value="Пауза"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
                         <Button Margin="2" Content="Пауза" IsEnabled="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged}"
+                                Visibility="Collapsed"
                                     Style="{DynamicResource ButtonStyle}" 
                                     x:Name="B_PauseCapture"
                                     Click="B_PauseCapture_Click"/>
-                        <Button Margin="2" Content="Стоп" IsEnabled="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged}"
+                        <Button Margin="2" Content="Стоп"
                                     Style="{DynamicResource ButtonStyle}" 
                                     x:Name="B_StopCapture"
-                                    Click="B_StopCapture_Click"/>
+                                    Click="B_StopCapture_Click"
+                                    IsEnabled="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
                     </UniformGrid>
                     <StackPanel Orientation="Horizontal" Grid.Column="4">
                         <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Видеозапись" VerticalAlignment="Center" FontSize="16" Margin="100 2 2 2"

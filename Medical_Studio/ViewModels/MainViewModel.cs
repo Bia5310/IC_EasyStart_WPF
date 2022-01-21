@@ -17,6 +17,18 @@ namespace Medical_Studio.ViewModels
         private const string NameOfApplication = "Medical Studio";
         private const string AppVersion = "3.0 Beta";
 
+        public IntPtr WindowHandle { get; set; } = IntPtr.Zero;
+
+        DispatcherTimer updatePropertiesTimer = null;
+
+        public MainViewModel()
+        {
+            updatePropertiesTimer = new DispatcherTimer(DispatcherPriority.Background);
+            updatePropertiesTimer.Tick += UpdatePropertiesTimer_Tick;
+            updatePropertiesTimer.Interval = new TimeSpan(0, 0, 0, 0, 250); //ms
+            updatePropertiesTimer.IsEnabled = false;
+        }
+
         public string WindowTitle
         {
             get => String.Format("{0} {1}", NameOfApplication, AppVersion);
@@ -46,9 +58,29 @@ namespace Medical_Studio.ViewModels
             get => icImagingControl;
             set
             {
+                if(icImagingControl != null)
+                {
+                    icImagingControl.DeviceLost -= IcImagingControl_DeviceLost;
+                }
+
                 icImagingControl = value;
+
+                if(icImagingControl != null)
+                {
+                    icImagingControl.DeviceLost += IcImagingControl_DeviceLost;
+                }
+
                 OnPropertyChanged("ICImagingControl");
             }
+        }
+
+        private void IcImagingControl_DeviceLost(object sender, ICImagingControl.DeviceLostEventArgs e)
+        {
+            try
+            {
+                CloseLostDevice();
+            }
+            catch (Exception) { }
         }
 
         private AviCompressor aviCompressor = null;
@@ -62,6 +94,7 @@ namespace Medical_Studio.ViewModels
                 OnPropertyChanged("AviCompressorName");
             }
         }
+
         public string AviCompressorName
         {
             get
@@ -84,7 +117,7 @@ namespace Medical_Studio.ViewModels
             }
         }
 
-        private string videoFileInfo = null;
+        private string videoFileInfo = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
         public string VideoFileInfo
         {
             get => videoFileInfo;
@@ -95,7 +128,7 @@ namespace Medical_Studio.ViewModels
             }
         }
 
-        private string photoFileInfo = null;
+        private string photoFileInfo = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
         public string PhotoFileInfo
         {
             get => photoFileInfo;
@@ -237,7 +270,16 @@ namespace Medical_Studio.ViewModels
             if (!DeviceValid)
                 return;
 
-            icImagingControl.LiveStart();
+            try
+            {
+                icImagingControl.LiveStart();
+            }
+            catch(Exception ex)
+            {
+                icImagingControl.Sink = new FrameHandlerSink();// new BaseSink();// oldSink;
+                icImagingControl.LiveStart();
+            }
+            
 
             OnPropertyChanged("IsLive");
         }
@@ -283,9 +325,14 @@ namespace Medical_Studio.ViewModels
             OnPropertyChanged("VideoCapturing");
         }
 
+        public string VideoFileName { get; set; } = "video";
+
         public MediaStreamSink PrepareVideoSink()
         {
-            MediaStreamSink mediaStreamSink = new MediaStreamSink(mediaStreamContainer, aviCompressor, videoFileInfo);
+            DirectoryInfo dir = Directory.CreateDirectory(VideoFileInfo);
+            string videoFullName = dir.FullName + '/' + VideoFileName;
+
+            MediaStreamSink mediaStreamSink = new MediaStreamSink(mediaStreamContainer, aviCompressor, videoFullName);
             return mediaStreamSink;
         }
 
@@ -317,9 +364,9 @@ namespace Medical_Studio.ViewModels
             if(DeviceValid)
                 if(mediaStreamSink != null)
                 {
-                    mediaStreamSink.SinkModeRunning = pause;
+                    mediaStreamSink.SinkModeRunning = !pause;
 
-                    videoOnPause = mediaStreamSink.SinkModeRunning;
+                    videoOnPause = !mediaStreamSink.SinkModeRunning;
                     OnPropertyChanged("VideoOnPause");
                 }
         }
@@ -383,7 +430,7 @@ namespace Medical_Studio.ViewModels
             set
             {
                 configKey = value;
-                LoadCurrentConfig();
+                LoadCurrentCameraConfig();
                 OnPropertyChanged("ConfigKey");
             }
         }
@@ -404,8 +451,10 @@ namespace Medical_Studio.ViewModels
             HistoryNumberString = Settings.Default.HistoryNumber;
             FIOString = Settings.Default.FIO;
 
-            VideoFileInfo = Settings.Default.VideoPath;
-            PhotoFileInfo = Settings.Default.PhotoPath;
+            if(Settings.Default.VideoPath != "")
+                VideoFileInfo = Settings.Default.VideoPath;
+            if(Settings.Default.PhotoPath != "")
+                PhotoFileInfo = Settings.Default.PhotoPath;
 
             LoadCodecAndCompressor();
 
@@ -431,7 +480,7 @@ namespace Medical_Studio.ViewModels
             SaveConfigsDictionary();
         }
 
-        public void LoadCurrentConfig()
+        public void LoadCurrentCameraConfig()
         {
             if (icImagingControl == null)
                 return;
@@ -441,16 +490,25 @@ namespace Medical_Studio.ViewModels
                 StopLive();
 
             string path = ConfigsDictionary[configKey].ConfigPath;
-            if (System.IO.File.Exists(path))
+            if(DeviceValid)
             {
-                icImagingControl.LoadDeviceStateFromFile(path, true);
+                if (System.IO.File.Exists(path))
+                {
+                    icImagingControl.LoadDeviceStateFromFile(path, false);
+                }
+                else
+                {
+                    path = "Default.xml";
+                    if(System.IO.File.Exists(path))
+                        icImagingControl.LoadDeviceStateFromFile(path, false);
+                }
             }
 
             if (wasLive)
                 StartLive();
         }
 
-        public void SaveCurrentConfig()
+        public void SaveCurrentCameraConfig()
         {
             if (icImagingControl == null)
                 return;
@@ -462,10 +520,7 @@ namespace Medical_Studio.ViewModels
             string path = String.Format("CameraConfig_{0}.xml", configKey); ;
             configsDictionary[configKey].ConfigPath = path;
 
-            if (System.IO.File.Exists(path))
-            {
-                icImagingControl.SaveDeviceStateToFile(path);
-            }
+            icImagingControl.SaveDeviceStateToFile(path);
             SaveConfigsDictionary();
 
             if (wasLive)
@@ -489,7 +544,6 @@ namespace Medical_Studio.ViewModels
             get => icImagingControl?.DeviceValid ?? false;
         }
 
-
         public bool OpenCamera(string deviceName = "")
         {
             if (icImagingControl.DeviceValid)
@@ -510,22 +564,18 @@ namespace Medical_Studio.ViewModels
             if(icImagingControl.DeviceValid)
             {
                 InitCameraProperties();
+                RefreshPropertiesValues();
             }
 
             OnPropertyChanged("DeviceValid");
-            RefreshPropertiesValues();
+
+            updatePropertiesTimer.Start();
+
+            StartLive();
+            OnPropertyChanged("VideoOnPause");
+            OnPropertyChanged("VideoCapturing");
 
             return icImagingControl.DeviceValid;
-        }
-
-        DispatcherTimer updatePropertiesTimer = null;
-        private void StartPropertiesUpdateTimer()
-        {
-            updatePropertiesTimer = new DispatcherTimer(DispatcherPriority.Background);
-            updatePropertiesTimer.Tick += UpdatePropertiesTimer_Tick;
-            updatePropertiesTimer.Interval = new TimeSpan(0, 0, 0, 0, 1000); //ms
-            updatePropertiesTimer.IsEnabled = false;
-            updatePropertiesTimer.Start();
         }
 
         private void UpdatePropertiesTimer_Tick(object sender, EventArgs e)
@@ -534,13 +584,12 @@ namespace Medical_Studio.ViewModels
             {
                 if (icImagingControl != null && icImagingControl.DeviceValid)
                 {
-                    if (ExposureAuto)
                         OnPropertyChanged("Exposure");
+                        OnPropertyChanged("ExposureAuto");
 
-                    if (GainAuto)
                         OnPropertyChanged("Gain");
+                        OnPropertyChanged("GainAuto");
 
-                    if (WhiteBalanceAuto)
                         OnPropertyChanged("WhiteBalanceAuto");
                 }
             }
@@ -575,7 +624,7 @@ namespace Medical_Studio.ViewModels
             OnPropertyChanged("WhiteBalanceAutoEnabled");
         }
 
-        private void CloseDevice()
+        public void CloseDevice()
         {
             if (videoCapturing)
                 StopVideoCapturing();
@@ -584,6 +633,25 @@ namespace Medical_Studio.ViewModels
 
             updatePropertiesTimer.Stop();
             DeinitCameraProperties();
+        }
+
+        private void CloseLostDevice()
+        {
+            videoCapturing = false;
+            videoOnPause = false;
+            if (mediaStreamSink != null)
+                mediaStreamSink.Dispose();
+            mediaStreamSink = null;
+
+            IsLive = false;
+
+            updatePropertiesTimer.Stop();
+            DeinitCameraProperties();
+
+            OnPropertyChanged("DeviceValid");
+            OnPropertyChanged("VideoOnPause");
+            OnPropertyChanged("VideoCapturing");
+            RefreshPropertiesValues();
         }
 
         public void SaveConfigsDictionary()

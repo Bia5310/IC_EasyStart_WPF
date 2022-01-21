@@ -11,7 +11,6 @@ namespace Medical_Studio
         public string ConfigName { get; set; } = "";
         public string ConfigPath { get; set; } = "";
 
-
         public static readonly string DictionaryFileName = "Configs.xml";
 
         public static Dictionary<string, ConfigElement> LoadConfigsDictionary(string filename)
@@ -33,11 +32,12 @@ namespace Medical_Studio
                 {
                     try
                     {
-                        if (dict.ContainsKey(xNode.Name))
+                        XmlNode xAttr = xNode.Attributes.GetNamedItem("Key");
+                        if (xAttr != null && dict.ContainsKey(xAttr.Value ?? ""))
                         {
-                            ConfigElement confElement = new ConfigElement();
+                            ConfigElement confElement = dict[xAttr.Value];
 
-                            XmlNode xAttr = xNode.Attributes.GetNamedItem("ConfigPath");
+                            xAttr = xNode.Attributes.GetNamedItem("ConfigPath");
                             if(xAttr != null)
                             {
                                 confElement.ConfigPath = xAttr.Value ?? "";
@@ -59,13 +59,18 @@ namespace Medical_Studio
         public static void SaveConfigsDictionary(Dictionary<string, ConfigElement> dictionary, string filename)
         {
             XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.AppendChild(xmlDocument.CreateXmlDeclaration("1.0", "utf-8", string.Empty));
             XmlElement xRoot = xmlDocument.CreateElement("configs");
             xmlDocument.AppendChild(xRoot);
 
             foreach(string key in dictionary.Keys)
             {
-                XmlNode xNode = xmlDocument.CreateNode(XmlNodeType.Element, key, xmlDocument.NamespaceURI);
-                XmlAttribute xAttr = xmlDocument.CreateAttribute("ConfigName");
+                XmlNode xNode = xmlDocument.CreateNode(XmlNodeType.Element, "config", xmlDocument.NamespaceURI);
+                XmlAttribute xAttr = xmlDocument.CreateAttribute("Key");
+                xAttr.Value = key;
+                xNode.Attributes.Append(xAttr);
+
+                xAttr = xmlDocument.CreateAttribute("ConfigName");
                 xAttr.Value = dictionary[key].ConfigName;
                 xNode.Attributes.Append(xAttr);
 

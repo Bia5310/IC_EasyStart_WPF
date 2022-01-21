@@ -22,6 +22,8 @@ using System.Windows.Threading;
 using System.Windows.Media.Animation;
 using System.Runtime.ExceptionServices;
 using System.Windows.Interop;
+using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Medical_Studio
 {
@@ -151,6 +153,7 @@ namespace Medical_Studio
 
             //Set main view model
             mainViewModel = new ViewModels.MainViewModel();
+            mainViewModel.WindowHandle = windowHandle;
             DataContext = mainViewModel;
             mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
 
@@ -179,7 +182,7 @@ namespace Medical_Studio
             }
             if(e.PropertyName == nameof(mainViewModel.ConfigKey))
             {
-                mainViewModel.LoadCurrentConfig();
+                mainViewModel.LoadCurrentCameraConfig();
             }
         }
 
@@ -244,8 +247,11 @@ namespace Medical_Studio
                 TIS.Imaging.LibrarySetup.SetLocalizationLanguage("ru");
 
                 IC_Control = new ICImagingControl();
-                Host.Child.Controls.Add(IC_Control);
 
+                //Setup render view
+
+                Host.Child.Controls.Add(IC_Control);
+                
                 IC_Control.SendToBack();
                 IC_Control.OverlayBitmapAtPath[PathPositions.Display].Enable = true;
                 Panel = Host.Child as System.Windows.Forms.Panel;
@@ -283,14 +289,9 @@ namespace Medical_Studio
             }
         }
 
-        private void ChooseCameraDialog()
-        {
-            IC_Control.ShowDeviceSettingsDialog(windowHandle);
-        }
-
         private void WhenDeviceOpened()
         {
-            mainViewModel.LoadCurrentConfig();
+            mainViewModel.LoadCurrentCameraConfig();
 
             try
             {
@@ -314,9 +315,9 @@ namespace Medical_Studio
                     FLog.Log("ERROR - Format adaptation error");
                 }
 
-                Device_name = IC_Control.Device;
-                Timer_camera_checker.Start();
-                STW_fps.Start();
+                //Device_name = IC_Control.Device;
+                //Timer_camera_checker.Start();
+                //STW_fps.Start();
             }
             catch (Exception ext)
             {
@@ -324,28 +325,51 @@ namespace Medical_Studio
                 MessageBox.Show(ext.Message);
                 Everything_loaded = true;
             }
-
-
         }
 
+        private bool noEvents = false;
         public void Init_ListOf_CheckButtons()
         {
+            noEvents = true;
+            RenameableToggleButton rtb = null;
             for (int i = 0; i < stackPanelPhacoButtons.Children.Count; i++)
             {
-                renameableButtonsConfigs.Add(stackPanelPhacoButtons.Children[i] as RenameableToggleButton);
+                rtb = stackPanelPhacoButtons.Children[i] as RenameableToggleButton;
+                renameableButtonsConfigs.Add(rtb);
+                rtb.Text = mainViewModel.ConfigsDictionary[rtb.Tag as string].ConfigName;
+                if ((string)rtb.Tag == mainViewModel.ConfigKey)
+                {
+                    rtb.IsChecked = true;
+                    tabPhaco.Focus();
+                }
             }
 
             for (int i = 0; i < stackPanelVitreoButtons.Children.Count; i++)
             {
-                renameableButtonsConfigs.Add(stackPanelVitreoButtons.Children[i] as RenameableToggleButton);
+                rtb = stackPanelVitreoButtons.Children[i] as RenameableToggleButton;
+                renameableButtonsConfigs.Add(rtb);
+                rtb.Text = mainViewModel.ConfigsDictionary[rtb.Tag as string].ConfigName;
+                if ((string)rtb.Tag == mainViewModel.ConfigKey)
+                {
+                    rtb.IsChecked = true;
+                    tabVitreo.Focus();
+                }
             }
 
             for (int i = 0; i < stackPanelUserConfigs.Children.Count; i++)
             {
-                renameableButtonsConfigs.Add(stackPanelUserConfigs.Children[i] as RenameableToggleButton);
+                rtb = stackPanelUserConfigs.Children[i] as RenameableToggleButton;
+                renameableButtonsConfigs.Add(rtb);
+                rtb.Text = mainViewModel.ConfigsDictionary[rtb.Tag as string].ConfigName;
+                if ((string)rtb.Tag == mainViewModel.ConfigKey)
+                {
+                    rtb.IsChecked = true;
+                    tabUser.Focus();
+                }
             }
-
+            noEvents = false;
         }
+
         public double GetScalingFactor_ofMonitor()
         {
             double resHeight = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height;  // 1440
@@ -355,21 +379,36 @@ namespace Medical_Studio
 
         private void B_Browse_Vid_Click(object sender, RoutedEventArgs e)
         {
-            FLog.Log("B_Browse_Vid_Click");
-            mainViewModel.VideoFileInfo = ServiceFunctions.Files.OpenDirectory(mainViewModel.VideoFileInfo);
+            try
+            {
+                mainViewModel.VideoFileInfo = ServiceFunctions.Files.OpenDirectory(mainViewModel.VideoFileInfo);
+            }
+            catch(Exception ex)
+            {
+                LogException(ex);
+            }
+
         }
 
         private void B_Browse_Photo_Click(object sender, RoutedEventArgs e)
         {
-            FLog.Log("B_Browse_Photo_Click");
-            mainViewModel.PhotoFileInfo = ServiceFunctions.Files.OpenDirectory(mainViewModel.PhotoFileInfo);
+            try
+            {
+                mainViewModel.PhotoFileInfo = ServiceFunctions.Files.OpenDirectory(mainViewModel.PhotoFileInfo);
+            }
+            catch (Exception ex)
+            {
+                LogException(ex);
+            }
+
         }
 
         private void Form1_FormClosing(object sender, CancelEventArgs e)
         {
             try
             {
-                mainViewModel.SaveCurrentConfig();
+                mainViewModel.SaveCurrentCameraConfig();
+                mainViewModel.CloseDevice();
                 mainViewModel.SaveSettings();
             }
             catch(Exception ex) { }
@@ -504,6 +543,7 @@ namespace Medical_Studio
         bool AutoExp_wasEnabled_beforeRecording = false;
         bool RecordingNeeded = false;
         List<Bitmap> bmp_list = new List<Bitmap>();
+
         private void B_StartCapture_Click(object sender, RoutedEventArgs e)
         {
             FLog.Log("B_StartCapture_Click");
@@ -516,18 +556,26 @@ namespace Medical_Studio
             {
                 MessageBox.Show(ex.ToString());
             }
-
         }
+
         private void B_StopCapture_Click(object sender, RoutedEventArgs e)
         {
-
+            try
+            {
+                mainViewModel.VideoCapturing = false;
+            }
+            catch(Exception ex)
+            {
+                LogException(ex);
+            }
         }
 
         private void B_Properties_Click(object sender, RoutedEventArgs e)
         {
             FLog.Log("B_Properties_Click");
-            IC_Control.ShowPropertyDialog();
-            Device_state = IC_Control.SaveDeviceState();
+            IC_Control.ShowPropertyDialog(windowHandle);
+            mainViewModel.SaveCurrentCameraConfig();
+            //Device_state = IC_Control.SaveDeviceState();
         }
 
         private void ChB_WhiteBalanceAuto_CheckedChanged(object sender, RoutedEventArgs e)
@@ -986,27 +1034,28 @@ namespace Medical_Studio
             //Обработка переключения до цикла!
 
             //FLog.Log("ChB_Config_N_Checked");
-            try
-            {
-                //Timer_camera_checker.Stop();
-                Config_tag = ((sender as RenameableToggleButton).Tag as string); //Вычленяем номер конфигурации
+            if(!noEvents)
+                try
+                {
+                    //Timer_camera_checker.Stop();
+                    Config_tag = ((sender as RenameableToggleButton).Tag as string); //Вычленяем номер конфигурации
 
-                if (mainViewModel.ScaleAuto)
-                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
-                else
-                    AdaptViewportControl();
+                    if (mainViewModel.ScaleAuto)
+                        CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                    else
+                        AdaptViewportControl();
 
-                mainViewModel.SaveCurrentConfig();
-                mainViewModel.ConfigKey = Config_tag;
+                    mainViewModel.SaveCurrentCameraConfig();
+                    mainViewModel.ConfigKey = Config_tag;
 
-                //LastConfig_tag = Config_tag; // присваиваем последнему загруженному тегу тот, который загружен сейчас
+                    //LastConfig_tag = Config_tag; // присваиваем последнему загруженному тегу тот, который загружен сейчас
 
-                //Timer_camera_checker.Start();
-            }
-            catch(Exception exc)
-            {
-                FLog.Log("Ошибка при переключении конфигураций");
-            }
+                    //Timer_camera_checker.Start();
+                }
+                catch(Exception exc)
+                {
+                    FLog.Log("Ошибка при переключении конфигураций");
+                }
 
             //Uncheck prvious
             for (int i = 0; i < renameableButtonsConfigs.Count; i++)
@@ -1025,13 +1074,14 @@ namespace Medical_Studio
 
         private void RenameableToggleButton_OnApplyChanges(object sender, RoutedEventArgs eventArgs)
         {
+            if (noEvents)
+                return;
+
             string local_tag = (sender as RenameableToggleButton).Tag as string;
             string local_text = (sender as RenameableToggleButton).Text;
 
             mainViewModel.ConfigsDictionary[local_tag].ConfigName = local_text;
-            mainViewModel.SaveCurrentConfig();
-
-            //ConfigsNamesDictionary[local_tag] = local_text;
+            mainViewModel.SaveCurrentCameraConfig();
         }
 
         private void RenameableToggleButton_Loaded(object sender, RoutedEventArgs e)
@@ -1057,21 +1107,19 @@ namespace Medical_Studio
         {
             try
             {
-                
+                ShowSetupCodecsDislog();
             }
-            catch(Exception ex) { }
+            catch(Exception ex)
+            {
+                LogException(ex);
+            }
         }
 
-        private void ToggleVideoCapturing()
+        private bool? ShowSetupCodecsDislog()
         {
-            try
-            {
-                mainViewModel.VideoCapturing = !mainViewModel.VideoCapturing;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
+            CodecSettings codecSettingsDialog = new CodecSettings();
+            codecSettingsDialog.DataContext = mainViewModel;
+            return codecSettingsDialog.ShowDialog();
         }
 
         private void Refresh_IC_BackColor()
@@ -1134,6 +1182,120 @@ namespace Medical_Studio
             FullScrin = false;
             //ВРЕМЕННО
             CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+        }
+
+        private bool offAutobalance = false;
+        private void ChB_WhiteBalanceAuto_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (mainViewModel.WhiteBalanceAutoEnabled)
+                {
+                    if(mainViewModel.WhiteBalanceAuto)
+                    {
+                        Task task = new Task(new Action(() =>
+                        {
+                            offAutobalance = false;
+                            Stopwatch sw = new Stopwatch();
+                            sw.Start();
+                            while (true)
+                            {
+                                if (offAutobalance)
+                                {
+                                    break;
+                                }
+                                if (sw.ElapsedMilliseconds >= 5000)
+                                {
+                                    mainViewModel.WhiteBalanceAuto = false;
+                                    break;
+                                }
+                                System.Threading.Thread.Sleep(50);
+                            }
+                            offAutobalance = false;
+                        }));
+                        task.Start();
+                    }
+                    else
+                    {
+                        offAutobalance = true;
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                LogException(ex);
+            }
+        }
+
+        private void LogException(Exception ex)
+        {
+            FLog.Log(ex.ToString());
+            MessageBox.Show(ex.ToString());
+        }
+
+        private void B_StartPauseVideo_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ToggleVideoCapture();
+            }
+            catch(Exception ex)
+            {
+                LogException(ex);
+            }
+        }
+
+
+        private void ToggleVideoCapture()
+        {
+            if (!mainViewModel.DeviceValid)
+                return;
+
+            if (mainViewModel.VideoCapturing)
+            {
+                mainViewModel.VideoOnPause = !mainViewModel.VideoOnPause;
+            }
+            else
+            {
+                bool codecCheck = mainViewModel.CheckCodecAndCompressorSupported();
+                if (codecCheck)
+                {
+                    string baseName = BuildBaseMediaFileName();
+                    if (baseName == null)
+                        throw new InvalidOperationException("MediaFile base name error");
+
+                    string videoName = BuildFileNameWithoutExt(mainViewModel.VideoFileInfo, baseName, mainViewModel.MediaStreamContainer.PreferredFileExtension);
+                    mainViewModel.VideoFileName = videoName;
+                    mainViewModel.StartVideoCapturing();
+                }
+                else
+                {
+                    if(ShowSetupCodecsDislog() ?? false)
+                        ToggleVideoCapture();
+                }
+            }
+        }
+
+        private static string BuildFileNameWithoutExt(string directory, string baseName, string ext)
+        {
+            DirectoryInfo dir = Directory.CreateDirectory(directory);
+
+            string tryname = "";
+            for(int i = 0; ;++i)
+            {
+                tryname = String.Format("{0} {1}.{2}", baseName, i, ext);
+                if (!File.Exists(dir.FullName + '/' + tryname))
+                {
+                    return tryname;
+                }
+            }
+        }
+
+        private string BuildBaseMediaFileName()
+        {
+            string FIO = !string.IsNullOrEmpty(TB_FIO.Text) ? TB_FIO.Text + " " : "";
+            string H_num = !string.IsNullOrEmpty(TB_HistoryNumber.Text) ? TB_HistoryNumber.Text + " " : "";
+            return FIO + H_num + TB_CurrentDate.Text;
         }
 
         private void FormatAdaptation(int WidthOfImage = -1, int HeightOfImage = -1)
