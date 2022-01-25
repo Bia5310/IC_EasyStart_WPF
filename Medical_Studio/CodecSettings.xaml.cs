@@ -64,7 +64,7 @@ namespace Medical_Studio
         private void selectUsersCodec()
         {
             List<AviCompressor> compressors = (List<AviCompressor>)Cb_Codecs.ItemsSource;
-
+            
             if(mainViewModel.AviCompressor == null)
             {
                 if (Cb_Codecs.Items.Count > 0)

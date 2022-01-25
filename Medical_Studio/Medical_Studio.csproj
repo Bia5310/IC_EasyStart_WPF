@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>Medical_Studio</RootNamespace>
     <AssemblyName>Medical_Studio</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -83,6 +83,7 @@
       <HintPath>..\packages\AForge.Video.FFMPEG.2.2.5.1-rc\lib\AForge.Video.FFMPEG.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -124,6 +125,7 @@
     <Compile Include="AVI\AviWriter.cs" />
     <Compile Include="AVI\H264Writer.cs" />
     <Compile Include="AVI\RiffFile.cs" />
+    <Compile Include="Capture\EncoderH264.cs" />
     <Compile Include="CodecSettings.xaml.cs">
       <DependentUpon>CodecSettings.xaml</DependentUpon>
     </Compile>
@@ -143,6 +145,8 @@
     </Compile>
     <Compile Include="SpeciallClasses.cs" />
     <Compile Include="TextBoxWatermark.cs" />
+    <Compile Include="Capture\VideoSinkListener.cs" />
+    <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="Viewport\ViewportControl.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Viewport\ViewportDrawingVisual.cs" />
@@ -243,9 +247,13 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VideoWriterNET\VideoWriterNET.vcxproj">
-      <Project>{ee7556bd-b29c-4d26-8522-b9313af0d0c1}</Project>
-      <Name>VideoWriterNET</Name>
+    <ProjectReference Include="..\MFLibv3_1\src.mfext\MediaFoundation.Extension-2010.csproj">
+      <Project>{6e6f1484-b5df-41f7-8e2a-f829a34b845c}</Project>
+      <Name>MediaFoundation.Extension-2010</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MFLibv3_1\src\MediaFoundation-2010.csproj">
+      <Project>{b78c0f3b-071a-4fd2-829d-7a67e0f7bd1c}</Project>
+      <Name>MediaFoundation-2010</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

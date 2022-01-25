@@ -10,10 +10,8 @@ using TIS.Imaging;
 
 namespace Medical_Studio.ViewModels
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public class MainViewModel : BaseViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         private const string NameOfApplication = "Medical Studio";
         private const string AppVersion = "3.0 Beta";
 
@@ -32,24 +30,6 @@ namespace Medical_Studio.ViewModels
         public string WindowTitle
         {
             get => String.Format("{0} {1}", NameOfApplication, AppVersion);
-        }
-
-        public void OnPropertyChanged(/*[CallerMemberName]*/string prop = "")
-        {
-            if(System.Windows.Application.Current.Dispatcher.CheckAccess())
-            {
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs(prop));
-                return;
-            }
-            else
-            {
-                System.Windows.Application.Current.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Normal, new Action(() =>
-                {
-                    OnPropertyChanged(prop);
-                    return;
-                }));
-            }
         }
 
         private ICImagingControl icImagingControl = null;
