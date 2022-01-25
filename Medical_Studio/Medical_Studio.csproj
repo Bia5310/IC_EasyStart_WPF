@@ -130,6 +130,10 @@
       <DependentUpon>CodecSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="ConfigElement.cs" />
+    <Compile Include="ConfigureEncoder.xaml.cs">
+      <DependentUpon>ConfigureEncoder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\MultiplyConverter.cs" />
     <Compile Include="Converters\BoolToRedColorConverter.cs" />
     <Compile Include="Converters\BoolVisibilityConverter.cs" />
     <Compile Include="Converters\ConverterLogarithm.cs" />
@@ -151,6 +155,10 @@
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Viewport\ViewportDrawingVisual.cs" />
     <Page Include="CodecSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ConfigureEncoder.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

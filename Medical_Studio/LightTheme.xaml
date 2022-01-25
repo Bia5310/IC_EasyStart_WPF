@@ -8,7 +8,9 @@
     </Style>
 
     <SolidColorBrush x:Key="Brush_Borders" Color="Yellow"/>
-    
+
+    <Color x:Key="MainFont">#000000</Color>
+    <SolidColorBrush x:Key="MainFontBrush" Color="{StaticResource MainFont}"/>
 
     <Style x:Key="ExpanderStyle" TargetType="Expander">
         <Setter Property="Background" Value="White"/>

@@ -3,9 +3,12 @@
                     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                     xmlns:local="clr-namespace:Medical_Studio">
 
+    <Color x:Key="MainFont">#FFFFFF</Color>
     <Color x:Key="YellowDark">#FFFFD556</Color>
     <Color x:Key="DarkBlue1Color">#FF1A89AA</Color>
     <Color x:Key="DarkBlue2Color">#FF133A46</Color>
+    
+    <SolidColorBrush x:Key="MainFontBrush" Color="{StaticResource MainFont}"/>
     <SolidColorBrush x:Key="DarkBlue1Brush" Color="{StaticResource DarkBlue1Color}"/>
     <SolidColorBrush x:Key="DarkBlue2Brush" Color="{StaticResource DarkBlue2Color}"/>
 

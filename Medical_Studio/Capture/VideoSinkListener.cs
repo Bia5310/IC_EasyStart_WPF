@@ -228,7 +228,6 @@ namespace Medical_Studio.Capture
             outMediaType.SetRatio(MediaFoundation.MFAttributesClsid.MF_MT_PIXEL_ASPECT_RATIO, 1, 1);
 
             hr = sinkWriter.AddStream(outMediaType, out streamIndex);
-            sinkWriter.GetServiceForStream(streamIndex, MFTransformCategory.MFT_CATEGORY_VIDEO_ENCODER, , out object ppvObject);
             
 
             //set input

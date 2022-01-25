@@ -1,0 +1,108 @@
+﻿<Window x:Class="Medical_Studio.ConfigureEncoder"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Medical_Studio"
+        xmlns:cv="clr-namespace:Medical_Studio.Converters"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
+        Style="{DynamicResource WindowStyle}"
+        Title="Настройка видеокодека H.264" Height="188.584" Width="662.59" Foreground="{DynamicResource MainFontBrush}">
+    <Window.Resources>
+        <cv:BoolVisibilityConverter x:Key="convBoolToVisibility"/>
+        <cv:MultiplyConverter x:Key="convMultiply"/>
+        <sys:Double x:Key="mul">0.000001</sys:Double>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <RadioButton Grid.Column="0" Grid.Row="1" Content="Качество, %" HorizontalAlignment="Left" Margin="4"
+                         Foreground="{DynamicResource MainFontBrush}"
+                         x:Name="rb_quality"/>
+
+            <Grid Grid.Row="1" Grid.Column="1" Margin="3"
+                  IsEnabled="{Binding ElementName=rb_quality, Path=IsChecked}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Slider Grid.Row="0" Grid.ColumnSpan="3"
+                        Style="{DynamicResource SliderStyle}"
+                        Visibility="{Binding ElementName=rb_quality, Path=IsChecked}"
+                        Interval="5"
+                        TickFrequency="10"
+                        TickPlacement="BottomRight"
+                        Value="{Binding Quality, UpdateSourceTrigger=PropertyChanged, TargetNullValue=10, Mode=TwoWay}"
+                        Minimum="{Binding QualityMin, UpdateSourceTrigger=PropertyChanged, TargetNullValue=1, Mode=OneWay}"
+                        Maximum="{Binding QualityMax, UpdateSourceTrigger=PropertyChanged, TargetNullValue=100, Mode=OneWay}"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" Text="{Binding QualityMin, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Text="{Binding Quality, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right" Text="{Binding QualityMax, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+            </Grid>
+
+            <RadioButton Grid.Column="0" Grid.Row="2" Content="Битрейт [Мбит/сек]" HorizontalAlignment="Left" Margin="4"
+                         Foreground="{DynamicResource MainFontBrush}"
+                         x:Name="rb_bitrate"/>
+
+            <Grid Grid.Row="2" Grid.Column="1" Margin="3"
+                  IsEnabled="{Binding ElementName=rb_bitrate, Path=IsChecked}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Slider Grid.Row="0" Grid.ColumnSpan="3"
+                        Style="{DynamicResource SliderStyle}"
+                        Interval="100000"
+                        TickFrequency="10"
+                        TickPlacement="BottomRight"
+                        Value="{Binding AverageBitrate, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                        Minimum="{Binding AverageBitrateMin, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                        Maximum="{Binding AverageBitrateMax, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" HorizontalAlignment="Left" Text="{Binding AverageBitrateMin, Mode=OneWay,
+                    Converter={StaticResource convMultiply}, ConverterParameter={StaticResource mul}, StringFormat=F0}"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Text="{Binding AverageBitrate, UpdateSourceTrigger=PropertyChanged, Mode=OneWay,
+                    Converter={StaticResource convMultiply}, ConverterParameter={StaticResource mul}, StringFormat=F0}"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" HorizontalAlignment="Right" Text="{Binding AverageBitrateMax, Mode=OneWay,
+                    Converter={StaticResource convMultiply}, ConverterParameter={StaticResource mul}, StringFormat=F0}"/>
+            </Grid>
+        </Grid>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
+            <Button Content="OK" Width="100" Margin="2" x:Name="Btn_OK"
+                    Click="Btn_OK_Click"
+                    Style="{DynamicResource ButtonStyle}"/>
+            <Button Content="Cancel" Width="100" Margin="2" x:Name="Btn_Cancel"
+                    Click="Btn_Cancel_Click"
+                    Style="{DynamicResource ButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</Window>

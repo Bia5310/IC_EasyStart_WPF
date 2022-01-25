@@ -1117,9 +1117,13 @@ namespace Medical_Studio
 
         private bool? ShowSetupCodecsDislog()
         {
-            CodecSettings codecSettingsDialog = new CodecSettings();
+            /*CodecSettings codecSettingsDialog = new CodecSettings();
             codecSettingsDialog.DataContext = mainViewModel;
-            return codecSettingsDialog.ShowDialog();
+            return codecSettingsDialog.ShowDialog();*/
+            ConfigureEncoder configureEncoderDialog = new ConfigureEncoder();
+            configureEncoderDialog.Owner = this;
+            configureEncoderDialog.DataContext = mainViewModel.Encoder;
+            return configureEncoderDialog.ShowDialog();
         }
 
         private void Refresh_IC_BackColor()

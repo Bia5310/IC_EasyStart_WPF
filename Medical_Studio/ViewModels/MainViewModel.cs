@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Medical_Studio.Capture;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -277,6 +278,9 @@ namespace Medical_Studio.ViewModels
         private BaseSink oldSink = null;
         private MediaStreamSink mediaStreamSink = null;
 
+        private VideoSinkListener videoSinkListener = null;
+        private FrameNotificationSink frameNotificationSink = null;
+
         public void StartVideoCapturing()
         {
             if (!DeviceValid)
@@ -291,9 +295,12 @@ namespace Medical_Studio.ViewModels
 
             oldSink = icImagingControl.Sink;
 
-            mediaStreamSink = PrepareVideoSink();
+            /*mediaStreamSink = PrepareVideoSink();
             icImagingControl.Sink = mediaStreamSink;
-            mediaStreamSink.SinkModeRunning = true;
+            mediaStreamSink.SinkModeRunning = true;*/
+            videoSinkListener = PrepareVideoSinkListener();
+            frameNotificationSink = new FrameNotificationSink(videoSinkListener);
+            icImagingControl.Sink = frameNotificationSink;
 
             videoOnPause = false;
             videoCapturing = true;
@@ -314,6 +321,20 @@ namespace Medical_Studio.ViewModels
 
             MediaStreamSink mediaStreamSink = new MediaStreamSink(mediaStreamContainer, aviCompressor, videoFullName);
             return mediaStreamSink;
+        }
+
+        private VideoSinkListener PrepareVideoSinkListener()
+        {
+            DirectoryInfo dir = Directory.CreateDirectory(VideoFileInfo);
+            string videoFullName = dir.FullName + '/' + VideoFileName + ".mp4";
+
+            VideoSinkListener videoSinkListener = new VideoSinkListener(
+                VideoFileName,
+                icImagingControl.VideoFormatCurrent.FrameType,
+                (int)icImagingControl.DeviceFrameRate,
+                encoder);
+
+            return videoSinkListener;
         }
 
         public void StopVideoCapturing()
@@ -342,13 +363,20 @@ namespace Medical_Studio.ViewModels
         public void PauseVideoCapturing(bool pause)
         {
             if(DeviceValid)
-                if(mediaStreamSink != null)
+                if(videoSinkListener != null)
+                {
+                    videoSinkListener.Pause = pause;
+                    
+                    videoOnPause = videoSinkListener.Pause;
+                    OnPropertyChanged("VideoOnPause");
+                }
+                /*if(mediaStreamSink != null)
                 {
                     mediaStreamSink.SinkModeRunning = !pause;
 
                     videoOnPause = !mediaStreamSink.SinkModeRunning;
                     OnPropertyChanged("VideoOnPause");
-                }
+                }*/
         }
 
         private readonly string codecsFileName = "codecSettings.bin";
@@ -436,6 +464,11 @@ namespace Medical_Studio.ViewModels
             if(Settings.Default.PhotoPath != "")
                 PhotoFileInfo = Settings.Default.PhotoPath;
 
+            Encoder = new Capture.EncoderH264();
+            encoder.Quality = Settings.Default.H264Quality;
+            encoder.AverageBitrate = Settings.Default.H264Bitrate;
+            encoder.Mode = Settings.Default.IsH264QualityMode ? Capture.EncoderH264.H264Modes.Quality : Capture.EncoderH264.H264Modes.AverageBitrate;
+
             LoadCodecAndCompressor();
 
             LoadConfigsDictionary();
@@ -455,6 +488,13 @@ namespace Medical_Studio.ViewModels
             Settings.Default.MediaContainerID = mediaStreamContainer?.ID ?? new Guid();
 
             Settings.Default.LastConfigKey = configKey;
+
+            if(encoder != null)
+            {
+                Settings.Default.H264Quality = encoder.Quality;
+                Settings.Default.H264Bitrate = encoder.AverageBitrate;
+                Settings.Default.IsH264QualityMode = encoder.Mode == Capture.EncoderH264.H264Modes.Quality;
+            }
 
             Settings.Default.Save();
             SaveConfigsDictionary();
@@ -632,6 +672,17 @@ namespace Medical_Studio.ViewModels
             OnPropertyChanged("VideoOnPause");
             OnPropertyChanged("VideoCapturing");
             RefreshPropertiesValues();
+        }
+
+        private Capture.EncoderH264 encoder = null;
+        public Capture.EncoderH264 Encoder
+        {
+            get => encoder;
+            set
+            {
+                encoder = value;
+                OnPropertyChanged("Encoder");
+            }
         }
 
         public void SaveConfigsDictionary()

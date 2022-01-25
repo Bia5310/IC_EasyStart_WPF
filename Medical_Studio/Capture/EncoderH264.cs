@@ -45,6 +45,9 @@ namespace Medical_Studio.Capture
             }
         }
 
+        public int AverageBitrateMin => 1000000;
+        public int AverageBitrateMax => 500000000;
+
         public enum H264Modes : int { Quality, AverageBitrate }
         private H264Modes mode = H264Modes.AverageBitrate;
         public H264Modes Mode
