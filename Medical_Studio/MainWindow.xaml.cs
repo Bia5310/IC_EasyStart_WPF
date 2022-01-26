@@ -253,7 +253,7 @@ namespace Medical_Studio
                 Host.Child.Controls.Add(IC_Control);
                 
                 IC_Control.SendToBack();
-                IC_Control.OverlayBitmapAtPath[PathPositions.Display].Enable = true;
+                //IC_Control.OverlayBitmapAtPath[PathPositions.Display].Enable = true;
                 Panel = Host.Child as System.Windows.Forms.Panel;
                 Refresh_IC_BackColor();
 
@@ -262,7 +262,7 @@ namespace Medical_Studio
                 mainViewModel.ICImagingControl.ScrollbarsEnabled = true;
                 mainViewModel.ICImagingControl.LiveDisplayDefault = false; //если false, то позволяет изменения размеров окна
 
-                mainViewModel.IsLive = true;
+                //mainViewModel.IsLive = true;
             }
             catch (Exception exc)
             {
@@ -273,17 +273,18 @@ namespace Medical_Studio
         private void TryOpenCamera()
         {
             var devices = IC_Control.Devices;
-            
-            if(devices.Length == 0)
+
+            mainViewModel.OpenCamera();
+            /*if(devices.Length == 0)
             {
                 mainViewModel.OpenCamera("");
             }
             else
             {
                 mainViewModel.OpenCamera(devices[0].Name);
-            }
+            }*/
 
-            if(IC_Control.DeviceValid)
+            if (IC_Control.DeviceValid)
             {
                 WhenDeviceOpened();
             }
@@ -291,7 +292,7 @@ namespace Medical_Studio
 
         private void WhenDeviceOpened()
         {
-            mainViewModel.LoadCurrentCameraConfig();
+            //mainViewModel.LoadCurrentCameraConfig();
 
             try
             {
@@ -627,7 +628,22 @@ namespace Medical_Studio
 
         private void B_Cam_Select_Click(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                string oldDevice = mainViewModel.ICImagingControl.Device;
+                mainViewModel.StopLive();
+                mainViewModel.ICImagingControl.ShowDeviceSettingsDialog(windowHandle);
 
+                mainViewModel.SaveCurrentCameraConfig();
+                mainViewModel.StartLive();
+                /*if(oldDevice != mainViewModel.ICImagingControl.Device)
+                {
+
+                }*/
+            }
+            catch (Exception ex) {
+            
+            }
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -1249,7 +1265,6 @@ namespace Medical_Studio
             }
         }
 
-
         private void ToggleVideoCapture()
         {
             if (!mainViewModel.DeviceValid)
@@ -1261,22 +1276,13 @@ namespace Medical_Studio
             }
             else
             {
-                bool codecCheck = mainViewModel.CheckCodecAndCompressorSupported();
-                if (codecCheck)
-                {
-                    string baseName = BuildBaseMediaFileName();
-                    if (baseName == null)
-                        throw new InvalidOperationException("MediaFile base name error");
+                string baseName = BuildBaseMediaFileName();
+                if (baseName == null)
+                    throw new InvalidOperationException("MediaFile base name error");
 
-                    string videoName = BuildFileNameWithoutExt(mainViewModel.VideoFileInfo, baseName, mainViewModel.MediaStreamContainer.PreferredFileExtension);
-                    mainViewModel.VideoFileName = videoName;
-                    mainViewModel.StartVideoCapturing();
-                }
-                else
-                {
-                    if(ShowSetupCodecsDislog() ?? false)
-                        ToggleVideoCapture();
-                }
+                string videoName = BuildFileNameWithoutExt(mainViewModel.VideoFileInfo, baseName, "mp4");
+                mainViewModel.VideoFileName = videoName;
+                mainViewModel.StartVideoCapturing();
             }
         }
 

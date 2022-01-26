@@ -48,7 +48,7 @@ namespace Medical_Studio.Capture
         private bool isDisposed = false;
         public bool IsDisposed => isDisposed;
 
-        private Stopwatch stopwatch = null;
+        private Stopwatch stopwatch = new Stopwatch();
         private long lastTime = 0;
 
         private int bufferLength = 0;

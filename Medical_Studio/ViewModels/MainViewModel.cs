@@ -257,7 +257,7 @@ namespace Medical_Studio.ViewModels
             }
             catch(Exception ex)
             {
-                icImagingControl.Sink = new FrameHandlerSink();// new BaseSink();// oldSink;
+                icImagingControl.Sink = null;// new BaseSink();// oldSink;
                 icImagingControl.LiveStart();
             }
             
@@ -346,9 +346,8 @@ namespace Medical_Studio.ViewModels
             if (wasLive)
                 StopLive();
 
-            icImagingControl.Sink = oldSink;
-            mediaStreamSink.Dispose();
-            mediaStreamSink = null;
+            if(oldSink != null)
+                icImagingControl.Sink = oldSink;
 
             videoOnPause = false;
             videoCapturing = false;
@@ -510,17 +509,17 @@ namespace Medical_Studio.ViewModels
                 StopLive();
 
             string path = ConfigsDictionary[configKey].ConfigPath;
-            if(DeviceValid)
+            if(icImagingControl != null)
             {
                 if (System.IO.File.Exists(path))
                 {
-                    icImagingControl.LoadDeviceStateFromFile(path, false);
+                    icImagingControl.LoadDeviceStateFromFile(path, true);
                 }
                 else
                 {
                     path = "Default.xml";
                     if(System.IO.File.Exists(path))
-                        icImagingControl.LoadDeviceStateFromFile(path, false);
+                        icImagingControl.LoadDeviceStateFromFile(path, true);
                 }
             }
 
@@ -573,8 +572,13 @@ namespace Medical_Studio.ViewModels
 
             if (deviceName == null || deviceName == "")
             {
-                IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle;
-                icImagingControl.ShowDeviceSettingsDialog(hwnd);
+                LoadCurrentCameraConfig();
+                
+                if(!DeviceValid)
+                {
+                    IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle;
+                    icImagingControl.ShowDeviceSettingsDialog(hwnd);
+                }
             }
             else
             {
