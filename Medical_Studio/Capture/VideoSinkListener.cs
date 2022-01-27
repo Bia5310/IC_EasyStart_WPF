@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using TIS.Imaging;
 using MediaFoundation;
 using System.Diagnostics;
+using static Medical_Studio.NativeFunctions;
+using System.Windows.Media.Imaging;
 
 namespace Medical_Studio.Capture
 {
-    class VideoSinkListener : IFrameNotificationSinkListener
+    class VideoSinkListener : IFrameNotificationSinkListener, ISnapFrame
     {
         static VideoSinkListener()
         {
@@ -56,6 +58,8 @@ namespace Medical_Studio.Capture
 
         private bool successInitialized = false;
         private string filename = "";
+
+        private CopyImageHandler copyImageHandler = null;
 
         //encoder settings
         private int bitrate = 200000000;
@@ -133,7 +137,19 @@ namespace Medical_Studio.Capture
             {
                 IntPtr srcPtr = frame.GetIntPtr();
 
-                hr = MF.CopyImage(destPtr, stride, srcPtr, frame.FrameType.BytesPerLine, frame.FrameType.BytesPerLine, frameType.Height);
+                unsafe
+                {
+                    copyImageHandler?.Invoke(
+                        (byte*)srcPtr,
+                        frame.FrameType.BytesPerLine,
+                        (byte*)destPtr,
+                        stride,
+                        frameType.Height,
+                        true
+                        );
+                }
+
+                //hr = MF.CopyImage(destPtr, stride, srcPtr, frame.FrameType.BytesPerLine, frame.FrameType.BytesPerLine, frameType.Height);
             }
 
             mediaBuffer.Unlock();
@@ -165,11 +181,33 @@ namespace Medical_Studio.Capture
 
         public void SinkConnected(FrameType frameType)
         {
-            if (frameType.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppRgb &&
+            unsafe
+            {
+                switch (frameType.PixelFormat)
+                {
+                    case System.Drawing.Imaging.PixelFormat.Format32bppRgb:
+                    case System.Drawing.Imaging.PixelFormat.Format32bppArgb:
+                        copyImageHandler = NativeFunctions.CopyImageRGB32toRGB32;
+                        break;
+                    case System.Drawing.Imaging.PixelFormat.Format24bppRgb:
+                        copyImageHandler = NativeFunctions.CopyImageRGB24toRGB32;
+                        break;
+                    case System.Drawing.Imaging.PixelFormat.Format16bppGrayScale:
+                        copyImageHandler = NativeFunctions.CopyImageGray16toRGB32;
+                        break;
+                    case System.Drawing.Imaging.PixelFormat.Format8bppIndexed:
+                        copyImageHandler = NativeFunctions.CopyImageGray8toRGB32;
+                        break;
+                    default:
+                        throw new FormatException("This FrameType not supporded");
+                }
+            }
+
+            /*if (frameType.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppRgb &&
                 frameType.PixelFormat != System.Drawing.Imaging.PixelFormat.Format24bppRgb &&
                 frameType.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppArgb &&
                 frameType.PixelFormat != System.Drawing.Imaging.PixelFormat.Format32bppPArgb)
-                throw new FormatException("This FrameType not supporded");
+                throw new FormatException("This FrameType not supporded");*/
 
             System.Threading.Thread thread = new System.Threading.Thread(Init);
             thread.SetApartmentState(System.Threading.ApartmentState.MTA);
@@ -244,6 +282,11 @@ namespace Medical_Studio.Capture
             hr = sinkWriter.BeginWriting();
 
             return hr;
+        }
+
+        public void SnapImage(string filename, BitmapEncoder bitmapEncoder)
+        {
+            
         }
     }
 }

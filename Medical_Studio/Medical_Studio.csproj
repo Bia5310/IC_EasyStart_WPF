@@ -126,6 +126,9 @@
     <Compile Include="AVI\H264Writer.cs" />
     <Compile Include="AVI\RiffFile.cs" />
     <Compile Include="Capture\EncoderH264.cs" />
+    <Compile Include="Capture\ISnapFrame.cs" />
+    <Compile Include="Capture\MediaWriter.cs" />
+    <Compile Include="Capture\SnapSinkListener.cs" />
     <Compile Include="CodecSettings.xaml.cs">
       <DependentUpon>CodecSettings.xaml</DependentUpon>
     </Compile>
@@ -139,6 +142,7 @@
     <Compile Include="Converters\ConverterLogarithm.cs" />
     <Compile Include="Converters\InverseBoolConverter.cs" />
     <Compile Include="Converters\PercentConverter.cs" />
+    <Compile Include="NativeFunctions.cs" />
     <Compile Include="RenameableToggleButton.xaml.cs">
       <DependentUpon>RenameableToggleButton.xaml</DependentUpon>
     </Compile>
