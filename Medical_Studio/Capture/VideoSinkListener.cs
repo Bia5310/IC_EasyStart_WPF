@@ -145,7 +145,7 @@ namespace Medical_Studio.Capture
                         (byte*)destPtr,
                         stride,
                         frameType.Height,
-                        true
+                        false
                         );
                 }
 

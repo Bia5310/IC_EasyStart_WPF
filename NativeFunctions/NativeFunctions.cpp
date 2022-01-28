@@ -52,7 +52,7 @@ void CopyImageGray16toRGB32(char* srcPtr, int srcStride, char* destPtr, int dest
 		srcPtr += (lines - 1) * srcStride;
 		srcStride *= -1;
 	}
-	for (int h = 0; h < lines; h++)
+	for (long h = 0; h < lines; h++)
 	{
 		dest = destPtr + h * destStride;
 		src = srcPtr + h * srcStride;
