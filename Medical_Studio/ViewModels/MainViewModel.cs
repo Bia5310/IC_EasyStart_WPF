@@ -326,10 +326,10 @@ namespace Medical_Studio.ViewModels
         private VideoSinkListener PrepareVideoSinkListener()
         {
             DirectoryInfo dir = Directory.CreateDirectory(VideoFileInfo);
-            string videoFullName = dir.FullName + '/' + VideoFileName + ".mp4";
+            string videoFullName = dir.FullName + '/' + VideoFileName;
 
             VideoSinkListener videoSinkListener = new VideoSinkListener(
-                VideoFileName,
+                videoFullName,
                 icImagingControl.VideoFormatCurrent.FrameType,
                 (int)icImagingControl.DeviceFrameRate,
                 encoder);
@@ -454,7 +454,7 @@ namespace Medical_Studio.ViewModels
 
         public void LoadSettings()
         {
-            DateString = Settings.Default.Date;
+            DateString = DateTime.Now.ToString("ddMMyy");//Settings.Default.Date;
             HistoryNumberString = Settings.Default.HistoryNumber;
             FIOString = Settings.Default.FIO;
 

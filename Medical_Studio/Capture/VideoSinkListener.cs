@@ -145,7 +145,7 @@ namespace Medical_Studio.Capture
                         (byte*)destPtr,
                         stride,
                         frameType.Height,
-                        false
+                        true
                         );
                 }
 
@@ -193,6 +193,7 @@ namespace Medical_Studio.Capture
                         copyImageHandler = NativeFunctions.CopyImageRGB24toRGB32;
                         break;
                     case System.Drawing.Imaging.PixelFormat.Format16bppGrayScale:
+                    case System.Drawing.Imaging.PixelFormat.DontCare:
                         copyImageHandler = NativeFunctions.CopyImageGray16toRGB32;
                         break;
                     case System.Drawing.Imaging.PixelFormat.Format8bppIndexed:

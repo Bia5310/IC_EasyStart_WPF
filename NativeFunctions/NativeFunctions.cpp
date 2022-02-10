@@ -5,6 +5,7 @@ void CopyImageRGB32toRGB32(char* srcPtr, int srcStride, char* destPtr, int destS
 {
 	char* src = srcPtr;
 	char* dest = destPtr;
+	int bytesInLine = srcStride;
 	if (downToUp)
 	{
 		srcPtr += (lines - 1) * srcStride;
@@ -14,7 +15,7 @@ void CopyImageRGB32toRGB32(char* srcPtr, int srcStride, char* destPtr, int destS
 	{
 		dest = destPtr + h * destStride;
 		src = srcPtr + h * srcStride;
-		memcpy(dest, src, srcStride);
+		memcpy(dest, src, bytesInLine);
 	}
 }
 
@@ -22,6 +23,7 @@ void CopyImageRGB24toRGB32(char* srcPtr, int srcStride, char* destPtr, int destS
 {
 	char* src = srcPtr;
 	char* dest = destPtr;
+	int bytesInLine = srcStride;
 	if (downToUp)
 	{
 		srcPtr += (lines - 1) * srcStride;
@@ -31,7 +33,7 @@ void CopyImageRGB24toRGB32(char* srcPtr, int srcStride, char* destPtr, int destS
 	{
 		dest = destPtr + h * destStride;
 		src = srcPtr + h * srcStride;
-		for (int w = 0; w < srcStride; w += 3)
+		for (int w = 0; w < bytesInLine; w += 3)
 		{
 			dest[0] = src[0];
 			dest[1] = src[1];
@@ -47,6 +49,7 @@ void CopyImageGray16toRGB32(char* srcPtr, int srcStride, char* destPtr, int dest
 {
 	char* src = srcPtr;
 	char* dest = destPtr;
+	int bytesInLine = srcStride;
 	if (downToUp)
 	{
 		srcPtr += (lines - 1) * srcStride;
@@ -56,7 +59,7 @@ void CopyImageGray16toRGB32(char* srcPtr, int srcStride, char* destPtr, int dest
 	{
 		dest = destPtr + h * destStride;
 		src = srcPtr + h * srcStride;
-		for (int w = 0; w < srcStride; w += 2)
+		for (int w = 0; w < bytesInLine; w += 2)
 		{
 			dest[0] = src[1];
 			dest[1] = dest[0];
@@ -72,6 +75,7 @@ void CopyImageGray8toRGB32(char* srcPtr, int srcStride, char* destPtr, int destS
 {
 	char* src = srcPtr;
 	char* dest = destPtr;
+	int bytesInLine = srcStride;
 	if (downToUp)
 	{
 		srcPtr += (lines - 1) * srcStride;
@@ -81,7 +85,7 @@ void CopyImageGray8toRGB32(char* srcPtr, int srcStride, char* destPtr, int destS
 	{
 		dest = destPtr + h * destStride;
 		src = srcPtr + h * srcStride;
-		for (int w = 0; w < srcStride; ++w)
+		for (int w = 0; w < bytesInLine; ++w)
 		{
 			dest[0] = src[0];
 			dest[1] = dest[0];

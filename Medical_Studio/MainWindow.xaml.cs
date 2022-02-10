@@ -638,11 +638,11 @@ namespace Medical_Studio
                 mainViewModel.StartLive();
                 /*if(oldDevice != mainViewModel.ICImagingControl.Device)
                 {
-
+                    
                 }*/
             }
             catch (Exception ex) {
-            
+                
             }
         }
 
