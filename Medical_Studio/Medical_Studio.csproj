@@ -136,6 +136,7 @@
     <Compile Include="ConfigureEncoder.xaml.cs">
       <DependentUpon>ConfigureEncoder.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\MultiConverterAnd.cs" />
     <Compile Include="Converters\MultiplyConverter.cs" />
     <Compile Include="Converters\BoolToRedColorConverter.cs" />
     <Compile Include="Converters\BoolVisibilityConverter.cs" />

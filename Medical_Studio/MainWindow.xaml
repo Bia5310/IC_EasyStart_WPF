@@ -26,10 +26,19 @@
         <convs:BoolVisibilityConverter x:Key="myBoolVisibilityConvertery"/>
         <convs:BoolToRedColorConverter x:Key="myBoolToRedColorConverter"/>
         <convs:ConverterLogarithm x:Key="cvLogarithm"/>
+        <convs:MultiConverterAnd x:Key="cvMultiAnd"/>
         <Color x:Key="ColorToggleBlue">#FF1A89AA</Color>
         <Color x:Key="ColorToggleYellow">#FFBF00</Color>
         <SolidColorBrush x:Key="BrushToggleBlue" Color="{StaticResource ColorToggleBlue}"/>
         <SolidColorBrush x:Key="BrushToggleYellow" Color="{StaticResource ColorToggleYellow}"/>
+
+        <Ellipse x:Key="redEllipse" Width="22" Height="22" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 0 0 0"
+                         StrokeThickness="1" Stroke="Gray"
+                         Visibility="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolVisibilityConvertery}}">
+            <Ellipse.Fill>
+                <SolidColorBrush Color="Red"/>
+            </Ellipse.Fill>
+        </Ellipse>
 
         <!-- Animation to flicker, like a cursor when typing -->
         <Storyboard x:Key="AnimateFlicker" RepeatBehavior="Forever">
@@ -557,13 +566,38 @@
                                Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never"
                                VerticalAlignment="Center" FontSize="16" Margin="10 2 4 2"/>
                     <UniformGrid Grid.Column="3" Rows="1" Columns="3" HorizontalAlignment="Center">
-                        <Button Margin="2" Content="Старт"
+                        <Button Margin="2"
                                       x:Name="B_StartPauseVideo"
-                                      Click="B_StartPauseVideo_Click" >
+                                      Click="B_StartPauseVideo_Click">
                             <Button.Style>
                                 <Style TargetType="Button" BasedOn="{StaticResource ButtonStyle}">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" Value="True">
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource cvMultiAnd}">
+                                                    <Binding Path="VideoCapturing" UpdateSourceTrigger="PropertyChanged"/>
+                                                    <Binding Path="VideoOnPause" UpdateSourceTrigger="PropertyChanged"/>
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Content" Value="Прод."/>
+                                        </DataTrigger>
+                                        <DataTrigger Value="False">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource cvMultiAnd}">
+                                                    <Binding Path="VideoCapturing" UpdateSourceTrigger="PropertyChanged"/>
+                                                    <Binding Path="VideoOnPause" UpdateSourceTrigger="PropertyChanged"/>
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
+                                            <Setter Property="Content" Value="Старт">
+                                            </Setter>
+                                        </DataTrigger>
+                                        <DataTrigger Value="True">
+                                            <DataTrigger.Binding>
+                                                <MultiBinding Converter="{StaticResource cvMultiAnd}">
+                                                    <Binding Path="VideoCapturing" UpdateSourceTrigger="PropertyChanged"/>
+                                                    <Binding Path="VideoOnPause" Converter="{StaticResource myBoolInverterConverter}" UpdateSourceTrigger="PropertyChanged"/>
+                                                </MultiBinding>
+                                            </DataTrigger.Binding>
                                             <Setter Property="Content" Value="Пауза"/>
                                         </DataTrigger>
                                     </Style.Triggers>

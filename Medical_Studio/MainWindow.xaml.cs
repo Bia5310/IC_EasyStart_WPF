@@ -274,7 +274,7 @@ namespace Medical_Studio
         {
             var devices = IC_Control.Devices;
 
-            mainViewModel.OpenCamera();
+            mainViewModel.OpenCamera(true);
             /*if(devices.Length == 0)
             {
                 mainViewModel.OpenCamera("");
@@ -573,9 +573,25 @@ namespace Medical_Studio
 
         private void B_Properties_Click(object sender, RoutedEventArgs e)
         {
-            FLog.Log("B_Properties_Click");
-            IC_Control.ShowPropertyDialog(windowHandle);
-            mainViewModel.SaveCurrentCameraConfig();
+            try
+            {
+                FLog.Log("B_Properties_Click");
+                mainViewModel.OpenCamera(false);
+
+                if (IC_Control.DeviceValid)
+                {
+                    WhenDeviceOpened();
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+
+
+            //IC_Control.ShowPropertyDialog(windowHandle);
+            //mainViewModel.SaveCurrentCameraConfig();
             //Device_state = IC_Control.SaveDeviceState();
         }
 
@@ -672,7 +688,7 @@ namespace Medical_Studio
                 double zf = mainViewModel.Scale;
 
                 Rect rectHost = new Rect(0, 0, Host.ActualWidth * Scaling_of_monitor, Host.ActualHeight * Scaling_of_monitor);
-                Rect imageRect = new Rect(0, 0, IC_Control.ImageWidth, IC_Control.ImageHeight);
+                Rect imageRect = new Rect(0, 0, IMG_W_now, IMG_H_now);
                 imageRect.Scale(zf, zf);
                 imageRect.Offset((rectHost.Width - imageRect.Width) * 0.5d, (rectHost.Height - imageRect.Height) * 0.5d);
 

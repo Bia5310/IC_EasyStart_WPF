@@ -563,29 +563,23 @@ namespace Medical_Studio.ViewModels
             get => icImagingControl?.DeviceValid ?? false;
         }
 
-        public bool OpenCamera(string deviceName = "")
+        public bool OpenCamera(bool auto)
         {
             if (icImagingControl.DeviceValid)
             {
                 CloseDevice();
             }
 
-            if (deviceName == null || deviceName == "")
-            {
+            if(auto)
                 LoadCurrentCameraConfig();
-                
-                if(!DeviceValid)
-                {
-                    IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle;
-                    icImagingControl.ShowDeviceSettingsDialog(hwnd);
-                }
-            }
-            else
+
+            if (!auto || !DeviceValid)
             {
-                icImagingControl.Device = deviceName;
+                IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle;
+                icImagingControl.ShowDeviceSettingsDialog(hwnd);
             }
 
-            if(icImagingControl.DeviceValid)
+            if (icImagingControl.DeviceValid)
             {
                 InitCameraProperties();
                 RefreshPropertiesValues();
