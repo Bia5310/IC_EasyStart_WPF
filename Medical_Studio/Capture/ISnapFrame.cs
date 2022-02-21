@@ -8,6 +8,6 @@ namespace Medical_Studio.Capture
 {
     public interface ISnapFrame
     {
-        void SnapImage(string filename, System.Windows.Media.Imaging.BitmapEncoder bitmapEncoder);
+        void SnapImage(string filename, int timeout_ms);
     }
 }

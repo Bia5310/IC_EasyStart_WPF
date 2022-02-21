@@ -12,7 +12,7 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
         xmlns:tis="clr-namespace:TIS.Imaging;assembly=TIS.Imaging.ICImagingControl35"
-        Title="{Binding WindowTitle}"
+        Title="{Binding WindowTitle, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
         WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
         Width="1280"
@@ -178,7 +178,13 @@
                                     </Viewbox>
                                 </TabItem.Header>
                                 <StackPanel Name="stackPanelPhacoButtons"
-                                            IsEnabled="{Binding DeviceValid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                                            >
+                                    <StackPanel.IsEnabled>
+                                        <MultiBinding Converter="{StaticResource cvMultiAnd}">
+                                            <Binding Path="DeviceValid" UpdateSourceTrigger="PropertyChanged"/>
+                                            <Binding Path="VideoCapturing" UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource myBoolInverterConverter}"/>
+                                        </MultiBinding>
+                                    </StackPanel.IsEnabled>
                                     <local:RenameableToggleButton Text="Config Phaco 0"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
@@ -207,8 +213,13 @@
                                         <TextBlock Text="Vitreo" Margin="2"/>
                                     </Viewbox>
                                 </TabItem.Header>
-                                <StackPanel Name="stackPanelVitreoButtons"
-                                            IsEnabled="{Binding DeviceValid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                                <StackPanel Name="stackPanelVitreoButtons">
+                                    <StackPanel.IsEnabled>
+                                        <MultiBinding Converter="{StaticResource cvMultiAnd}">
+                                            <Binding Path="DeviceValid" UpdateSourceTrigger="PropertyChanged"/>
+                                            <Binding Path="VideoCapturing" UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource myBoolInverterConverter}"/>
+                                        </MultiBinding>
+                                    </StackPanel.IsEnabled>
                                     <local:RenameableToggleButton Text="Config Vitreo 0" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
@@ -237,8 +248,13 @@
                                         <TextBlock Text=" User " Margin="2"/>
                                     </Viewbox>
                                 </TabItem.Header>
-                                <StackPanel Name="stackPanelUserConfigs"
-                                            IsEnabled="{Binding DeviceValid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                                <StackPanel Name="stackPanelUserConfigs">
+                                    <StackPanel.IsEnabled>
+                                        <MultiBinding Converter="{StaticResource cvMultiAnd}">
+                                            <Binding Path="DeviceValid" UpdateSourceTrigger="PropertyChanged"/>
+                                            <Binding Path="VideoCapturing" UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource myBoolInverterConverter}"/>
+                                        </MultiBinding>
+                                    </StackPanel.IsEnabled>
                                     <local:RenameableToggleButton Text="Config User 0" 
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
@@ -413,7 +429,8 @@
                                     </Viewbox>
                                 </ToggleButton.Content>
                             </ToggleButton>
-                            <Button MaxHeight="42" Margin="2" 
+                            <Button MaxHeight="42" Margin="2"
+                                    IsEnabled="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolInverterConverter}}"
                                     Style="{DynamicResource ButtonStyle}" 
                                     x:Name="B_Cam_Select"
                                     Click="B_Cam_Select_Click">
@@ -427,8 +444,13 @@
                             <Button MaxHeight="42" Margin="2" 
                                     Style="{DynamicResource ButtonStyle}" 
                                     x:Name="B_Properties"
-                                    Click="B_Properties_Click"
-                                    IsEnabled="{Binding DeviceValid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                                    Click="B_Properties_Click">
+                                <Button.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource cvMultiAnd}">
+                                        <Binding Path="DeviceValid" UpdateSourceTrigger="PropertyChanged"/>
+                                        <Binding Path="VideoCapturing" UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource myBoolInverterConverter}"/>
+                                    </MultiBinding>
+                                </Button.IsEnabled>
                                 <Button.Content>
                                     <Viewbox Height="24">
                                         <TextBlock Text="Дополнительные настройки"/>

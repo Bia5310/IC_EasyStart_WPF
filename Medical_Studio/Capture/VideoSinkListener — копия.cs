@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 
 namespace Medical_Studio.Capture
 {
-    class VideoSinkListener : SnapSinkListener
+    class VideoSinkListener : IFrameNotificationSinkListener, ISnapFrame
     {
         static VideoSinkListener()
         {
@@ -119,10 +119,8 @@ namespace Medical_Studio.Capture
             isDisposed = true;
         }
 
-        public override void FrameReceived(IFrame frame)
+        public void FrameReceived(IFrame frame)
         {
-            base.FrameReceived(frame);
-
             if (!successInitialized)
             {
                 return;
@@ -181,9 +179,8 @@ namespace Medical_Studio.Capture
             }
         }
 
-        public override void SinkConnected(FrameType frameType)
+        public void SinkConnected(FrameType frameType)
         {
-            base.SinkConnected(frameType);
             unsafe
             {
                 switch (frameType.PixelFormat)
@@ -220,10 +217,8 @@ namespace Medical_Studio.Capture
             stopwatch.Restart();
         }
 
-        public override void SinkDisconnected()
+        public void SinkDisconnected()
         {
-            base.SinkDisconnected();
-
             CloseWriter();
         }
 
@@ -272,6 +267,7 @@ namespace Medical_Studio.Capture
             outMediaType.SetRatio(MediaFoundation.MFAttributesClsid.MF_MT_PIXEL_ASPECT_RATIO, 1, 1);
 
             hr = sinkWriter.AddStream(outMediaType, out streamIndex);
+            
 
             //set input
             IMFMediaType inMediaType = MF.CreateMediaType();
@@ -287,6 +283,11 @@ namespace Medical_Studio.Capture
             hr = sinkWriter.BeginWriting();
 
             return hr;
+        }
+
+        public void SnapImage(string filename, BitmapEncoder bitmapEncoder)
+        {
+            
         }
     }
 }

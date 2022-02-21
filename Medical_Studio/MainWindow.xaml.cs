@@ -575,13 +575,13 @@ namespace Medical_Studio
         {
             try
             {
-                FLog.Log("B_Properties_Click");
-                mainViewModel.OpenCamera(false);
+                //FLog.Log("B_Properties_Click");
+                mainViewModel.ShowAdditionalDeviceProps();
 
-                if (IC_Control.DeviceValid)
+                /*if (IC_Control.DeviceValid)
                 {
                     WhenDeviceOpened();
-                }
+                }*/
             }
             catch(Exception ex)
             {
@@ -620,42 +620,47 @@ namespace Medical_Studio
 
         private void B_Snapshot_Click(object sender, RoutedEventArgs e)
         {
-            /*FLog.Log("B_Snapshot_Click");
-            string dataName = FindLast_Photo(SavePhoto_dir, (TB_FIO.Text + "_" + TB_CurrentDate.Text + "_" + TB_HistoryNumber.Text), ".tiff");
-            string FullPathAndName = dataName;
-            IC_Control.MemorySaveImage(FullPathAndName);*/
-            
-            //запустить анимаицю
-            ThicknessAnimationUsingKeyFrames thicknessAnimationUsingKeyFrames = new ThicknessAnimationUsingKeyFrames();
-            thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(0, 0, 0, 0), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 50))));
-            thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(4, 4, 4, 4), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 200))));
-            thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(0, 0, 0, 0), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 50))));
-            thicknessAnimationUsingKeyFrames.AutoReverse = false;
-            thicknessAnimationUsingKeyFrames.FillBehavior = FillBehavior.Stop;
-            thicknessAnimationUsingKeyFrames.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 500));
+            try
+            {
+                mainViewModel.TakeSnapshot();
 
-            ThicknessAnimation thicknessAnimation = new ThicknessAnimation(new Thickness(0, 0, 0, 0),
-                new Thickness(2, 2, 2, 2),
-                new TimeSpan(0, 0, 0, 0, 300),
-                FillBehavior.Stop);
-            thicknessAnimation.AutoReverse = true;
-            border_host.BeginAnimation(Border.BorderThicknessProperty, thicknessAnimationUsingKeyFrames);
+                /*FLog.Log("B_Snapshot_Click");
+                string dataName = FindLast_Photo(SavePhoto_dir, (TB_FIO.Text + "_" + TB_CurrentDate.Text + "_" + TB_HistoryNumber.Text), ".tiff");
+                string FullPathAndName = dataName;
+                IC_Control.MemorySaveImage(FullPathAndName);*/
+
+                //запустить анимаицю
+                ThicknessAnimationUsingKeyFrames thicknessAnimationUsingKeyFrames = new ThicknessAnimationUsingKeyFrames();
+                thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(0, 0, 0, 0), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 50))));
+                thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(4, 4, 4, 4), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 200))));
+                thicknessAnimationUsingKeyFrames.KeyFrames.Add(new DiscreteThicknessKeyFrame(new Thickness(0, 0, 0, 0), KeyTime.FromTimeSpan(new TimeSpan(0, 0, 0, 0, 50))));
+                thicknessAnimationUsingKeyFrames.AutoReverse = false;
+                thicknessAnimationUsingKeyFrames.FillBehavior = FillBehavior.Stop;
+                thicknessAnimationUsingKeyFrames.Duration = new Duration(new TimeSpan(0, 0, 0, 0, 500));
+
+                ThicknessAnimation thicknessAnimation = new ThicknessAnimation(new Thickness(0, 0, 0, 0),
+                    new Thickness(2, 2, 2, 2),
+                    new TimeSpan(0, 0, 0, 0, 300),
+                    FillBehavior.Stop);
+                thicknessAnimation.AutoReverse = true;
+                border_host.BeginAnimation(Border.BorderThicknessProperty, thicknessAnimationUsingKeyFrames);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private void B_Cam_Select_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                string oldDevice = mainViewModel.ICImagingControl.Device;
-                mainViewModel.StopLive();
-                mainViewModel.ICImagingControl.ShowDeviceSettingsDialog(windowHandle);
-
-                mainViewModel.SaveCurrentCameraConfig();
-                mainViewModel.StartLive();
-                /*if(oldDevice != mainViewModel.ICImagingControl.Device)
+                mainViewModel.ShowDevicePropsDialog();
+                if (mainViewModel.DeviceValid)
                 {
-                    
-                }*/
+                    WhenDeviceOpened();
+                    mainViewModel.SaveCurrentCameraConfig();
+                }
             }
             catch (Exception ex) {
                 
@@ -1083,6 +1088,7 @@ namespace Medical_Studio
                     //LastConfig_tag = Config_tag; // присваиваем последнему загруженному тегу тот, который загружен сейчас
 
                     //Timer_camera_checker.Start();
+                    WhenDeviceOpened();
                 }
                 catch(Exception exc)
                 {
@@ -1285,6 +1291,12 @@ namespace Medical_Studio
         {
             if (!mainViewModel.DeviceValid)
                 return;
+            var frameType = mainViewModel.ICImagingControl.VideoFormatCurrent.FrameType;
+            if (frameType.Height > 1080 || frameType.Width > 1920)
+            {
+                MessageBox.Show("Установлено слишком большое разрешение изображения.\n Максимально доступное разрешение для записи видео 1920x1080");
+                return;
+            }
 
             if (mainViewModel.VideoCapturing)
             {
@@ -1292,36 +1304,8 @@ namespace Medical_Studio
             }
             else
             {
-                string baseName = BuildBaseMediaFileName();
-                if (baseName == null)
-                    throw new InvalidOperationException("MediaFile base name error");
-
-                string videoName = BuildFileNameWithoutExt(mainViewModel.VideoFileInfo, baseName, "mp4");
-                mainViewModel.VideoFileName = videoName;
                 mainViewModel.StartVideoCapturing();
             }
-        }
-
-        private static string BuildFileNameWithoutExt(string directory, string baseName, string ext)
-        {
-            DirectoryInfo dir = Directory.CreateDirectory(directory);
-
-            string tryname = "";
-            for(int i = 0; ;++i)
-            {
-                tryname = String.Format("{0} {1}.{2}", baseName, i, ext);
-                if (!File.Exists(dir.FullName + '/' + tryname))
-                {
-                    return tryname;
-                }
-            }
-        }
-
-        private string BuildBaseMediaFileName()
-        {
-            string FIO = !string.IsNullOrEmpty(TB_FIO.Text) ? TB_FIO.Text + " " : "";
-            string H_num = !string.IsNullOrEmpty(TB_HistoryNumber.Text) ? TB_HistoryNumber.Text + " " : "";
-            return FIO + H_num + TB_CurrentDate.Text;
         }
 
         private void FormatAdaptation(int WidthOfImage = -1, int HeightOfImage = -1)

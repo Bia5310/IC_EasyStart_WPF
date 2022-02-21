@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TIS.Imaging;
 
@@ -30,7 +31,20 @@ namespace Medical_Studio.ViewModels
 
         public string WindowTitle
         {
-            get => String.Format("{0} {1}", NameOfApplication, AppVersion);
+            get
+            {
+                string title = String.Format("{0} {1}", NameOfApplication, AppVersion);
+                if (DeviceValid)
+                {
+                    try
+                    {
+                        var frameType = icImagingControl.VideoFormatCurrent.FrameType;
+                        return title + " " + String.Format("[{2} {0}x{1}]", frameType.Width, frameType.Height, icImagingControl.DeviceCurrent.Name);
+                    }
+                    catch (Exception) { }
+                }
+                return title;
+            }
         }
 
         private ICImagingControl icImagingControl = null;
@@ -198,7 +212,7 @@ namespace Medical_Studio.ViewModels
             }
             set
             {
-                if (!DeviceValid)
+                if (DeviceValid)
                 {
                     if (value)
                     {
@@ -257,12 +271,21 @@ namespace Medical_Studio.ViewModels
             }
             catch(Exception ex)
             {
-                icImagingControl.Sink = null;// new BaseSink();// oldSink;
+                icImagingControl.Sink = GetDefaultSink();
                 icImagingControl.LiveStart();
             }
             
-
             OnPropertyChanged("IsLive");
+        }
+
+        private ISnapFrame snapFrame = null;
+
+        private BaseSink GetDefaultSink()
+        {
+            SnapSinkListener ssl = new SnapSinkListener();
+            BaseSink bs = new FrameNotificationSink(ssl);
+            snapFrame = ssl;
+            return bs;
         }
 
         public void StopLive()
@@ -276,6 +299,7 @@ namespace Medical_Studio.ViewModels
         }
 
         private BaseSink oldSink = null;
+        private ISnapFrame oldSnapFrame = null;
         private MediaStreamSink mediaStreamSink = null;
 
         private VideoSinkListener videoSinkListener = null;
@@ -294,11 +318,11 @@ namespace Medical_Studio.ViewModels
                 StopLive();
 
             oldSink = icImagingControl.Sink;
+            oldSnapFrame = snapFrame;
 
-            /*mediaStreamSink = PrepareVideoSink();
-            icImagingControl.Sink = mediaStreamSink;
-            mediaStreamSink.SinkModeRunning = true;*/
             videoSinkListener = PrepareVideoSinkListener();
+            snapFrame = videoSinkListener;
+
             frameNotificationSink = new FrameNotificationSink(videoSinkListener);
             icImagingControl.Sink = frameNotificationSink;
 
@@ -313,18 +337,18 @@ namespace Medical_Studio.ViewModels
         }
 
         public string VideoFileName { get; set; } = "video";
-
-        public MediaStreamSink PrepareVideoSink()
-        {
-            DirectoryInfo dir = Directory.CreateDirectory(VideoFileInfo);
-            string videoFullName = dir.FullName + '/' + VideoFileName;
-
-            MediaStreamSink mediaStreamSink = new MediaStreamSink(mediaStreamContainer, aviCompressor, videoFullName);
-            return mediaStreamSink;
-        }
+        public string PhotoFileName { get; set; } = "photo";
 
         private VideoSinkListener PrepareVideoSinkListener()
         {
+            string baseName = BuildBaseMediaFileName();
+            if (baseName == null)
+                throw new InvalidOperationException("MediaFile base name error");
+
+            string videoName = BuildFileNameWithoutExt(VideoFileInfo, baseName, "mp4");
+            
+            VideoFileName = videoName;
+
             DirectoryInfo dir = Directory.CreateDirectory(VideoFileInfo);
             string videoFullName = dir.FullName + '/' + VideoFileName;
 
@@ -333,8 +357,30 @@ namespace Medical_Studio.ViewModels
                 icImagingControl.VideoFormatCurrent.FrameType,
                 (int)icImagingControl.DeviceFrameRate,
                 encoder);
-
+            
             return videoSinkListener;
+        }
+
+        private static string BuildFileNameWithoutExt(string directory, string baseName, string ext)
+        {
+            DirectoryInfo dir = Directory.CreateDirectory(directory);
+
+            string tryname = "";
+            for (int i = 0; ; ++i)
+            {
+                tryname = String.Format("{0} {1}.{2}", baseName, i, ext);
+                if (!File.Exists(dir.FullName + '/' + tryname))
+                {
+                    return tryname;
+                }
+            }
+        }
+
+        private string BuildBaseMediaFileName()
+        {
+            string fio = !string.IsNullOrEmpty(FIOString) ? FIOString + " " : "";
+            string H_num = !string.IsNullOrEmpty(HistoryNumberString) ? HistoryNumberString + " " : "";
+            return fio + H_num + DateString;
         }
 
         public void StopVideoCapturing()
@@ -347,7 +393,10 @@ namespace Medical_Studio.ViewModels
                 StopLive();
 
             if(oldSink != null)
+            {
                 icImagingControl.Sink = oldSink;
+                snapFrame = oldSnapFrame;
+            }
 
             videoOnPause = false;
             videoCapturing = false;
@@ -357,6 +406,27 @@ namespace Medical_Studio.ViewModels
 
             OnPropertyChanged("VideoOnPause");
             OnPropertyChanged("VideoCapturing");
+        }
+
+        public void TakeSnapshot()
+        {
+            string baseName = BuildBaseMediaFileName();
+            if (baseName == null)
+                throw new InvalidOperationException("MediaFile base name error");
+
+            string snapName = BuildFileNameWithoutExt(PhotoFileInfo, baseName, "tiff");
+
+            PhotoFileName = snapName;
+
+            DirectoryInfo dir = Directory.CreateDirectory(PhotoFileInfo);
+            string photoFullName = dir.FullName + '/' + PhotoFileName;
+            try
+            {
+                snapFrame.SnapImage(photoFullName, Convert.ToInt32(Exposure * 1e3d) + 2000);
+            }
+            catch(Exception ex)
+            {
+            }
         }
 
         public void PauseVideoCapturing(bool pause)
@@ -521,10 +591,15 @@ namespace Medical_Studio.ViewModels
                     if(System.IO.File.Exists(path))
                         icImagingControl.LoadDeviceStateFromFile(path, true);
                 }
+                icImagingControl.Sink = GetDefaultSink();
+                OnPropertyChanged("WindowTitle");
             }
 
             if (wasLive)
+            {
                 StartLive();
+            }
+
         }
 
         public void SaveCurrentCameraConfig()
@@ -570,19 +645,36 @@ namespace Medical_Studio.ViewModels
                 CloseDevice();
             }
 
-            if(auto)
+            int devices = icImagingControl.Devices.Length;
+
+            if(auto && devices > 0)
                 LoadCurrentCameraConfig();
 
-            if (!auto || !DeviceValid)
+            if (!auto || !DeviceValid || devices == 0)
             {
                 IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle;
                 icImagingControl.ShowDeviceSettingsDialog(hwnd);
+                
+                if(DeviceValid)
+                    icImagingControl.Sink = GetDefaultSink();
             }
 
             if (icImagingControl.DeviceValid)
             {
                 InitCameraProperties();
                 RefreshPropertiesValues();
+            }
+
+            CameraOpened();
+
+            return icImagingControl.DeviceValid;
+        }
+
+        private void CameraOpened()
+        {
+            if (DeviceValid)
+            {
+                icImagingControl.Sink = GetDefaultSink();
             }
 
             OnPropertyChanged("DeviceValid");
@@ -592,8 +684,30 @@ namespace Medical_Studio.ViewModels
             StartLive();
             OnPropertyChanged("VideoOnPause");
             OnPropertyChanged("VideoCapturing");
+            OnPropertyChanged("WindowTitle");
+        }
 
-            return icImagingControl.DeviceValid;
+        public void ShowDevicePropsDialog()
+        {
+            bool wasLive = IsLive;
+
+            IsLive = false;
+
+            IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle;
+            icImagingControl.ShowDeviceSettingsDialog(hwnd);
+            
+            SaveCurrentCameraConfig();
+
+            CameraOpened();
+
+            if (wasLive)
+                IsLive = wasLive;
+        }
+
+        public void ShowAdditionalDeviceProps()
+        {
+            IntPtr hwnd = new System.Windows.Interop.WindowInteropHelper(System.Windows.Application.Current.MainWindow).Handle;
+            icImagingControl.ShowPropertyDialog(hwnd);
         }
 
         private void UpdatePropertiesTimer_Tick(object sender, EventArgs e)
@@ -602,13 +716,13 @@ namespace Medical_Studio.ViewModels
             {
                 if (icImagingControl != null && icImagingControl.DeviceValid)
                 {
-                        OnPropertyChanged("Exposure");
-                        OnPropertyChanged("ExposureAuto");
+                    OnPropertyChanged("Exposure");
+                    OnPropertyChanged("ExposureAuto");
 
-                        OnPropertyChanged("Gain");
-                        OnPropertyChanged("GainAuto");
+                    OnPropertyChanged("Gain");
+                    OnPropertyChanged("GainAuto");
 
-                        OnPropertyChanged("WhiteBalanceAuto");
+                    OnPropertyChanged("WhiteBalanceAuto");
                 }
             }
             catch (Exception) { }
@@ -669,6 +783,7 @@ namespace Medical_Studio.ViewModels
             OnPropertyChanged("DeviceValid");
             OnPropertyChanged("VideoOnPause");
             OnPropertyChanged("VideoCapturing");
+            OnPropertyChanged("WindowTitle");
             RefreshPropertiesValues();
         }
 
