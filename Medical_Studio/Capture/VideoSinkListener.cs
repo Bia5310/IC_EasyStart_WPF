@@ -38,9 +38,16 @@ namespace Medical_Studio.Capture
             {
                 pause = value;
                 if (pause)
+                {
                     stopwatch.Stop();
+                    pauseWatch.Start();
+                }
                 else
+                {
                     stopwatch.Start();
+                    pauseWatch.Stop();
+                }
+
             }
         }
 
@@ -50,7 +57,10 @@ namespace Medical_Studio.Capture
         private bool isDisposed = false;
         public bool IsDisposed => isDisposed;
 
+        public TimeSpan TimeSpan => stopwatch.Elapsed;
+
         private Stopwatch stopwatch = new Stopwatch();
+        private Stopwatch pauseWatch = new Stopwatch();
         private long lastTime = 0;
 
         private int bufferLength = 0;
@@ -90,6 +100,7 @@ namespace Medical_Studio.Capture
                 throw new Exception("Errors while MF initialization: " + Enum.GetName(typeof(HResult), HR));
 
             successInitialized = true;
+            firstSample = true;
         }
 
         private void CloseWriterThread()
@@ -119,6 +130,12 @@ namespace Medical_Studio.Capture
             isDisposed = true;
         }
 
+        private bool firstSample = true;
+        private ulong startTime = 0;
+        private double pauseTime = 0;
+        private long lastFrameTime = 0;
+        private bool inProcess = false;
+
         public override void FrameReceived(IFrame frame)
         {
             base.FrameReceived(frame);
@@ -127,11 +144,19 @@ namespace Medical_Studio.Capture
             {
                 return;
             }
-
-            if(pause)
+            if(firstSample)
+            {
+                firstSample = false;
+                startTime = frame.FrameMetadata.DeviceTimeStamp;
+                pauseTime = 0;
+                lastFrameTime = 0;
+            }
+            //ulong ts = frame.FrameMetadata.DeviceTimeStamp - startTime;
+            if (pause || inProcess)
             {
                 return;
             }
+            inProcess = true;
 
             HResult hr = mediaBuffer.Lock(out IntPtr destPtr, out int pcbMaxLength, out int pcbCurrentLength);
 
@@ -167,18 +192,25 @@ namespace Medical_Studio.Capture
             if (hr == HResult.S_OK)
                 hr = sample.AddBuffer(mediaBuffer);
 
+            long timestamp = stopwatch.ElapsedMilliseconds * 10L * 1000L;
             if (hr == HResult.S_OK)
-                hr = sample.SetSampleTime(stopwatch.ElapsedMilliseconds * 10000);
+                hr = sample.SetSampleTime(timestamp);
+
+            /*if (hr == HResult.S_OK)
+                hr = sample.SetSampleTime(Convert.ToInt64((frame.FrameMetadata.DeviceTimeStamp-startTime)/100) - pauseWatch.ElapsedMilliseconds*10000);*/
 
             if (hr == HResult.S_OK)
             {
-                hr = sample.SetSampleDuration(10 * 1000 * 1000 / fps);
+                hr = sample.SetSampleDuration(0);// timestamp - lastFrameTime);
+                lastFrameTime = timestamp;
             }
 
             if (hr == HResult.S_OK && sinkWriter != null)
             {
                 hr = sinkWriter.WriteSample(streamIndex, sample);
             }
+
+            inProcess = false;
         }
 
         public override void SinkConnected(FrameType frameType)
@@ -218,6 +250,7 @@ namespace Medical_Studio.Capture
             thread.Start();
             thread.Join();
             stopwatch.Restart();
+            pauseWatch.Reset();
         }
 
         public override void SinkDisconnected()
@@ -265,7 +298,7 @@ namespace Medical_Studio.Capture
             IMFMediaType outMediaType = MF.CreateMediaType();
             outMediaType.SetGUID(MFAttributesClsid.MF_MT_MAJOR_TYPE, MFMediaType.Video);
             outMediaType.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, MFMediaType.H264);
-            outMediaType.SetUINT32(MediaFoundation.MFAttributesClsid.MF_MT_AVG_BITRATE, 500000000);
+            outMediaType.SetUINT32(MediaFoundation.MFAttributesClsid.MF_MT_AVG_BITRATE, bitrate);//500000000
             outMediaType.SetUINT32(MFAttributesClsid.MF_MT_INTERLACE_MODE, (int)MFVideoInterlaceMode.Progressive);
             outMediaType.SetSize(MediaFoundation.MFAttributesClsid.MF_MT_FRAME_SIZE, (uint)width, (uint)height);
             outMediaType.SetRatio(MediaFoundation.MFAttributesClsid.MF_MT_FRAME_RATE, (uint)fps, 1);

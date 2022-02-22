@@ -11,7 +11,7 @@ namespace Medical_Studio
         public string ConfigName { get; set; } = "";
         public string ConfigPath { get; set; } = "";
 
-        public static readonly string DictionaryFileName = "Configs.xml";
+        public static readonly string DictionaryFilePattern = "Configs_{0}.xml";
 
         public static Dictionary<string, ConfigElement> LoadConfigsDictionary(string filename)
         {

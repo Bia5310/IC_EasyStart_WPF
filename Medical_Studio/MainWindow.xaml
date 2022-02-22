@@ -332,7 +332,7 @@
 
                             <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Экспозиция" Margin="2"/>
                             <xctk:DoubleUpDown Grid.Row="0" Grid.Column="1" Margin="2"
-                                           Value="{Binding Exposure, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                           
                                            Maximum="{Binding ExposureMax, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                            Minimum="{Binding ExposureMin, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                            Increment="0.001"
@@ -637,13 +637,12 @@
                                     Click="B_StopCapture_Click"
                                     IsEnabled="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
                     </UniformGrid>
-                    <StackPanel Orientation="Horizontal" Grid.Column="4">
-                        <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Видеозапись" VerticalAlignment="Center" FontSize="16" Margin="100 2 2 2"
-                           Visibility="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolVisibilityConvertery}}"/>
+                    <StackPanel Orientation="Horizontal" Grid.Column="4"
+                                Visibility="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolVisibilityConvertery}}">
+                        <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Видеозапись" VerticalAlignment="Center" FontSize="16" Margin="100 2 2 2"/>
 
                         <Ellipse Width="22" Height="22" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10 0 0 0"
-                         StrokeThickness="1" Stroke="Gray"
-                         Visibility="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolVisibilityConvertery}}">
+                         StrokeThickness="1" Stroke="Gray">
                             <Ellipse.Fill>
                                 <SolidColorBrush Color="Red"/>
                             </Ellipse.Fill>
@@ -653,6 +652,8 @@
                                 </EventTrigger>
                             </Ellipse.Triggers>
                         </Ellipse>
+                        <TextBlock VerticalAlignment="Center" TextAlignment="Center" Margin="5 0 5 2" FontSize="20"
+                                   Text="{Binding VideoTimeSpan, StringFormat={}{0:hh':'mm':'ss}}"/>
                     </StackPanel>
 
                 </Grid>

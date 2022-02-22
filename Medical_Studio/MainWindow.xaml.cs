@@ -154,6 +154,8 @@ namespace Medical_Studio
             //Set main view model
             mainViewModel = new ViewModels.MainViewModel();
             mainViewModel.WindowHandle = windowHandle;
+            mainViewModel.DeviceOpened += WhenDeviceOpened;
+
             DataContext = mainViewModel;
             mainViewModel.PropertyChanged += MainViewModel_PropertyChanged;
 
@@ -180,10 +182,10 @@ namespace Medical_Studio
                 //Set Zoom Factor
                 SetLiveDisplayZoomFactor((float)mainViewModel.Scale);
             }
-            if(e.PropertyName == nameof(mainViewModel.ConfigKey))
+            /*if(e.PropertyName == nameof(mainViewModel.ConfigKey))
             {
                 mainViewModel.LoadCurrentCameraConfig();
-            }
+            }*/
         }
 
         private void SetLiveDisplayZoomFactor(float zoomFactor)
@@ -218,7 +220,6 @@ namespace Medical_Studio
             {
                 B_FS_Switcher_form.UseVisualStyleBackColor = true;
                 B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
-                Init_ListOf_CheckButtons();
 
                 Scaling_of_monitor = GetScalingFactor_ofMonitor();
             }
@@ -272,38 +273,13 @@ namespace Medical_Studio
 
         private void TryOpenCamera()
         {
-            var devices = IC_Control.Devices;
-
-            mainViewModel.OpenCamera(true);
-            /*if(devices.Length == 0)
-            {
-                mainViewModel.OpenCamera("");
-            }
-            else
-            {
-                mainViewModel.OpenCamera(devices[0].Name);
-            }*/
-
-            if (IC_Control.DeviceValid)
-            {
-                WhenDeviceOpened();
-            }
+            mainViewModel.OpenCamera();
         }
 
         private void WhenDeviceOpened()
         {
-            //mainViewModel.LoadCurrentCameraConfig();
-
             try
             {
-                /*try
-                {
-                    Load_FlipState();
-                    FLog.Log("Load_FlipState() call finished succesfully");
-                }
-                catch (Exception exc)
-                { FLog.Log("ERROR - Load_flipstate error "); }*/
-
                 try
                 {
                     var frameType = IC_Control.VideoFormatCurrent.FrameType;
@@ -316,9 +292,7 @@ namespace Medical_Studio
                     FLog.Log("ERROR - Format adaptation error");
                 }
 
-                //Device_name = IC_Control.Device;
-                //Timer_camera_checker.Start();
-                //STW_fps.Start();
+                Init_ListOf_CheckButtons();
             }
             catch (Exception ext)
             {
@@ -401,14 +375,12 @@ namespace Medical_Studio
             {
                 LogException(ex);
             }
-
         }
 
         private void Form1_FormClosing(object sender, CancelEventArgs e)
         {
             try
             {
-                mainViewModel.SaveCurrentCameraConfig();
                 mainViewModel.CloseDevice();
                 mainViewModel.SaveSettings();
             }
@@ -656,11 +628,11 @@ namespace Medical_Studio
             try
             {
                 mainViewModel.ShowDevicePropsDialog();
-                if (mainViewModel.DeviceValid)
+
+                /*if (mainViewModel.DeviceValid)
                 {
                     WhenDeviceOpened();
-                    mainViewModel.SaveCurrentCameraConfig();
-                }
+                }*/
             }
             catch (Exception ex) {
                 
@@ -1088,7 +1060,7 @@ namespace Medical_Studio
                     //LastConfig_tag = Config_tag; // присваиваем последнему загруженному тегу тот, который загружен сейчас
 
                     //Timer_camera_checker.Start();
-                    WhenDeviceOpened();
+                    //WhenDeviceOpened();
                 }
                 catch(Exception exc)
                 {

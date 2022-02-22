@@ -35,5 +35,8 @@
     <Setting Name="H264Bitrate" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">200000000</Value>
     </Setting>
+    <Setting Name="LastDevice" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
