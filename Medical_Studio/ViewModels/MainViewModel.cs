@@ -921,7 +921,7 @@ namespace Medical_Studio.ViewModels
         {
             ConfigElement.SaveConfigsDictionary(ConfigsDictionary, String.Format(CameraConfigsFolder + "/" + ConfigElement.DictionaryFilePattern, cameraName));
         }
-
+        
         private void InitCameraProperties()
         {
             exposureAutoProperty = icImagingControl.VCDPropertyItems.Find<VCDSwitchProperty>(VCDGUIDs.VCDID_Exposure, VCDGUIDs.VCDElement_Auto);

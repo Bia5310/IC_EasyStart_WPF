@@ -343,7 +343,7 @@
                                            Minimum="{Binding ExposureMin, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, Converter={StaticResource myExpLogConverter}}"
                                            Value="{Binding Exposure, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource myExpLogConverter}}"
                                            FormatString="F0"
-                                           Increment="10"
+                                           Increment="50"
                                            IsEnabled="{Binding ExposureAuto, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolInverterConverter}}"
                                            Height="25"
                                            MaxWidth="120" ValueChanged="NUD_Exposure_ValueChanged">
@@ -574,6 +574,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Orientation="Horizontal">
@@ -591,18 +592,19 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="Фото:" Grid.Column="1" HorizontalAlignment="Right"
                                Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never"
                                VerticalAlignment="Center" FontSize="16" Margin="10 2 4 2"/>
-                    
+
                     <Button Style="{DynamicResource ButtonStyle}" Grid.Column="2" Margin="2"
                                 x:Name="B_Snapshot" HorizontalAlignment="Center"
                                 IsEnabled="{Binding DeviceValid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                 Click="B_Snapshot_Click">
                         <Button.Content>
-                            <Image Source="Images/PhotoImage.png" Height="24" Margin="-4"/>
+                            <Image Source="Images/PhotoImage.png" Height="24" Margin="-4" RenderOptions.BitmapScalingMode="LowQuality"/>
                         </Button.Content>
                     </Button>
 
@@ -626,7 +628,7 @@
                                             <!--<Setter Property="Content" Value="Прод."/>-->
                                             <Setter Property="Content">
                                                 <Setter.Value>
-                                                    <Image Source="Images/PlayIcon.png" Height="24" Margin="-4"/>
+                                                    <Image Source="Images/PlayIcon.png" Height="24" Margin="-4" RenderOptions.BitmapScalingMode="LowQuality"/>
                                                 </Setter.Value>
                                             </Setter>
                                         </DataTrigger>
@@ -640,7 +642,7 @@
                                             <!--<Setter Property="Content" Value="Старт">-->
                                             <Setter Property="Content">
                                                 <Setter.Value>
-                                                    <Image Source="Images/RecordIcon.png" Height="24" Margin="-4"/>
+                                                    <Image Source="Images/RecordIcon.png" Height="24" Margin="-4" RenderOptions.BitmapScalingMode="LowQuality"/>
                                                 </Setter.Value>
                                             </Setter>
                                         </DataTrigger>
@@ -654,7 +656,7 @@
                                             <!--<Setter Property="Content" Value="Пауза"/>-->
                                             <Setter Property="Content">
                                                 <Setter.Value>
-                                                    <Image Source="Images/PauseIcon.png" Height="24" Margin="-4"/>
+                                                    <Image Source="Images/PauseIcon.png" Height="24" Margin="-4" RenderOptions.BitmapScalingMode="LowQuality"/>
                                                 </Setter.Value>
                                             </Setter>
                                         </DataTrigger>
@@ -673,7 +675,7 @@
                                     Click="B_StopCapture_Click"
                                     IsEnabled="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
                             <Button.Content>
-                                <Image Source="Images/StopIcon.png" Height="24" Margin="-4"/>
+                                <Image Source="Images/StopIcon.png" Height="24" Margin="-4"  RenderOptions.BitmapScalingMode="NearestNeighbor"/>
                             </Button.Content>
                         </Button>
                     </UniformGrid>
@@ -695,8 +697,18 @@
                         <TextBlock VerticalAlignment="Center" TextAlignment="Center" Margin="5 0 5 2" FontSize="20"
                                    Text="{Binding VideoTimeSpan, StringFormat={}{0:hh':'mm':'ss}}"/>
                     </StackPanel>
-
                 </Grid>
+
+                <Button Grid.Column="2"
+                        Style="{DynamicResource ButtonStyle}"
+                        HorizontalAlignment="Center"
+                        Margin="2"
+                        x:Name="B_Info"
+                        Click="B_Info_Click">
+                    <Button.Content>
+                        <Image Source="Images/InfoIcon.png" Height="24" Margin="-4"/>
+                    </Button.Content>
+                </Button>
             </Grid>
         </Border>
 

@@ -95,6 +95,10 @@ namespace Medical_Studio
         public static RoutedCommand FullScreenRoutedCommand = new RoutedCommand();
         public static RoutedCommand QuiteRoutedCommand = new RoutedCommand();
         public static RoutedCommand CRoutedCommand = new RoutedCommand();
+        public static RoutedCommand VideoRecordCommand = new RoutedCommand();
+        public static RoutedCommand VideoPauseCommand = new RoutedCommand();
+        public static RoutedCommand VideoStopCommand = new RoutedCommand();
+        public static RoutedCommand TakePhotoCommand = new RoutedCommand();
 
         System.Drawing.Image bmpFS_on = null;
         System.Drawing.Image bmpFS_off = null;
@@ -104,6 +108,8 @@ namespace Medical_Studio
         private Dictionary<string, string> ConfigsNamesDictionary = new Dictionary<string, string>();
 
         IntPtr windowHandle = IntPtr.Zero;
+
+        private GlobalKeyboardHook globalKeyboardHook = new GlobalKeyboardHook();
 
         public MainWindow()
         {
@@ -165,9 +171,20 @@ namespace Medical_Studio
             FullScreenRoutedCommand.InputGestures.Add(new KeyGesture(Key.F, ModifierKeys.Alt));
             QuiteRoutedCommand.InputGestures.Add(new KeyGesture(Key.Q, ModifierKeys.Alt));
             CRoutedCommand.InputGestures.Add(new KeyGesture(Key.C, ModifierKeys.Alt));
-            CommandBindings.Add(new CommandBinding(FullScreenRoutedCommand, FullScreenSwitchKey));
+            VideoRecordCommand.InputGestures.Add(new KeyGesture(Key.R, ModifierKeys.Alt));
+            VideoPauseCommand.InputGestures.Add(new KeyGesture(Key.P, ModifierKeys.Alt));
+            VideoStopCommand.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Alt));
+            TakePhotoCommand.InputGestures.Add(new KeyGesture(Key.I, ModifierKeys.Alt));
+
+            /*CommandBindings.Add(new CommandBinding(FullScreenRoutedCommand, FullScreenSwitchKey));
             CommandBindings.Add(new CommandBinding(QuiteRoutedCommand, QuiteKey));
             CommandBindings.Add(new CommandBinding(CRoutedCommand, CodecPropKey));
+            CommandBindings.Add(new CommandBinding(VideoRecordCommand, commandRecordVideoMethod));
+            CommandBindings.Add(new CommandBinding(VideoPauseCommand, commandPauseVideoMethod));
+            CommandBindings.Add(new CommandBinding(VideoStopCommand, commandStopVideoMethod));
+            CommandBindings.Add(new CommandBinding(TakePhotoCommand, commandTakePhotoMethod));*/
+
+            globalKeyboardHook.KeyboardPressed += GlobalKeyboardHook_KeyboardPressed;
 
             B_FS_Switcher_form = Host.Child.Controls[0] as System.Windows.Forms.Button; //new System.Windows.Forms.Button();
             B_FS_Switcher_form.ForeColor = System.Drawing.Color.Gray;
@@ -192,6 +209,73 @@ namespace Medical_Studio
             {
                 MessageBox.Show(ex.ToString());
             }
+        }
+
+        public enum Keys : int { 
+            None = 0, 
+            Alt = 56, 
+            Ctrl = 29,
+            P = 25,
+            R = 19, 
+            Q = 16, 
+            C = 46, 
+            F = 33, 
+            S = 31,
+            I = 23 
+        };
+
+        private bool altPressed = false;
+        private void GlobalKeyboardHook_KeyboardPressed(object sender, GlobalKeyboardHookEventArgs e)
+        {
+            switch(e.KeyboardState)
+            {
+                case GlobalKeyboardHook.KeyboardState.KeyDown:
+                case GlobalKeyboardHook.KeyboardState.SysKeyDown:
+                    if (altPressed)
+                    {
+                        e.Handled = true;
+                        switch((Keys)e.KeyboardData.HardwareScanCode)
+                        {
+                            case Keys.F:
+                                FullScreenSwitchKey(null, null);
+                                break;
+                            case Keys.Q:
+                                QuiteKey(null, null);
+                                break;
+                            case Keys.C:
+                                CodecPropKey(null, null);
+                                break;
+                            case Keys.I:
+                                commandTakePhotoMethod(null, null);
+                                break;
+                            case Keys.R:
+                                commandRecordVideoMethod(null, null);
+                                break;
+                            case Keys.S:
+                                commandStopVideoMethod(null, null);
+                                break;
+                            case Keys.P:
+                                commandPauseVideoMethod(null, null);
+                                break;
+                            default:
+                                e.Handled = false;
+                                break;
+                        }
+                    }
+
+                    if (e.KeyboardData.HardwareScanCode == (int)Keys.Alt)
+                        altPressed = true;
+                    break;
+                case GlobalKeyboardHook.KeyboardState.SysKeyUp:
+                case GlobalKeyboardHook.KeyboardState.KeyUp:
+                    if (e.KeyboardData.HardwareScanCode == (int)Keys.Alt)
+                        altPressed = false;
+                    break;
+            }
+            /*Keys key = (Keys)e.KeyboardData.HardwareScanCode;
+            if(altPressed && (key == Keys.C || key == Keys.F || key == Keys.I || key == Keys.P || key == Keys.Q || key == Keys.R || key == Keys.S))
+                e.Handled = true;
+            e.Handled = false;*/
         }
 
         private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -271,7 +355,11 @@ namespace Medical_Studio
                 mainViewModel.ICImagingControl.LiveDisplayDefault = false; //если false, то позволяет изменения размеров окна
 
 
-                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                //CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                if (mainViewModel.ScaleAuto)
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                else
+                    AdaptViewportControl();
             }
             catch (Exception exc)
             {
@@ -293,7 +381,12 @@ namespace Medical_Studio
                     var frameType = IC_Control.VideoFormatCurrent.FrameType;
                     IMG_W_now = frameType.Width;
                     IMG_H_now = frameType.Height;
-                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+
+                    if (mainViewModel.ScaleAuto)
+                        CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                    else
+                        AdaptViewportControl();
+                    //CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
                 }
                 catch
                 {
@@ -422,34 +515,30 @@ namespace Medical_Studio
 
         }
 
-        private void Save_Flipstate()
-        {
-            bool Flip_Hor = IC_Control.DeviceFlipHorizontal;
-            bool Flip_Ver = IC_Control.DeviceFlipVertical;
-            List<string> Flips = new List<string>();
-            Flips.Add("<Flip Settings>");
-            Flips.Add(Flip_Hor.ToString());
-            Flips.Add(Flip_Ver.ToString());
-            Flips.Add("</Flip Settings>");
-            ServiceFunctions.Files.Write_txt("FlipSettings.xml", Flips);
-        }
-
         private void QuiteKey(object sender, ExecutedRoutedEventArgs e)
         {
-            Form1_FormClosing(null, null);
             Application.Current.Shutdown();
-            return;
         }
 
         private void CodecPropKey(object sender, ExecutedRoutedEventArgs e)
         {
-            B_CodecProp_Click(null, null);
+            B_codecSettings_Click(null, null);
         }
 
         private void FullScreenSwitchKey(object sender, ExecutedRoutedEventArgs e)
         {
-            if (FullScrin) { MinimizeWindow(); FullScrin = false; }
-            else { MaximizeWindow(); FullScrin = true; }
+            if (FullScrin)
+            {
+                B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
+                MinimizeWindow();
+            }
+            else
+            {
+                B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_off_form.png");
+                MaximizeWindow();
+            }
+
+            //CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
         }
 
         private void TrB_ExposureVal_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -491,8 +580,14 @@ namespace Medical_Studio
 
         private void ChB_ScaleAuto_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            if(IC_Control != null && IC_Control.DeviceValid)
-                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+            if (IC_Control != null && IC_Control.DeviceValid)
+            {
+                if (mainViewModel.ScaleAuto)
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                else
+                    AdaptViewportControl();
+                //CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+            }
         }
 
         private void TrB_ScaleVal_Scroll(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -656,8 +751,11 @@ namespace Medical_Studio
                 /*if (FullScrin) Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 1, 1); // resize
                 else Adapt_Size_ofCont((IC_Control as System.Windows.Forms.Control), IMG_W_now, IMG_H_now, 0.8, 1);
                 FormatAdaptation(IMG_W_now, IMG_H_now);*/
-
-                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                if (mainViewModel.ScaleAuto)
+                    CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+                else
+                    AdaptViewportControl();
+                //CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
             }
         }
         int datacounter = 0;
@@ -678,6 +776,11 @@ namespace Medical_Studio
                 imageRect.Offset((rectHost.Width - imageRect.Width) * 0.5d, (rectHost.Height - imageRect.Height) * 0.5d);
 
                 Rect controlRect = Rect.Intersect(rectHost, imageRect);
+
+                if((int)controlRect.Width == 0 || (int)controlRect.Height == 0)
+                {
+
+                }
 
                 IC_Control.Width = (int)controlRect.Width;
                 IC_Control.Height = (int)controlRect.Height;
@@ -717,7 +820,6 @@ namespace Medical_Studio
             else
             {//вписываем по вертикали
                 zoomFactor = (1d* PanelNewHeight / IMG_Height);
-
             }
 
             if(!FullScrin)
@@ -1068,10 +1170,10 @@ namespace Medical_Studio
                     //Timer_camera_checker.Stop();
                     Config_tag = ((sender as RenameableToggleButton).Tag as string); //Вычленяем номер конфигурации
 
-                    if (mainViewModel.ScaleAuto)
+                    /*if (mainViewModel.ScaleAuto)
                         CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
                     else
-                        AdaptViewportControl();
+                        AdaptViewportControl();*/
 
                     mainViewModel.SaveCurrentCameraConfig();
                     mainViewModel.ConfigKey = Config_tag;
@@ -1198,6 +1300,11 @@ namespace Medical_Studio
             grid_main.ColumnDefinitions[0].Width = new System.Windows.GridLength(0, System.Windows.GridUnitType.Auto);
 
             FullScrin = true;
+
+            if (mainViewModel.ScaleAuto)
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+            else
+                AdaptViewportControl();
         }
         private void MinimizeWindow()
         {
@@ -1214,7 +1321,11 @@ namespace Medical_Studio
 
             FullScrin = false;
             //ВРЕМЕННО
-            CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+            if (mainViewModel.ScaleAuto)
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
+            else
+                AdaptViewportControl();
+            //CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
         }
 
         private bool offAutobalance = false;
@@ -1280,50 +1391,107 @@ namespace Medical_Studio
 
         private void ToggleVideoCapture()
         {
-            if (!mainViewModel.DeviceValid)
-                return;
+            try
+            {
+                if (!mainViewModel.DeviceValid)
+                    return;
+
+                checkVideoFrameType();
+
+                if (mainViewModel.VideoCapturing)
+                {
+                    mainViewModel.VideoOnPause = !mainViewModel.VideoOnPause;
+                }
+                else
+                {
+                    mainViewModel.StartVideoCapturing();
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+
+        private void checkVideoFrameType()
+        {
             var frameType = mainViewModel.ICImagingControl.VideoFormatCurrent.FrameType;
             if (frameType.Height > 1080 || frameType.Width > 1920)
             {
                 MessageBox.Show("Установлено слишком большое разрешение изображения.\n Максимально доступное разрешение для записи видео 1920x1080");
                 return;
             }
-
-            if (mainViewModel.VideoCapturing)
-            {
-                mainViewModel.VideoOnPause = !mainViewModel.VideoOnPause;
-            }
-            else
-            {
-                mainViewModel.StartVideoCapturing();
-            }
         }
 
-        private void FormatAdaptation(int WidthOfImage = -1, int HeightOfImage = -1)
+        private void commandRecordVideoMethod(object sender, ExecutedRoutedEventArgs e)
         {
-            var ic = IC_Control;
-            if (WidthOfImage == -1) WidthOfImage = ic.ImageWidth;
-            if (HeightOfImage == -1) HeightOfImage = ic.ImageHeight;
-            int ControlWidth = ic.Width;
-            int ControlHeight = ic.Height;
-            float ZFactWidth = (float)ControlWidth / (float)WidthOfImage;
-            float ZFactHeight = (float)ControlHeight / (float)HeightOfImage;
-            float ZFactFinal = 100.0f;
-            if (ZFactWidth >= ZFactHeight) ZFactFinal = ZFactHeight;
-            else ZFactFinal = ZFactWidth;
-
-            if (ic.LiveDisplayDefault == false)
+            try
             {
-                ic.LiveDisplayZoomFactor = ZFactFinal;
+                if (!mainViewModel.DeviceValid)
+                    return;
 
-                if (ic.LiveDisplayZoomFactor > 1.0) ic.ScrollbarsEnabled = true;
-                else ic.ScrollbarsEnabled = false;
+                checkVideoFrameType();
+
+                if (mainViewModel.VideoCapturing)
+                {
+                    mainViewModel.StopVideoCapturing();
+                }
+                mainViewModel.StartVideoCapturing();
             }
-            else
+            catch (Exception) { }
+        }
+
+        private void commandPauseVideoMethod(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
             {
+                if (!mainViewModel.DeviceValid)
+                    return;
 
+                if (mainViewModel.VideoCapturing)
+                {
+                    mainViewModel.VideoOnPause = !mainViewModel.VideoOnPause;
+                }
             }
+            catch (Exception) { }
+        }
 
+        private void commandStopVideoMethod(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
+            {
+                if (!mainViewModel.DeviceValid)
+                    return;
+
+                if (mainViewModel.VideoCapturing)
+                {
+                    mainViewModel.StopVideoCapturing();
+                }
+            }
+            catch (Exception) { }
+        }
+
+        private void B_Info_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                InfoWindow info = new InfoWindow();
+                info.Owner = this;
+                info.ShowDialog();
+            }
+            catch (Exception) { }
+        }
+
+        private void commandTakePhotoMethod(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
+            {
+                if (!mainViewModel.DeviceValid)
+                    return;
+
+                B_Snapshot_Click(null, null);
+            }
+            catch (Exception) { }
         }
     }
 }

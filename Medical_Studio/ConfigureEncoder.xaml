@@ -8,6 +8,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
         Style="{DynamicResource WindowStyle}"
         Title="Настройка видеокодека H.264" Height="188.584" Width="662.59" Foreground="{DynamicResource MainFontBrush}">
     <Window.Resources>
@@ -21,7 +22,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid VerticalAlignment="Stretch">
+        <Grid VerticalAlignment="Stretch" Margin="5">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition Height="Auto"/>
@@ -96,13 +97,16 @@
             </Grid>
         </Grid>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
-            <Button Content="OK" Width="100" Margin="2" x:Name="Btn_OK"
+        <Border HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource BorderDownStyle}" BorderThickness="0 2 0 0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
+                <Button Content="OK" Width="100" Margin="2" x:Name="Btn_OK"
                     Click="Btn_OK_Click"
                     Style="{DynamicResource ButtonStyle}"/>
-            <Button Content="Cancel" Width="100" Margin="2" x:Name="Btn_Cancel"
+                <Button Content="Cancel" Width="100" Margin="2" x:Name="Btn_Cancel"
                     Click="Btn_Cancel_Click"
                     Style="{DynamicResource ButtonStyle}"/>
-        </StackPanel>
+            </StackPanel>
+        </Border>
+
     </Grid>
 </Window>

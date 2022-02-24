@@ -1,0 +1,38 @@
+﻿<Window x:Class="Medical_Studio.InfoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Medical_Studio"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Style="{DynamicResource WindowStyle}"
+        Title="Информация" Height="320" Width="360">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock TextWrapping="WrapWithOverflow" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Run Text="Alt + F : Полный экран"/><LineBreak/>
+            <LineBreak/>
+            <Run Text="Alt + R : Начало новой видеозаписи"/><LineBreak/>
+            <Run Text="Alt + S : Остановка записи"/><LineBreak/>
+            <Run Text="Alt + P : Пауза/Продолжение видеозаписи"/><LineBreak/>
+            <Run Text="Alt + I : Сделать фото"/><LineBreak/>
+            <LineBreak/>
+            <Run Text="Alt + C : Настройки кодека H.264"/><LineBreak/>
+            <Run Text="Alt + Q : Выход"/><LineBreak/>
+        </TextBlock>
+
+        <Border Grid.Row="1" HorizontalAlignment="Stretch" Style="{DynamicResource BorderDownStyle}" BorderThickness="0 2 0 0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="OK" Width="100" Margin="2" x:Name="Btn_OK"
+                    Click="Btn_OK_Click"
+                    Style="{DynamicResource ButtonStyle}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

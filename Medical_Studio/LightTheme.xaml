@@ -399,7 +399,7 @@
             </TransformGroup>
         </RadialGradientBrush.RelativeTransform>
         <GradientStop Offset="1" Color="#FFE5F5FF"/>
-        <GradientStop Offset="0" Color="#FF74A1BD"/>
+        <GradientStop Offset="0" Color="#FF2997DB"/>
     </RadialGradientBrush>
 
     <Style x:Key="ToggleButtonStyle" TargetType="{x:Type RadioButton}">
