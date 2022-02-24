@@ -548,6 +548,8 @@ namespace Medical_Studio.ViewModels
         private string historyNumberString = "";
         public string HistoryNumberString { get => historyNumberString; set { historyNumberString = value; OnPropertyChanged("HistoryNumberString"); } }
 
+        public bool IsLightTheme { get; set; } = false;
+
         public Dictionary<string, ConfigElement> configsDictionary = new Dictionary<string, ConfigElement>();
         public Dictionary<string, ConfigElement> ConfigsDictionary { get => configsDictionary; set { configsDictionary = value; OnPropertyChanged("ConfigsDictionary"); } } 
 
@@ -557,7 +559,9 @@ namespace Medical_Studio.ViewModels
             HistoryNumberString = Settings.Default.HistoryNumber;
             FIOString = Settings.Default.FIO;
 
-            if(Settings.Default.VideoPath != "")
+            IsLightTheme = Settings.Default.IsLightTheme;
+
+            if (Settings.Default.VideoPath != "")
                 VideoFileInfo = Settings.Default.VideoPath;
             if(Settings.Default.PhotoPath != "")
                 PhotoFileInfo = Settings.Default.PhotoPath;
@@ -575,6 +579,8 @@ namespace Medical_Studio.ViewModels
             Settings.Default.Date = DateString;
             Settings.Default.HistoryNumber = HistoryNumberString;
             Settings.Default.FIO = FIOString;
+
+            Settings.Default.IsLightTheme = IsLightTheme;
 
             Settings.Default.VideoPath = VideoFileInfo;
             Settings.Default.PhotoPath = PhotoFileInfo;

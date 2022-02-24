@@ -72,6 +72,9 @@
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>MedicalStudioLogo_2.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AForge, Version=2.2.5.0, Culture=neutral, PublicKeyToken=c1db6ff4eaa06aeb, processorArchitecture=MSIL">
       <HintPath>..\packages\AForge.2.2.5\lib\AForge.dll</HintPath>
@@ -136,6 +139,7 @@
     <Compile Include="ConfigureEncoder.xaml.cs">
       <DependentUpon>ConfigureEncoder.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\ExposureLogConverter.cs" />
     <Compile Include="Converters\MultiConverterAnd.cs" />
     <Compile Include="Converters\MultiplyConverter.cs" />
     <Compile Include="Converters\BoolToRedColorConverter.cs" />
@@ -254,7 +258,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Images\" />
     <Folder Include="UserControls\" />
   </ItemGroup>
   <ItemGroup>
@@ -269,6 +272,35 @@
       <Project>{b78c0f3b-071a-4fd2-829d-7a67e0f7bd1c}</Project>
       <Name>MediaFoundation-2010</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PauseIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\RecordIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\StopIcon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\MedicalStudioLogo16.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\MedicalStudioLogo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="MedicalStudioLogo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="MedicalStudioLogo_2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\MedicalStudioLogo_2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\PhotoImage.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

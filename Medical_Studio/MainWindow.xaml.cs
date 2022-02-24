@@ -170,9 +170,28 @@ namespace Medical_Studio
             CommandBindings.Add(new CommandBinding(CRoutedCommand, CodecPropKey));
 
             B_FS_Switcher_form = Host.Child.Controls[0] as System.Windows.Forms.Button; //new System.Windows.Forms.Button();
+            B_FS_Switcher_form.ForeColor = System.Drawing.Color.Gray;
 
             bmpFS_on = Bitmap.FromFile("FS_on_form.png");
             bmpFS_off = Bitmap.FromFile("FS_off_form.png");
+
+            try
+            {
+                mainViewModel.LoadSettings();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+            try
+            {
+                InitICCaptureControl();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
         }
 
         private void MainViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -200,25 +219,7 @@ namespace Medical_Studio
 
             try
             {
-                InitICCaptureControl();
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-
-            try
-            {
-                mainViewModel.LoadSettings();
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-
-            try
-            {
-                B_FS_Switcher_form.UseVisualStyleBackColor = true;
+                //B_FS_Switcher_form.UseVisualStyleBackColor = true;
                 B_FS_Switcher_form.BackgroundImage = System.Drawing.Image.FromFile("FS_on_form.png");
 
                 Scaling_of_monitor = GetScalingFactor_ofMonitor();
@@ -239,6 +240,12 @@ namespace Medical_Studio
 
             Everything_loaded = true;
             FLog.Log("Initialization end");
+
+            try
+            {
+                toggleTheme.IsChecked = mainViewModel.IsLightTheme;
+            }
+            catch (Exception) { }
         }
 
         private void InitICCaptureControl()
@@ -263,7 +270,8 @@ namespace Medical_Studio
                 mainViewModel.ICImagingControl.ScrollbarsEnabled = true;
                 mainViewModel.ICImagingControl.LiveDisplayDefault = false; //если false, то позволяет изменения размеров окна
 
-                //mainViewModel.IsLive = true;
+
+                CalculateZoomFactor((int)Host.ActualWidth, (int)Host.ActualHeight, IMG_W_now, IMG_H_now);
             }
             catch (Exception exc)
             {
@@ -992,9 +1000,18 @@ namespace Medical_Studio
 
         private void ToggleButton_Checked(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                ToggleTheme(toggleTheme.IsChecked == true);
+            }
+            catch (Exception) { }
+        }
+
+        private void ToggleTheme(bool isLight)
+        {
             string themePath = "";
 
-            if (toggleTheme.IsChecked == true)
+            if (isLight)
             {
                 themePath = "LightTheme.xaml";
             }
@@ -1009,6 +1026,8 @@ namespace Medical_Studio
             // добавляем загруженный словарь ресурсов
             Application.Current.Resources.MergedDictionaries.Add(resourceDict);
             Refresh_IC_BackColor();
+
+            mainViewModel.IsLightTheme = isLight;
         }
 
         private void Host_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -18,7 +18,8 @@
         Width="1280"
         Height="1117"
         Closing="Form1_FormClosing"
-        Style="{DynamicResource WindowStyle}">
+        Style="{DynamicResource WindowStyle}"
+        Icon="Icons/MedicalStudioLogo_2.ico">
 
     <Window.Resources>
         <convs:PercentConverter x:Key="myPercentConverter"/>
@@ -27,6 +28,7 @@
         <convs:BoolToRedColorConverter x:Key="myBoolToRedColorConverter"/>
         <convs:ConverterLogarithm x:Key="cvLogarithm"/>
         <convs:MultiConverterAnd x:Key="cvMultiAnd"/>
+        <convs:ExposureLogConverter x:Key="myExpLogConverter"/>
         <Color x:Key="ColorToggleBlue">#FF1A89AA</Color>
         <Color x:Key="ColorToggleYellow">#FFBF00</Color>
         <SolidColorBrush x:Key="BrushToggleBlue" Color="{StaticResource ColorToggleBlue}"/>
@@ -75,6 +77,11 @@
         </Style>
 
         <Image x:Key="folder_img" Source="Folder_img.png" Height="15"/>
+        <Image x:Key="pause_img" Source="Images/PauseIcon.png" Height="24" Margin="-4"/>
+        <Image x:Key="record_img" Source="Images/RecordIcon.png" Height="24" Margin="-4"/>
+        <Image x:Key="stop_img" Source="Images/StopIcon.png" Height="24" Margin="-4"/>
+        <Image x:Key="play_img" Source="Images/PlayIcon.png" Height="24" Margin="-4"/>
+        
         <Style TargetType="{x:Type ToggleButton}" x:Key="ToggleButtonSwitchStyle">
             <Setter Property="Template">
                 <Setter.Value>
@@ -332,10 +339,11 @@
 
                             <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Экспозиция" Margin="2"/>
                             <xctk:DoubleUpDown Grid.Row="0" Grid.Column="1" Margin="2"
-                                           
-                                           Maximum="{Binding ExposureMax, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                           Minimum="{Binding ExposureMin, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                           Increment="0.001"
+                                           Maximum="{Binding ExposureMax, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, Converter={StaticResource myExpLogConverter}}"
+                                           Minimum="{Binding ExposureMin, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, Converter={StaticResource myExpLogConverter}}"
+                                           Value="{Binding Exposure, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource myExpLogConverter}}"
+                                           FormatString="F0"
+                                           Increment="10"
                                            IsEnabled="{Binding ExposureAuto, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolInverterConverter}}"
                                            Height="25"
                                            MaxWidth="120" ValueChanged="NUD_Exposure_ValueChanged">
@@ -500,10 +508,14 @@
                                  x:Name="TB_Directory_Vid"
                                  PreviewTextInput="TB_Directory_PreviewTextInput"
                                  Text="{Binding VideoFileInfo, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                        <Button Content="{StaticResource folder_img}" Grid.Row="5" Grid.Column="3" Margin="2" 
+                        <Button Grid.Row="5" Grid.Column="3" Margin="2" 
                                 Style="{DynamicResource ButtonStyle}" 
                                 x:Name="B_Browse_Vid"
-                                Click="B_Browse_Vid_Click"/>
+                                Click="B_Browse_Vid_Click">
+                            <Button.Content>
+                                <Image Source="Folder_img.png" Height="16"/>
+                            </Button.Content>
+                        </Button>
                         <Button Content="Настройки видеозаписи" Grid.Row="6" Grid.ColumnSpan="4" Margin="2 4 2 2"
                                 Style="{DynamicResource ButtonStyle}"
                                 x:Name="B_codecSettings"
@@ -558,7 +570,7 @@
                       x:Name="gridSplitter_left"/>
 
         <Border x:Name="toolBar" Grid.Row="1" Grid.ColumnSpan="3" Style="{DynamicResource BorderDownStyle}" BorderThickness="0 2 0 0">
-            <Grid IsEnabled="{Binding DeviceValid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition/>
@@ -569,9 +581,11 @@
                     <ToggleButton ToolBar.OverflowMode="Never" x:Name="toggleTheme" Margin="2" Style="{StaticResource ToggleButtonSwitchStyle}" Checked="ToggleButton_Checked" Unchecked="ToggleButton_Checked"/>
                 </StackPanel>
 
-                <Grid Grid.Column="1" HorizontalAlignment="Stretch">
+                <Grid Grid.Column="1" HorizontalAlignment="Stretch"
+                      IsEnabled="{Binding DeviceValid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="Auto"/>
@@ -579,15 +593,23 @@
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button Style="{DynamicResource ButtonStyle}" Grid.Column="1" Margin="2" Content="Сделать фото" 
-                                x:Name="B_Snapshot" HorizontalAlignment="Center"
-                                IsEnabled="{Binding DeviceValid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                Click="B_Snapshot_Click"/>
-
-                    <TextBlock Text="Видео:" Grid.Column="2" HorizontalAlignment="Right"
+                    <TextBlock Text="Фото:" Grid.Column="1" HorizontalAlignment="Right"
                                Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never"
                                VerticalAlignment="Center" FontSize="16" Margin="10 2 4 2"/>
-                    <UniformGrid Grid.Column="3" Rows="1" Columns="3" HorizontalAlignment="Center">
+                    
+                    <Button Style="{DynamicResource ButtonStyle}" Grid.Column="2" Margin="2"
+                                x:Name="B_Snapshot" HorizontalAlignment="Center"
+                                IsEnabled="{Binding DeviceValid, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                Click="B_Snapshot_Click">
+                        <Button.Content>
+                            <Image Source="Images/PhotoImage.png" Height="24" Margin="-4"/>
+                        </Button.Content>
+                    </Button>
+
+                    <TextBlock Text="Видео:" Grid.Column="3" HorizontalAlignment="Right"
+                               Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never"
+                               VerticalAlignment="Center" FontSize="16" Margin="10 2 4 2"/>
+                    <UniformGrid Grid.Column="4" Rows="1" Columns="3" HorizontalAlignment="Center">
                         <Button Margin="2"
                                       x:Name="B_StartPauseVideo"
                                       Click="B_StartPauseVideo_Click">
@@ -601,7 +623,12 @@
                                                     <Binding Path="VideoOnPause" UpdateSourceTrigger="PropertyChanged"/>
                                                 </MultiBinding>
                                             </DataTrigger.Binding>
-                                            <Setter Property="Content" Value="Прод."/>
+                                            <!--<Setter Property="Content" Value="Прод."/>-->
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="Images/PlayIcon.png" Height="24" Margin="-4"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                         <DataTrigger Value="False">
                                             <DataTrigger.Binding>
@@ -610,7 +637,11 @@
                                                     <Binding Path="VideoOnPause" UpdateSourceTrigger="PropertyChanged"/>
                                                 </MultiBinding>
                                             </DataTrigger.Binding>
-                                            <Setter Property="Content" Value="Старт">
+                                            <!--<Setter Property="Content" Value="Старт">-->
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="Images/RecordIcon.png" Height="24" Margin="-4"/>
+                                                </Setter.Value>
                                             </Setter>
                                         </DataTrigger>
                                         <DataTrigger Value="True">
@@ -620,7 +651,12 @@
                                                     <Binding Path="VideoOnPause" Converter="{StaticResource myBoolInverterConverter}" UpdateSourceTrigger="PropertyChanged"/>
                                                 </MultiBinding>
                                             </DataTrigger.Binding>
-                                            <Setter Property="Content" Value="Пауза"/>
+                                            <!--<Setter Property="Content" Value="Пауза"/>-->
+                                            <Setter Property="Content">
+                                                <Setter.Value>
+                                                    <Image Source="Images/PauseIcon.png" Height="24" Margin="-4"/>
+                                                </Setter.Value>
+                                            </Setter>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -631,13 +667,17 @@
                                     Style="{DynamicResource ButtonStyle}" 
                                     x:Name="B_PauseCapture"
                                     Click="B_PauseCapture_Click"/>
-                        <Button Margin="2" Content="Стоп"
+                        <Button Margin="2"
                                     Style="{DynamicResource ButtonStyle}" 
                                     x:Name="B_StopCapture"
                                     Click="B_StopCapture_Click"
-                                    IsEnabled="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"/>
+                                    IsEnabled="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                            <Button.Content>
+                                <Image Source="Images/StopIcon.png" Height="24" Margin="-4"/>
+                            </Button.Content>
+                        </Button>
                     </UniformGrid>
-                    <StackPanel Orientation="Horizontal" Grid.Column="4"
+                    <StackPanel Orientation="Horizontal" Grid.Column="5"
                                 Visibility="{Binding VideoCapturing, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource myBoolVisibilityConvertery}}">
                         <TextBlock Foreground="{DynamicResource BrushNUD_Foreground}" ToolBar.OverflowMode="Never" Text="Видеозапись" VerticalAlignment="Center" FontSize="16" Margin="100 2 2 2"/>
 
