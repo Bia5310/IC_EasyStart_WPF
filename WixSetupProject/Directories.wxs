@@ -5,6 +5,27 @@
     
     <Directory Id="TARGETDIR" Name="SourceDir">
 
+      <!--Desctop Shortcut-->
+      <Directory Id="DesktopFolder" Name="Desktop">
+        <Component Id="ApplicationShortcutDesktop" Guid="{DFF0D665-F594-478D-8AD7-94EB34FBD727}">
+          <Shortcut Id="ApplicationDesktopShortcut"
+              Name="!(loc.ProductName_$(var.Platform))"
+              Target="[INSTALLFOLDER]Medical_Studio.exe"
+              WorkingDirectory="INSTALLFOLDER"
+              Icon="icon.ico"/>
+
+          <RemoveFolder Id="DesktopFolder" On="uninstall"/>
+
+          <RegistryValue Id="RemoveDecktopIcon"
+              Root="HKCU"
+              Key="SOFTWARE\!(loc.ProductNameFolder)"
+              Name="ShortcutDecktop"
+              Type="integer"
+              Value="1"
+              KeyPath="yes"/>
+        </Component>
+      </Directory>
+
       <!-- Start Menu -->
       <Directory Id="ProgramMenuFolder">
         <Directory Id="InstallProgramMenuFolder" Name="!(loc.ProductNameFolder)" />
@@ -23,7 +44,8 @@
       <?endif?>
             
     </Directory>
-    
+
+
   </Fragment>
 
 </Wix>

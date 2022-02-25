@@ -8,6 +8,7 @@
 
       <!-- Shortcut -->
       <ComponentRef Id="MainAppShortcut" />
+      <ComponentRef Id="ApplicationShortcutDesktop" />
       
     </ComponentGroup>
 
@@ -32,7 +33,7 @@
         <RemoveFolder Id="RemoveStartMenu" Directory="InstallProgramMenuFolder" On="uninstall" />
         
       </Component>
-
+      
     </DirectoryRef>
     
   </Fragment>
