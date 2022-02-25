@@ -25,6 +25,9 @@
             <LineBreak/>
             <Run Text="Alt + C : Настройки кодека H.264"/><LineBreak/>
             <Run Text="Alt + Q : Выход"/><LineBreak/>
+            <LineBreak></LineBreak>
+            <Run Text="Версия сборки: "/>
+            <Run Name="version"/>
         </TextBlock>
 
         <Border Grid.Row="1" HorizontalAlignment="Stretch" Style="{DynamicResource BorderDownStyle}" BorderThickness="0 2 0 0">

@@ -23,6 +23,18 @@ namespace Medical_Studio.ViewModels
 
         public static string CameraConfigsFolder = "Configs";
 
+        static MainViewModel()
+        {
+            try
+            {
+                CameraConfigsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "/Medical Studio Configs";
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.ToString());
+            }
+        }
+
         public MainViewModel()
         {
             updatePropertiesTimer = new DispatcherTimer(DispatcherPriority.Background);
@@ -35,7 +47,7 @@ namespace Medical_Studio.ViewModels
         {
             get
             {
-                string title = String.Format("{0} {1}", NameOfApplication, AppVersion);
+                string title = String.Format("{0} {1}", NameOfApplication, System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
                 if (DeviceValid)
                 {
                     try

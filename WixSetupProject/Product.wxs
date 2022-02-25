@@ -1,43 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="MedicalStudio" Language="1033" Version="1.0.0.0" Manufacturer="" UpgradeCode="b95a27cf-4810-473b-85a2-fa56510ebd6e">
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
-    <Icon Id="icon.ico" SourceFile="MedicalStudioLogo_Inst_1.ico"/>
-    <Property Id="ARPPRODUCTICON" Value="icon.ico"/>
-    
-		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-		<MediaTemplate />
+  <!-- Give product a unique ID per platform -->
+  <?if $(var.Platform)=x64 ?>
+  <?define ProductCode = "{DC79392A-3757-46A3-A409-259C7B6B4470}" ?>
+  <?else?>
+  <?define ProductCode = "{BEBA2815-67DA-46D4-BD3D-0A11E6CF7845}" ?>
+  <?endif?>
 
-		<Feature Id="ProductFeature" Title="WixSetupProject" Level="1">
-			<ComponentGroupRef Id="ProductComponents" />
-		</Feature>
-	</Product>
+  <!-- Fixed upgrade Id -->
+  <?define UpgradeCode = "{80C1AB37-0469-4673-967F-C4E0FE68D353}" ?>
 
-  <Fragment>
-    <Condition Message="This application requires .NET Framework 4.6.1">
-      
-    </Condition>
-  </Fragment>
-  
-	<Fragment>
-		<Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="ProgramFilesFolder">
-				<Directory Id="INSTALLFOLDER" Name="MedicalStudio" />
-			</Directory>
-      <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsFolder" Name="MedicalStudio"/>
-      </Directory>
-      <Directory Id="DesktopFolder" Name="Desktop"/>
-		</Directory>
-	</Fragment>
+  <!-- Define main product -->
+  <Product Id="$(var.ProductCode)"
+           Name="!(loc.ProductName_$(var.Platform))"
+           Language="!(loc.Language)"
+           Version="$(var.BuildVersion)"
+           Manufacturer="No data"
+           UpgradeCode="$(var.UpgradeCode)">
 
-	<Fragment>
-		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
-			<!-- <Component Id="ProductComponent"> -->
-				<!-- TODO: Insert files, registry keys, and other resources here. -->
-			<!-- </Component> -->
-		</ComponentGroup>
-	</Fragment>
+    <!-- Provide package details -->
+    <Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine"
+             Platform="$(var.Platform)"
+             Manufacturer="No data"
+             Description="!(loc.Description)"
+             Keywords="!(loc.Keywords)"
+             Comments="!(loc.Comments)"
+             Languages="!(loc.Language)"
+             />
+
+    <!-- Downgrade error message -->
+    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
+
+    <!-- Include .cab file into .msi file -->
+    <MediaTemplate
+      EmbedCab="yes"/>
+
+    <!-- Define main app icon -->
+    <Icon Id="icon.ico" SourceFile="..\Medical_Studio\MedicalStudioLogo_2.ico" />
+
+    <!-- Use the icon.ico icon for this installer (shows up in Add/Remove programs) -->
+    <Property Id="ARPPRODUCTICON">icon.ico</Property>
+    <!-- Help/Support website (shows in the Add/Remove programs) -->
+    <!--<Property Id="ARPURLINFOABOUT">http://www.angelsix.com</Property>-->
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <!-- Create a basic UI for the installer -->
+    <UIRef Id="WixUI_InstallDir" />
+
+    <!-- Change the installer UI background images -->
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\Assets\License.rtf" />
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)\Assets\Background.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)\Assets\Banner.bmp" />
+
+    <!-- Define components, shortcuts, files etc... for installer -->
+    <Feature Id="ProductFeature" Title="MedicalStudio" Level="1">
+
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="PublishedComponents" />
+
+    </Feature>
+
+  </Product>
+
 </Wix>

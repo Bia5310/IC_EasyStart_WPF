@@ -22,6 +22,12 @@ namespace Medical_Studio
         public InfoWindow()
         {
             InitializeComponent();
+            version.Text = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+#if X64
+            version.Text += " (x64)";
+#else
+            version.Text += " (x86)";
+#endif
         }
 
         private void Btn_OK_Click(object sender, RoutedEventArgs e)
