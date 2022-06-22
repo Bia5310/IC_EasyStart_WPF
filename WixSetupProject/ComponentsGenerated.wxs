@@ -2,241 +2,241 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <DirectoryRef Id="INSTALLFOLDER">
-            <Component Id="cmpC51E147A4F32BC2A5AAB41BFC8CC4B32" Guid="{ED8E4D1E-2C08-453F-B649-B1D0A36BB313}">
+            <Component Id="cmpC51E147A4F32BC2A5AAB41BFC8CC4B32" Guid="{C3DD60CF-0F55-4027-BCA7-3307DCFE5EDF}">
                 <File Id="filA82A036E4EF98D3A22DAFC784529DC17" KeyPath="yes" Source="$(var.BasePath)\FS_off_form.png" />
             </Component>
-            <Component Id="cmp8104302EF2F6E18C552491263D47D34F" Guid="{3E88BA8D-8024-4D49-B42C-6022FDCAD195}">
+            <Component Id="cmp8104302EF2F6E18C552491263D47D34F" Guid="{BA6FE195-6DE8-49F8-8680-1317B5E9EA81}">
                 <File Id="fil8876F965667F81E29B287E21473DD7CC" KeyPath="yes" Source="$(var.BasePath)\FS_on_form.png" />
             </Component>
-            <Component Id="cmpC50C281CF71309F81B39E9980A2E8D37" Guid="{8ADF4431-9973-47C8-8097-A279DED07A0E}">
+            <Component Id="cmpC50C281CF71309F81B39E9980A2E8D37" Guid="{1D69D070-5864-43E8-ACC1-C05E681CFF9A}">
                 <File Id="fil69CA3172246C5DB9B9A35CBD0BC2102E" KeyPath="yes" Source="$(var.BasePath)\MediaFoundation.dll" />
             </Component>
-            <Component Id="cmpABE8E06D752D05C06C11A3E28D43174A" Guid="{A1202298-BA5E-40DE-87E9-F1A1CADC4961}">
+            <Component Id="cmpABE8E06D752D05C06C11A3E28D43174A" Guid="{63FAF05C-362E-4D91-9E9B-DCBDB2EA7514}">
                 <File Id="filFC40B228BE6C3E8E680B459BFC2D7F5A" KeyPath="yes" Source="$(var.BasePath)\MediaFoundation.Extension.dll" />
             </Component>
-            <Component Id="cmp0C534A93768F82D5FAC6F7318562A270" Guid="{189C174A-DB11-4097-8117-EACCB7D554A7}">
+            <Component Id="cmp0C534A93768F82D5FAC6F7318562A270" Guid="{D3BD8CEF-8DB7-4F61-88FD-B13C3D94F125}">
                 <File Id="fil001C07AD4F8F6CC112FF2F97BF0EF81F" KeyPath="yes" Source="$(var.BasePath)\MediaFoundation.Extension.pdb" />
             </Component>
-            <Component Id="cmp9E795527570AA752A1EF9CA3AFA67E5D" Guid="{42567D90-FD41-4A17-BCB5-60E63FC0FFC1}">
+            <Component Id="cmp9E795527570AA752A1EF9CA3AFA67E5D" Guid="{CC2699D6-D3EE-4A84-8AE3-8FB8CE16C431}">
                 <File Id="filF274A3A86BA6F44C26F20B721D3728C2" KeyPath="yes" Source="$(var.BasePath)\MediaFoundation.pdb" />
             </Component>
-            <Component Id="cmpFE16B727D72F804E766BEE90C9A46BEF" Guid="{9CEA4425-1F23-4C24-887C-164390F481C1}">
+            <Component Id="cmpFE16B727D72F804E766BEE90C9A46BEF" Guid="{C1D3C9E8-134F-4211-8B19-DEC92A06326E}">
                 <File Id="fil065A6F3EC5C4867C69DE07D00850192E" KeyPath="yes" Source="$(var.BasePath)\Medical_Studio.application" />
             </Component>
-            <Component Id="cmpBCC1DA5154DA2B9BEC547B100F85BFAA" Guid="{E50672F0-145F-4134-B49D-0BA70662698A}">
+            <Component Id="cmpBCC1DA5154DA2B9BEC547B100F85BFAA" Guid="{8845DF15-4975-42F5-BE6A-FD65C92479DF}">
                 <File Id="filBE25977DFD5B7154359B926621946093" KeyPath="yes" Source="$(var.BasePath)\Medical_Studio.exe" />
             </Component>
-            <Component Id="cmp690C6AED48730912E3CEA77F15E18C80" Guid="{A05A3B50-14D7-4B19-8357-6B8300B603D9}">
+            <Component Id="cmp690C6AED48730912E3CEA77F15E18C80" Guid="{7845507E-CECC-4035-B565-DD864CEDAC34}">
                 <File Id="filE7EDB6AE2E8046F651C23E07B72729A5" KeyPath="yes" Source="$(var.BasePath)\Medical_Studio.exe.config" />
             </Component>
-            <Component Id="cmp5164E040FB4436D946A013702E0B2F79" Guid="{6D9562FF-4AAA-49C3-AF5A-755F34DB5775}">
+            <Component Id="cmp5164E040FB4436D946A013702E0B2F79" Guid="{2E98EB26-E2C8-4D4F-B6F4-68AF4D1D1089}">
                 <File Id="filC897F156CAE3F4FFEE67BE4B87E506FE" KeyPath="yes" Source="$(var.BasePath)\Medical_Studio.exe.manifest" />
             </Component>
-            <Component Id="cmp996AF28776F8B4C2BA72D6110A0F4BF9" Guid="{ED29191E-2AAD-447E-92EB-7BB38BB37067}">
+            <Component Id="cmp996AF28776F8B4C2BA72D6110A0F4BF9" Guid="{0E4F1A22-784B-40D0-9DE9-489A8B995541}">
                 <File Id="fil9A1F7C354135F754A0A33BBAEF7A41F8" KeyPath="yes" Source="$(var.BasePath)\NativeFunctions.dll" />
             </Component>
-            <Component Id="cmp6A6B43583B37A54A148B062C1F77B3E1" Guid="{CA367ED7-8404-431F-8714-E608B536DD28}">
+            <Component Id="cmp6A6B43583B37A54A148B062C1F77B3E1" Guid="{7B05B586-82FE-4903-B8FE-79F8BBB12F9E}">
                 <File Id="filABA72256B4D406CF45A2CAA960BCAAC2" KeyPath="yes" Source="$(var.BasePath)\NativeFunctions.exp" />
             </Component>
-            <Component Id="cmp86CF69A2EBDFDE50651C596C3AFFBD16" Guid="{87608186-359A-4ED4-8AA5-B2376328939D}">
+            <Component Id="cmp86CF69A2EBDFDE50651C596C3AFFBD16" Guid="{7D2DC6C1-4D38-4914-A364-A9E712C4FA6C}">
                 <File Id="fil131587A9ABB7092D75C8D865BF5DFF7B" KeyPath="yes" Source="$(var.BasePath)\NativeFunctions.lib" />
             </Component>
-            <Component Id="cmpB2693572C7AD7D8A032ED1A77EE19ECC" Guid="{1A866CBC-1461-4A07-B95A-1DC6C44EAA4E}">
+            <Component Id="cmpB2693572C7AD7D8A032ED1A77EE19ECC" Guid="{C40BCA63-897F-45ED-ACF2-CD688FD5E8CE}">
                 <File Id="fil7ABAF6A5283552EB7A66716E16EC84A5" KeyPath="yes" Source="$(var.BasePath)\NativeFunctions.pdb" />
             </Component>
-            <Component Id="cmp7302177948D7B09318F1FDA3E3C9B935" Guid="{C309573A-89F6-4A3E-A85A-864C0BD8F729}">
+            <Component Id="cmp7302177948D7B09318F1FDA3E3C9B935" Guid="{77CA5C20-6C86-4D97-A6C9-56908D53DBEA}">
                 <File Id="filB9E2C31B26C8B552FB489EF8039F0CED" KeyPath="yes" Source="$(var.BasePath)\TIS.Imaging.ICImagingControl35.dll" />
             </Component>
-            <Component Id="cmpAABC70F8213324E862021470D5CCDF3B" Guid="{813517C2-5D9C-4E33-B26B-FF959D69078B}">
+            <Component Id="cmpAABC70F8213324E862021470D5CCDF3B" Guid="{341E6F01-17D8-4707-921F-584E153B7BF0}">
                 <File Id="filE99A339CF287BE2916287502DC5192D7" KeyPath="yes" Source="$(var.BasePath)\TIS.Imaging.ICImagingControl35.xml" />
             </Component>
-            <Component Id="cmpB5AC76F2952CC9DFFEAE55F2225097DA" Guid="{06524C39-4D81-46A7-9AD7-B6E9288331EF}">
+            <Component Id="cmpB5AC76F2952CC9DFFEAE55F2225097DA" Guid="{9E46110B-72A7-417E-ACC8-334CFDB6D85C}">
                 <File Id="fil6AA069CB067F41A6BD8EE397FDA8959D" KeyPath="yes" Source="$(var.BasePath)\Xceed.Wpf.AvalonDock.dll" />
             </Component>
-            <Component Id="cmp2A23BAA07F6AEF1BAC39F167324A8F3A" Guid="{E49FEC5A-A091-4DC9-A42F-0D717643F478}">
+            <Component Id="cmp2A23BAA07F6AEF1BAC39F167324A8F3A" Guid="{DAD6E66C-ECB8-4B81-9415-9E9F3D66D38A}">
                 <File Id="filBC3F4C1166E0142D06933250742EA7C2" KeyPath="yes" Source="$(var.BasePath)\Xceed.Wpf.AvalonDock.Themes.Aero.dll" />
             </Component>
-            <Component Id="cmpD2BBFD2B0371F68A1185CC644A1BEA64" Guid="{EFD89BD7-2017-45A1-8CCB-E7DC9B86E42B}">
+            <Component Id="cmpD2BBFD2B0371F68A1185CC644A1BEA64" Guid="{3985EEFD-FD83-408A-BE9C-CD431C8DBA8B}">
                 <File Id="fil4DFF05E2DF20649A72E2FB5FBC3CBA2E" KeyPath="yes" Source="$(var.BasePath)\Xceed.Wpf.AvalonDock.Themes.Metro.dll" />
             </Component>
-            <Component Id="cmpFFB651FFCBD1B293A7B0FE113C056F8F" Guid="{338C828F-CC2C-44DC-AB44-B139F8F37235}">
+            <Component Id="cmpFFB651FFCBD1B293A7B0FE113C056F8F" Guid="{C10C213D-50E4-47FF-9AAB-486785B8661E}">
                 <File Id="filEFDE58C5ABCFCB31E073211560F487D2" KeyPath="yes" Source="$(var.BasePath)\Xceed.Wpf.AvalonDock.Themes.VS2010.dll" />
             </Component>
-            <Component Id="cmpC85BD7478E073743A39F17DF06865203" Guid="{3624C25F-9A1A-46D6-B34D-EC0E1ECF7A55}">
+            <Component Id="cmpC85BD7478E073743A39F17DF06865203" Guid="{B56D8454-1ACF-45E8-B635-142E44E33923}">
                 <File Id="fil3DAD59899DDA1B0FCEDF95F84CB3C475" KeyPath="yes" Source="$(var.BasePath)\Xceed.Wpf.Toolkit.dll" />
             </Component>
             <Directory Id="dir00122602D311392A9D483BE33FE17DEF" Name="app.publish">
-                <Component Id="cmpD3C9C1160018C188F0424DD414DF8F30" Guid="{1DC6EA71-6863-4495-8ADC-D46CD2036A0C}">
+                <Component Id="cmpD3C9C1160018C188F0424DD414DF8F30" Guid="{A4408BDC-5CE2-4B2E-B179-80795FABE44A}">
                     <File Id="filA280EB041CBA77EF4639BAA4AE9E694C" KeyPath="yes" Source="$(var.BasePath)\app.publish\Medical_Studio.exe" />
                 </Component>
             </Directory>
             <Directory Id="dirA0524E2C9CF04A3A4325F8351CBC8B72" Name="Configs">
-                <Component Id="cmp361443ED4A91422AF091EF1B458089CB" Guid="{1DF5B8FA-8F3C-4A14-BDBD-CB167ED8BB92}">
+                <Component Id="cmp361443ED4A91422AF091EF1B458089CB" Guid="{11A6DAB2-53D5-48C6-9DCF-E33D44DB3AFC}">
                     <File Id="fil40108A6CD60648C186B57EBF641C9BD2" KeyPath="yes" Source="$(var.BasePath)\Configs\Configs_DFM 37UX178-MLA.xml" />
                 </Component>
                 <Directory Id="dir922CE0AED790D922F726B4F65DC601B5" Name="DFM 37UX178-MLA">
-                    <Component Id="cmpC71C2D6D5CB8FA5AE0523B22CB5305E4" Guid="{34D8B5F0-7161-45B1-889A-FC867E8A57D5}">
+                    <Component Id="cmpC71C2D6D5CB8FA5AE0523B22CB5305E4" Guid="{080B08D1-973A-4272-A684-99AB1B655B56}">
                         <File Id="filC4C34F9B0B2464A14F8327440C510C84" KeyPath="yes" Source="$(var.BasePath)\Configs\DFM 37UX178-MLA\CameraConfig_0_0.xml" />
                     </Component>
-                    <Component Id="cmp63D74D1D863ED354070EF27D3E407A0B" Guid="{954554A4-B9DE-418F-A2B4-6016D28F4A03}">
+                    <Component Id="cmp63D74D1D863ED354070EF27D3E407A0B" Guid="{CC75469C-986F-4EEC-B475-A946EDE45F39}">
                         <File Id="filD1D0E05F9FB0EC19D00506596A7E92DB" KeyPath="yes" Source="$(var.BasePath)\Configs\DFM 37UX178-MLA\CameraConfig_0_1.xml" />
                     </Component>
-                    <Component Id="cmp53B0DF0B239546205758257F0C6E421F" Guid="{FD2A495D-4502-4242-8046-FE41E02A0724}">
+                    <Component Id="cmp53B0DF0B239546205758257F0C6E421F" Guid="{8CAA21A5-35FB-4C63-A386-89358915B921}">
                         <File Id="fil50F004D0C4AFC4E560491D90E018C421" KeyPath="yes" Source="$(var.BasePath)\Configs\DFM 37UX178-MLA\CameraConfig_0_2.xml" />
                     </Component>
-                    <Component Id="cmpBEBCC63F49B2B146E5DAEAB897021F2A" Guid="{460A5710-07A4-4F1D-8F58-42CF141004BF}">
+                    <Component Id="cmpBEBCC63F49B2B146E5DAEAB897021F2A" Guid="{84FFA226-A032-4457-A901-CEEC64ECFB6A}">
                         <File Id="fil09B5AE66E8D96B539B7C7090F8B7BF28" KeyPath="yes" Source="$(var.BasePath)\Configs\DFM 37UX178-MLA\CameraConfig_0_3.xml" />
                     </Component>
                 </Directory>
             </Directory>
             <Directory Id="dir242DC17B8DFC53C13CAF172FC08B730A" Name="de">
-                <Component Id="cmp5C894AE3FF956FCDDF4DFFE3BA89B9C1" Guid="{3084C5F0-4BFA-4AC2-8D40-23590471F291}">
+                <Component Id="cmp5C894AE3FF956FCDDF4DFFE3BA89B9C1" Guid="{DDD53EC4-A888-48B9-A719-5A7376F4C635}">
                     <File Id="filB1C9AEB28739722A7265C14C29D55B54" KeyPath="yes" Source="$(var.BasePath)\de\Xceed.Wpf.AvalonDock.resources.dll" />
                 </Component>
             </Directory>
             <Directory Id="dir9AE38F4F5CB5E565E774521E138F44FD" Name="es">
-                <Component Id="cmp6EFE3E0288B5FA57D98FB920AB342897" Guid="{3D6FBC59-0FEF-4849-B443-7A0DD8C32D57}">
+                <Component Id="cmp6EFE3E0288B5FA57D98FB920AB342897" Guid="{B2D062BA-EDE3-4D1C-8B10-9245C1D6CC99}">
                     <File Id="fil87AEDF35E30560161D787B0A3BF3750B" KeyPath="yes" Source="$(var.BasePath)\es\Xceed.Wpf.AvalonDock.resources.dll" />
                 </Component>
             </Directory>
             <Directory Id="dirB55DFDA91FEE7CCCBC65CA7493B75748" Name="fr">
-                <Component Id="cmp3EB7F17B0DCBDF3729FDAAAF0CF6B665" Guid="{2C8BC85C-7D48-4CAE-9822-823890F4F6EC}">
+                <Component Id="cmp3EB7F17B0DCBDF3729FDAAAF0CF6B665" Guid="{F14B9327-42C0-4787-BE9B-21B25252066D}">
                     <File Id="fil894A87B41983376BAAE165DD02D4FB6C" KeyPath="yes" Source="$(var.BasePath)\fr\Xceed.Wpf.AvalonDock.resources.dll" />
                 </Component>
             </Directory>
             <Directory Id="dir937629FDAC3D30087170D6DA46E383A6" Name="hu">
-                <Component Id="cmpFB118A47202A6B98ED49B3C952C22F35" Guid="{96EEBF29-721B-449C-88FF-5C548F304B0A}">
+                <Component Id="cmpFB118A47202A6B98ED49B3C952C22F35" Guid="{368B3501-76E2-4E2E-80D8-084F0F584C50}">
                     <File Id="fil0686FF7DCF04C68D53BD45FE0C2A8BF6" KeyPath="yes" Source="$(var.BasePath)\hu\Xceed.Wpf.AvalonDock.resources.dll" />
                 </Component>
             </Directory>
             <Directory Id="dir45DE18DD71F3E8DD6BE4A0E2B48778C8" Name="it">
-                <Component Id="cmp0B9527E49327DF46736C8F6F58634C01" Guid="{5EDA0DDB-F238-4300-8BD7-8D30EB5AE60D}">
+                <Component Id="cmp0B9527E49327DF46736C8F6F58634C01" Guid="{1FB5FE23-41DA-40EB-ABE3-C2F27BB61B92}">
                     <File Id="fil0B4AABB0E6DE194FF7BBE1F51933E675" KeyPath="yes" Source="$(var.BasePath)\it\Xceed.Wpf.AvalonDock.resources.dll" />
                 </Component>
             </Directory>
             <Directory Id="dirCF01D5040FD9778C6964A1321276CBAE" Name="Logs">
-                <Component Id="cmpAD9862D23A74A3EA543B31362584F843" Guid="{42EFF1EF-6DA8-4C57-A2BA-BA46B81DC118}">
+                <Component Id="cmpAD9862D23A74A3EA543B31362584F843" Guid="{0A2D18ED-CDBC-44F0-9CC1-F29B4E9581C5}">
                     <File Id="filAC85046BBBA30A4F8C19B7A67E2B7479" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_17_03_2022_13_59_40.txt" />
                 </Component>
-                <Component Id="cmp092F99CEB16A42A1226CA57C86BC6AC8" Guid="{DA07F017-C80A-40D3-95CA-4BB0FCA62159}">
+                <Component Id="cmp092F99CEB16A42A1226CA57C86BC6AC8" Guid="{B56755D0-8412-4B42-9C6E-FBBB2E393C89}">
                     <File Id="filCD2787829F5187917E7A9D2EB65860F0" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_10_33.txt" />
                 </Component>
-                <Component Id="cmp68D77B821AA718DB22E1C421B8C70ABA" Guid="{3BFF9961-6534-40D3-B589-4E9CE4E3D038}">
+                <Component Id="cmp68D77B821AA718DB22E1C421B8C70ABA" Guid="{717B6053-12AE-41D0-8B4B-D0CE72EFC434}">
                     <File Id="fil48B8C45DB780A550BEE69BB1EE0396B8" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_12_16.txt" />
                 </Component>
-                <Component Id="cmpB2D65CB7F268D489BFDB46AFA084C5B3" Guid="{ED2EF6CD-78B9-41C8-9550-262C380BA7CD}">
+                <Component Id="cmpB2D65CB7F268D489BFDB46AFA084C5B3" Guid="{409FE6A7-C18A-4EF2-A0A2-DC24F1342CD1}">
                     <File Id="fil8834195C839E2EC2D658CED8FA8A1021" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_16_35.txt" />
                 </Component>
-                <Component Id="cmp365080699EEEE7B6211F41337EB29D93" Guid="{4CD7684F-0441-4F98-A81C-641603DDA939}">
+                <Component Id="cmp365080699EEEE7B6211F41337EB29D93" Guid="{BDF071A3-258D-409A-BF6A-1E4877DA58C3}">
                     <File Id="fil4116B76F602F368A2384B990B9D6F1ED" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_17_31.txt" />
                 </Component>
-                <Component Id="cmp4714706227C965106D3C7BB7F54FBF8B" Guid="{4E7902FA-2AD6-4D6B-8390-FC12D925C356}">
+                <Component Id="cmp4714706227C965106D3C7BB7F54FBF8B" Guid="{A14A1593-7611-45B7-A0EE-654BB424D274}">
                     <File Id="filFD417C1D04B2A565761D0A073151A3C1" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_20_50.txt" />
                 </Component>
-                <Component Id="cmpC9A8E21E25B4476B5AB31BEDA8B72661" Guid="{956A1F29-FB87-49CB-BD4B-32A127FF31DA}">
+                <Component Id="cmpC9A8E21E25B4476B5AB31BEDA8B72661" Guid="{8DA2259A-E2B4-4701-B575-C2B3A40D6628}">
                     <File Id="fil7580C9240CB2075831F91B68EE751BA3" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_22_47.txt" />
                 </Component>
-                <Component Id="cmp1F26A9C8E118D5EF952799C28C862C8A" Guid="{187726AE-F1FB-4BF5-ACFD-9979158F1EA4}">
+                <Component Id="cmp1F26A9C8E118D5EF952799C28C862C8A" Guid="{A1E44A4D-2415-462D-8D98-961155622623}">
                     <File Id="fil6312C1548FFB744B7E8DF8EA33644419" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_26_39.txt" />
                 </Component>
-                <Component Id="cmp5050738FFF23DBB5DC850DEB6CFB24DF" Guid="{29353F97-D482-4832-988A-19EF54D27A43}">
+                <Component Id="cmp5050738FFF23DBB5DC850DEB6CFB24DF" Guid="{0496984B-157C-4328-8D9A-C8050DEAA8D7}">
                     <File Id="fil36C9E340B577DF9BDB6267563ED4929B" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_27_25.txt" />
                 </Component>
-                <Component Id="cmp2574B1D906D109ECAD2DF06A6A1205CE" Guid="{91B7CF9A-F4C7-4A84-9613-83956554E224}">
+                <Component Id="cmp2574B1D906D109ECAD2DF06A6A1205CE" Guid="{A461DC54-F317-48F9-AFD0-3FD43DB4A3C1}">
                     <File Id="filBBA5AC410721EC5DE4B78E9D773F25E8" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_29_14.txt" />
                 </Component>
-                <Component Id="cmp96596DC2F0EC5B668844C243E5B7513D" Guid="{D425ABAC-C161-41DF-9228-7EDB9C334D4F}">
+                <Component Id="cmp96596DC2F0EC5B668844C243E5B7513D" Guid="{3FB00274-147A-4FCA-95A2-F85E6360E512}">
                     <File Id="fil43E362D45AAE2948FE846AD18F384938" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_36_16.txt" />
                 </Component>
-                <Component Id="cmp12A7A80B1E638A93F86E644FE2BF428A" Guid="{1786B47D-0E91-400C-AF3E-CE155E0CB949}">
+                <Component Id="cmp12A7A80B1E638A93F86E644FE2BF428A" Guid="{6CEC7FC9-8297-483B-8658-4E683B3BC860}">
                     <File Id="filBAB2C6AA1F1F3BF2F1DACFF9951D32C6" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_41_56.txt" />
                 </Component>
-                <Component Id="cmp202E3B09BC9ABCC6F5BA31AB6BE8B382" Guid="{919BAF85-B13F-4D1F-BD79-44C6C723CD9D}">
+                <Component Id="cmp202E3B09BC9ABCC6F5BA31AB6BE8B382" Guid="{3FB5A774-E25D-43B7-A6CB-4DBB61D7ED15}">
                     <File Id="fil351DEF937C41108CFB43C320F5FE6E05" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_42_21.txt" />
                 </Component>
-                <Component Id="cmp8B4DF3C42A87B2087A06A18DE1977E24" Guid="{975E7CC6-0119-4EE0-8496-A580950E41E4}">
+                <Component Id="cmp8B4DF3C42A87B2087A06A18DE1977E24" Guid="{1596241C-B58A-4663-BFA7-12D9D105CE3B}">
                     <File Id="filA952810D5A928AE50E7A2D66313A3C2B" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_44_43.txt" />
                 </Component>
-                <Component Id="cmpEF0E89453E5F9CE60DAF607B9E376674" Guid="{ED519B70-DA1F-4B51-8208-D2EBAF4AE82B}">
+                <Component Id="cmpEF0E89453E5F9CE60DAF607B9E376674" Guid="{5EFE9CF2-B1CD-4800-BC87-9F58C1975DEC}">
                     <File Id="fil1B0121142948868B34875803FA243CAF" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_45_22.txt" />
                 </Component>
-                <Component Id="cmpB7FFD56D634D4AEC4D0E9608C9867AA4" Guid="{14126931-BCF4-4384-9C6F-5FE5B720046E}">
+                <Component Id="cmpB7FFD56D634D4AEC4D0E9608C9867AA4" Guid="{BF1C3657-F1B1-4335-9CAD-E4ACF1FCA03A}">
                     <File Id="filD4F3F3963A7BEC469CA9FB248F3711D8" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_48_35.txt" />
                 </Component>
-                <Component Id="cmpE3FAD7230D5DE5E090B75BF734380FF6" Guid="{DBD9CFC3-9707-42BA-BC71-81305D765371}">
+                <Component Id="cmpE3FAD7230D5DE5E090B75BF734380FF6" Guid="{85A85006-E41F-4EBD-A651-799C4AEBE2BD}">
                     <File Id="fil77115E5C1F9E4359D436A9828A3ECCBA" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_17_52_26.txt" />
                 </Component>
-                <Component Id="cmp4CE83125EDC387C3605836F8D61BDC24" Guid="{19796607-9870-4445-9F92-8D51BD774CE4}">
+                <Component Id="cmp4CE83125EDC387C3605836F8D61BDC24" Guid="{07965DA1-4FCA-4E95-900C-F8C6A5613067}">
                     <File Id="fil60B1B2EF9846343B3B230A656B460D00" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_18_03_07.txt" />
                 </Component>
-                <Component Id="cmp9232A00B4518CC444A2B33439B608BBF" Guid="{C3D52864-47C5-4FE0-9F82-7FFB587DABCB}">
+                <Component Id="cmp9232A00B4518CC444A2B33439B608BBF" Guid="{6EADE767-F39B-4075-96C6-47B35BBBEA2C}">
                     <File Id="fil73243FAA6A516C6BB56AFEAE671C2C7F" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_02_2022_18_28_02.txt" />
                 </Component>
-                <Component Id="cmpEE207B9D801227A89BC97AE471CE95F4" Guid="{4C628D5C-80BC-4021-A258-C8AA9DC0B089}">
+                <Component Id="cmpEE207B9D801227A89BC97AE471CE95F4" Guid="{D5B4B905-CC1D-4DC7-B21B-6253E6B199F6}">
                     <File Id="fil0289AB670C3A66B84BC2751561CAFF2A" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_06_2022_19_41_12.txt" />
                 </Component>
-                <Component Id="cmp49EBE1F7555D487D2313EC15759F28A6" Guid="{3F2B4292-8F1F-47B4-8A71-D2755EBBB08A}">
+                <Component Id="cmp49EBE1F7555D487D2313EC15759F28A6" Guid="{5548237D-8B02-48BB-8280-434EEE4E802B}">
                     <File Id="filB7F56B38F8711C7E4B9EFA746936B1AA" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_06_2022_19_42_15.txt" />
                 </Component>
-                <Component Id="cmp20163223DB0E2906169D40762AD35070" Guid="{29477BBE-2AB1-46EF-B492-386CC489EDA6}">
+                <Component Id="cmp20163223DB0E2906169D40762AD35070" Guid="{D79037D4-3FBF-4CB3-B244-95BBB9CD0506}">
                     <File Id="fil17203B7A4CF7E33AD158079826AB8F2B" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_06_2022_19_42_35.txt" />
                 </Component>
-                <Component Id="cmpE5576EEEAD87FC1019A4175C2C790A68" Guid="{0CD7540E-75C6-4F3C-86B4-5AA4277068B9}">
+                <Component Id="cmpE5576EEEAD87FC1019A4175C2C790A68" Guid="{D8C7C8E0-F4C3-45E0-A71A-4A1086D46E97}">
                     <File Id="fil80BDB9EE96A091373847C9FEB050655F" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_06_2022_19_43_25.txt" />
                 </Component>
-                <Component Id="cmp77803981186804C9D48BA7E3E54DCC9D" Guid="{41C643AC-ABA6-4486-A5FA-F9D8FEA8CF25}">
+                <Component Id="cmp77803981186804C9D48BA7E3E54DCC9D" Guid="{161CB3F7-B291-4742-B06D-59816110F1CC}">
                     <File Id="fil7754E34FB2F314BB7857A8029B7BC77E" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_06_2022_19_44_18.txt" />
                 </Component>
-                <Component Id="cmp32F759502A44CAAC8D93C8432E82A032" Guid="{5E55CF35-4DA3-4AA4-B91E-DBBC4B081A9F}">
+                <Component Id="cmp32F759502A44CAAC8D93C8432E82A032" Guid="{E55A329D-3D56-4BD7-A872-4071859B0517}">
                     <File Id="fil2E84665FA124CA9DB77DDF9CFF34497F" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_06_2022_19_45_29.txt" />
                 </Component>
-                <Component Id="cmp08B8C9939B7DD6BF2FBACD0BD474C372" Guid="{13A4EF13-1E0E-4B4B-A1A7-7C959FC7C859}">
+                <Component Id="cmp08B8C9939B7DD6BF2FBACD0BD474C372" Guid="{465D82D6-71E1-490F-9D49-0B697E94F374}">
                     <File Id="fil0EFC7A73C675039F8940D07489012249" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_22_06_2022_19_52_44.txt" />
                 </Component>
-                <Component Id="cmp6BAEC763761B8F7BE9269AA845FA99FC" Guid="{D0B5D682-D029-4726-8887-D2CDDF408BD8}">
+                <Component Id="cmp6BAEC763761B8F7BE9269AA845FA99FC" Guid="{8DCF828C-0D1B-43FB-8979-9E90592E2E8E}">
                     <File Id="fil7D06A03347421EA25BE2C839F94A6BE6" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_24_02_2022_17_59_09.txt" />
                 </Component>
-                <Component Id="cmpE39B12675BCA893E2633AB5F2BC5475B" Guid="{41768071-E41E-41DC-9444-644794EC9449}">
+                <Component Id="cmpE39B12675BCA893E2633AB5F2BC5475B" Guid="{C180C209-8DB6-4CEE-853F-34D5DC9BACA9}">
                     <File Id="fil8353DEEA21E346ED96D9397097A0297F" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_25_02_2022_16_18_49.txt" />
                 </Component>
-                <Component Id="cmpA4C74E287D79C0037E93BE5ACBC71D89" Guid="{F99208B7-2C6B-47F4-AB22-612A54B743CE}">
+                <Component Id="cmpA4C74E287D79C0037E93BE5ACBC71D89" Guid="{F25096E8-E00F-4DE6-AA64-02B263BE4819}">
                     <File Id="filB1F082171A30D83BA309D70C94D6475D" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_25_02_2022_16_45_12.txt" />
                 </Component>
-                <Component Id="cmp05B2A7AB9996AA9B8AC4902E0E3672D1" Guid="{74050562-2972-412A-9B99-9385925BF5AB}">
+                <Component Id="cmp05B2A7AB9996AA9B8AC4902E0E3672D1" Guid="{53435848-B7A4-4466-96C5-A19A08FE1170}">
                     <File Id="fil98E0EAD70AA3A776B2870D595DFF4298" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_25_02_2022_16_46_23.txt" />
                 </Component>
-                <Component Id="cmp60EBCA0B3AFC40C5D430BBE49D166C96" Guid="{91CA4C39-1647-4556-8C8D-793CDA04019D}">
+                <Component Id="cmp60EBCA0B3AFC40C5D430BBE49D166C96" Guid="{73C8CCCB-3A06-4084-85EF-48F8A6B36D0F}">
                     <File Id="fil08E5AB6DD4C6C1AA6BE2AA0B06BDA241" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_25_02_2022_16_48_14.txt" />
                 </Component>
-                <Component Id="cmp44DF60104448A433E68B6EFBD253FF88" Guid="{4B12F68B-6262-4665-99C5-31054949F500}">
+                <Component Id="cmp44DF60104448A433E68B6EFBD253FF88" Guid="{45612708-237C-40A7-91C4-F656E2C2B5AB}">
                     <File Id="filF834C7654D885D76812406733ACCD732" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_25_02_2022_16_48_56.txt" />
                 </Component>
-                <Component Id="cmpE07A63BEFCD33D0F83882BDB7CBE0C0E" Guid="{7AC6ABCF-E55B-423E-8E7B-DA782FFAF11C}">
+                <Component Id="cmpE07A63BEFCD33D0F83882BDB7CBE0C0E" Guid="{DD389B46-821B-4C44-98BC-B84B4A78A702}">
                     <File Id="fil6CFD169D67C2536923F714DC1D226576" KeyPath="yes" Source="$(var.BasePath)\Logs\Log_25_02_2022_16_49_45.txt" />
                 </Component>
             </Directory>
             <Directory Id="dir339F53F3A11C56B053FD1FEC9B438810" Name="pt-BR">
-                <Component Id="cmp78E3AC4B6177179C5F50ECB1A8B16D85" Guid="{402A3703-07D8-4E09-85BC-58C8CE8B910F}">
+                <Component Id="cmp78E3AC4B6177179C5F50ECB1A8B16D85" Guid="{F1674F7D-9294-45B8-A0A4-DBB3941669CD}">
                     <File Id="fil449CD491C0135989D68E91371269A3B8" KeyPath="yes" Source="$(var.BasePath)\pt-BR\Xceed.Wpf.AvalonDock.resources.dll" />
                 </Component>
             </Directory>
             <Directory Id="dirBD3668345143F8EFDFB86A9B73810966" Name="ro">
-                <Component Id="cmp1540E6C17030090C628A142AB815893D" Guid="{2C01BDC5-E8AE-4A1A-BD70-4E975E846946}">
+                <Component Id="cmp1540E6C17030090C628A142AB815893D" Guid="{E255F9B5-5221-4B58-B9F3-68423A639D65}">
                     <File Id="filA53F285204ABC84BDD30D704D3AD1488" KeyPath="yes" Source="$(var.BasePath)\ro\Xceed.Wpf.AvalonDock.resources.dll" />
                 </Component>
             </Directory>
             <Directory Id="dirE9205C68F964857267FD3312DBFF9A91" Name="ru">
-                <Component Id="cmp0D4BE05FC1DE55590C9709CA01911525" Guid="{CADF812F-1ABC-4357-B962-DCA08042607B}">
+                <Component Id="cmp0D4BE05FC1DE55590C9709CA01911525" Guid="{1A43BF53-C1D6-4D51-8DAC-36031A1C896F}">
                     <File Id="fil4C2ED72F2BA64BA2A890779CC3B77DA4" KeyPath="yes" Source="$(var.BasePath)\ru\Xceed.Wpf.AvalonDock.resources.dll" />
                 </Component>
             </Directory>
             <Directory Id="dir8FBB04D7AB5FE55FCF40758128EC763E" Name="sv">
-                <Component Id="cmpC21D9CCB5856693FB3CE2A23AFB7DD83" Guid="{0330238B-16BE-4CDA-ABF8-6F6A587E6751}">
+                <Component Id="cmpC21D9CCB5856693FB3CE2A23AFB7DD83" Guid="{F95B674B-1A26-4A1B-AA42-2C09E06F7E97}">
                     <File Id="fil75EA045A69F3E238DA47EBBABBF5DCD8" KeyPath="yes" Source="$(var.BasePath)\sv\Xceed.Wpf.AvalonDock.resources.dll" />
                 </Component>
             </Directory>
             <Directory Id="dir4A8DD77DBC79775EC39CACBC8AA06107" Name="zh-Hans">
-                <Component Id="cmp11A3FE50B66CC04F854A4486A5199C89" Guid="{0AC18916-A8C9-4B33-985F-AD0718A4C62C}">
+                <Component Id="cmp11A3FE50B66CC04F854A4486A5199C89" Guid="{3D944D5C-E467-47C8-8FE0-07AE96BD75FB}">
                     <File Id="fil6EE1E4B1FB2A7DF0A95E3D283E73ADFA" KeyPath="yes" Source="$(var.BasePath)\zh-Hans\Xceed.Wpf.AvalonDock.resources.dll" />
                 </Component>
             </Directory>
