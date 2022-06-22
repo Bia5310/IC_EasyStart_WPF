@@ -35,9 +35,6 @@
     <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="MedicalStudioLogo_Inst_1.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Common.wxl" />
   </ItemGroup>
   <ItemGroup>

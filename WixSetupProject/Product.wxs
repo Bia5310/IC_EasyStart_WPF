@@ -10,7 +10,7 @@
 
   <!-- Fixed upgrade Id -->
   <!--<?define UpgradeCode = "{80C1AB37-0469-4673-967F-C4E0FE68D353}" ?>-->
-  <?define UpgradeCode = "{5A851985-CB1E-4038-A2C0-698CEFDE867F}" ?>
+  <?define UpgradeCode = "{ECA9C397-88B4-423B-9B0F-496ECB7BE35D}" ?>
 
   <!-- Define main product -->
   <Product Id="$(var.ProductCode)"
