@@ -47,8 +47,9 @@ namespace Medical_Studio.ViewModels
         {
             get
             {
-                string title = String.Format("{0} {1}", NameOfApplication, System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
-                if (DeviceValid)
+                string title = NameOfApplication;
+                //string title = String.Format("{0} {1}", NameOfApplication, System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(3));
+                /*if (DeviceValid)
                 {
                     try
                     {
@@ -58,7 +59,7 @@ namespace Medical_Studio.ViewModels
                             icImagingControl.DeviceFrameRate);
                     }
                     catch (Exception) { }
-                }
+                }*/
                 return title;
             }
         }

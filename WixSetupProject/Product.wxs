@@ -9,7 +9,8 @@
   <?endif?>
 
   <!-- Fixed upgrade Id -->
-  <?define UpgradeCode = "{80C1AB37-0469-4673-967F-C4E0FE68D353}" ?>
+  <!--<?define UpgradeCode = "{80C1AB37-0469-4673-967F-C4E0FE68D353}" ?>-->
+  <?define UpgradeCode = "{5A851985-CB1E-4038-A2C0-698CEFDE867F}" ?>
 
   <!-- Define main product -->
   <Product Id="$(var.ProductCode)"
@@ -32,7 +33,8 @@
              />
 
     <!-- Downgrade error message -->
-    <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" />
+    <MajorUpgrade AllowDowngrades="yes"/>
+    <!-- DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" AllowSameVersionUpgrades="yes" AllowDowngrades="yes"-->
 
     <!-- Include .cab file into .msi file -->
     <MediaTemplate
