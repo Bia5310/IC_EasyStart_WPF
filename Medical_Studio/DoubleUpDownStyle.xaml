@@ -73,21 +73,26 @@
                                 </Style>
                             </xctk:ButtonSpinner.Style>
                             <xctk:WatermarkTextBox x:Name="PART_TextBox" AutoMoveFocus="{Binding AutoMoveFocus, RelativeSource={RelativeSource TemplatedParent}}"
-                                                                               AutoSelectBehavior="{Binding AutoSelectBehavior, RelativeSource={RelativeSource TemplatedParent}}"
-                                                                               AcceptsReturn="False" BorderThickness="0" Background="Transparent"
-                                                                               ContextMenu="{TemplateBinding ContextMenu}" Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}" FontStyle="{TemplateBinding FontStyle}" FontStretch="{TemplateBinding FontStretch}"
-                                                                               FontSize="{TemplateBinding FontSize}" FontFamily="{TemplateBinding FontFamily}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                               IsTabStop="{TemplateBinding IsTabStop}" IsUndoEnabled="True" MinWidth="20" Padding="{TemplateBinding Padding}"
-                                                                               CaretBrush="White"
-                                                                               TextAlignment="{Binding TextAlignment, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="NoWrap"
-                                                                               TabIndex="{TemplateBinding TabIndex}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}"
-                                                                               Watermark="{Binding Watermark, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                                                        AutoSelectBehavior="{Binding AutoSelectBehavior, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                        AcceptsReturn="False" BorderThickness="0" Background="Transparent"
+                                                                        ContextMenu="{TemplateBinding ContextMenu}" Foreground="{TemplateBinding Foreground}" FontWeight="{TemplateBinding FontWeight}" FontStyle="{TemplateBinding FontStyle}" FontStretch="{TemplateBinding FontStretch}"
+                                                                        FontSize="{TemplateBinding FontSize}" FontFamily="{TemplateBinding FontFamily}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                        IsTabStop="{TemplateBinding IsTabStop}" IsUndoEnabled="True" MinWidth="20" Padding="{TemplateBinding Padding}"
+                                                                        CaretBrush="White"
+                                                                        TextAlignment="{Binding TextAlignment, RelativeSource={RelativeSource TemplatedParent}}" TextWrapping="NoWrap"
+                                                                        TabIndex="{TemplateBinding TabIndex}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" WatermarkTemplate="{Binding WatermarkTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                        Watermark="{Binding Watermark, RelativeSource={RelativeSource TemplatedParent}}"/>
                         </xctk:ButtonSpinner>
 
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style.Setters>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource BrushNUD_BackgroundMouseOver}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="repeatButtons" TargetType="{x:Type RepeatButton}">

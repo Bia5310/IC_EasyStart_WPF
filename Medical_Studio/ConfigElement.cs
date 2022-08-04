@@ -13,7 +13,7 @@ namespace Medical_Studio
 
         public static readonly string DictionaryFilePattern = "Configs_{0}.xml";
 
-        public static Dictionary<string, ConfigElement> LoadConfigsDictionary(string filename)
+        public static Dictionary<string, ConfigElement> LoadConfigsDictionary(string filename, out string selectedConfig)
         {
             XmlDocument xmlDocument = new XmlDocument();
 
@@ -25,9 +25,12 @@ namespace Medical_Studio
             XmlElement xRoot = xmlDocument.DocumentElement;
 
             Dictionary<string, ConfigElement> dict = GetEmptyDictionary();// new Dictionary<string, ConfigElement>();
+            selectedConfig = "0_0";
 
             if(xRoot != null)
             {
+                selectedConfig = xRoot.GetAttribute("SelectedConfig") ?? "0_0";
+
                 foreach(XmlElement xNode in xRoot)
                 {
                     try
@@ -56,11 +59,14 @@ namespace Medical_Studio
             return dict;
         }
 
-        public static void SaveConfigsDictionary(Dictionary<string, ConfigElement> dictionary, string filename)
+        public static void SaveConfigsDictionary(Dictionary<string, ConfigElement> dictionary, string filename, string selectedConfig)
         {
             XmlDocument xmlDocument = new XmlDocument();
             xmlDocument.AppendChild(xmlDocument.CreateXmlDeclaration("1.0", "utf-8", string.Empty));
             XmlElement xRoot = xmlDocument.CreateElement("configs");
+            XmlAttribute xAttrSelectedConfig = xmlDocument.CreateAttribute("SelectedConfig");
+            xAttrSelectedConfig.Value = selectedConfig;
+            xRoot.Attributes.Append(xAttrSelectedConfig);
             xmlDocument.AppendChild(xRoot);
 
             foreach(string key in dictionary.Keys)
@@ -81,6 +87,8 @@ namespace Medical_Studio
                 xRoot.AppendChild(xNode);
             }
 
+            System.IO.FileInfo fi = new System.IO.FileInfo(filename);
+            fi.Directory.Create();
             xmlDocument.Save(filename);
         }
 

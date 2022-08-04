@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NativeFunctions", "NativeFu
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "WixSetupProject", "WixSetupProject\WixSetupProject.wixproj", "{CBEEEBDE-73BE-423E-87C1-106EE3895594}"
 EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "BootstrapperMedicalStudio", "BootstrapperMedicalStudio\BootstrapperMedicalStudio.wixproj", "{31C88B14-54B2-4520-884C-3351DF5F9AAA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,14 @@ Global
 		{CBEEEBDE-73BE-423E-87C1-106EE3895594}.Release|x64.ActiveCfg = Release|x64
 		{CBEEEBDE-73BE-423E-87C1-106EE3895594}.Release|x86.ActiveCfg = Release|x86
 		{CBEEEBDE-73BE-423E-87C1-106EE3895594}.Release|x86.Build.0 = Release|x86
+		{31C88B14-54B2-4520-884C-3351DF5F9AAA}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{31C88B14-54B2-4520-884C-3351DF5F9AAA}.Debug|x64.ActiveCfg = Debug|x86
+		{31C88B14-54B2-4520-884C-3351DF5F9AAA}.Debug|x86.ActiveCfg = Debug|x86
+		{31C88B14-54B2-4520-884C-3351DF5F9AAA}.Debug|x86.Build.0 = Debug|x86
+		{31C88B14-54B2-4520-884C-3351DF5F9AAA}.Release|Any CPU.ActiveCfg = Release|x86
+		{31C88B14-54B2-4520-884C-3351DF5F9AAA}.Release|x64.ActiveCfg = Release|x86
+		{31C88B14-54B2-4520-884C-3351DF5F9AAA}.Release|x86.ActiveCfg = Release|x86
+		{31C88B14-54B2-4520-884C-3351DF5F9AAA}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

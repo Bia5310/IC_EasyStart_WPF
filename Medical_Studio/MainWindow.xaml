@@ -29,6 +29,8 @@
         <convs:ConverterLogarithm x:Key="cvLogarithm"/>
         <convs:MultiConverterAnd x:Key="cvMultiAnd"/>
         <convs:ExposureLogConverter x:Key="myExpLogConverter"/>
+        <convs:StringEqualConverter x:Key="stringEqConverter"/>
+        <convs:KeyToPageSelectedConverter x:Key="keyToPageConverter"/>
         <Color x:Key="ColorToggleBlue">#FF1A89AA</Color>
         <Color x:Key="ColorToggleYellow">#FFBF00</Color>
         <SolidColorBrush x:Key="BrushToggleBlue" Color="{StaticResource ColorToggleBlue}"/>
@@ -178,43 +180,43 @@
                 <Expander Header="Режимы" Margin="3 5 3 3" BorderThickness="0 0 0 3" Padding="3" IsExpanded="True" Style="{DynamicResource ExpanderStyle}">
                     <StackPanel>
                         <TabControl Style="{DynamicResource TabControlStyle}">
-                            <TabItem x:Name="tabPhaco">
+                            <TabItem x:Name="tabPhaco" IsSelected="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, Converter={StaticResource keyToPageConverter}, ConverterParameter=0}">
                                 <TabItem.Header>
                                     <Viewbox MaxHeight="42">
                                         <TextBlock Text="Phaco" Margin="2"/>
                                     </Viewbox>
                                 </TabItem.Header>
-                                <StackPanel Name="stackPanelPhacoButtons"
-                                            >
+                                <StackPanel Name="stackPanelPhacoButtons">
                                     <StackPanel.IsEnabled>
                                         <MultiBinding Converter="{StaticResource cvMultiAnd}">
                                             <Binding Path="DeviceValid" UpdateSourceTrigger="PropertyChanged"/>
                                             <Binding Path="VideoCapturing" UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource myBoolInverterConverter}"/>
                                         </MultiBinding>
                                     </StackPanel.IsEnabled>
-                                    <local:RenameableToggleButton Text="Config Phaco 0"
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[0_0].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="0_0" IsChecked="False" Loaded="RenameableToggleButton_Loaded"/>
-                                    <local:RenameableToggleButton Text="Config Phaco 1" 
+                                                                  Tag="0_0" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=0_0}"/>
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[0_1].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="0_1"/>
-                                    <local:RenameableToggleButton Text="Config Phaco 2" 
+                                                                  Tag="0_1" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=0_1}"/>
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[0_2].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="0_2"/>
-                                    <local:RenameableToggleButton Text="Config Phaco 3" 
+                                                                  Tag="0_2" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=0_2}"/>
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[0_3].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="0_3"/>
+                                                                  Tag="0_3" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=0_3}"/>
                                 </StackPanel>
                             </TabItem>
-                            <TabItem x:Name="tabVitreo">
+                            <TabItem x:Name="tabVitreo"
+                                     IsSelected="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, Converter={StaticResource keyToPageConverter}, ConverterParameter=1}">
                                 <TabItem.Header>
                                     <Viewbox MaxHeight="42">
                                         <TextBlock Text="Vitreo" Margin="2"/>
@@ -227,29 +229,30 @@
                                             <Binding Path="VideoCapturing" UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource myBoolInverterConverter}"/>
                                         </MultiBinding>
                                     </StackPanel.IsEnabled>
-                                    <local:RenameableToggleButton Text="Config Vitreo 0" 
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[1_0].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="1_0"/>
-                                    <local:RenameableToggleButton Text="Config Vitreo 1" 
+                                                                  Tag="1_0" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=1_0}"/>
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[1_1].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="1_1"/>
-                                    <local:RenameableToggleButton Text="Config Vitreo 2" 
+                                                                  Tag="1_1" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=1_1}"/>
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[1_2].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="1_2"/>
-                                    <local:RenameableToggleButton Text="Config Vitreo 3" 
+                                                                  Tag="1_2" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=1_2}"/>
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[1_3].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="1_3"/>
+                                                                  Tag="1_3" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=1_3}"/>
                                 </StackPanel>
                             </TabItem>
-                            <TabItem x:Name="tabUser">
+                            <TabItem x:Name="tabUser"
+                                     IsSelected="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=OneWay, Converter={StaticResource keyToPageConverter}, ConverterParameter=2}">
                                 <TabItem.Header>
                                     <Viewbox MaxHeight="42">
                                         <TextBlock Text=" User " Margin="2"/>
@@ -262,26 +265,26 @@
                                             <Binding Path="VideoCapturing" UpdateSourceTrigger="PropertyChanged" Converter="{StaticResource myBoolInverterConverter}"/>
                                         </MultiBinding>
                                     </StackPanel.IsEnabled>
-                                    <local:RenameableToggleButton Text="Config User 0" 
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[2_0].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="2_0"/>
-                                    <local:RenameableToggleButton Text="Config User 1" 
+                                                                  Tag="2_0" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=2_0}"/>
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[2_1].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="2_1"/>
-                                    <local:RenameableToggleButton Text="Config User 2" 
+                                                                  Tag="2_1" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=2_1}"/>
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[2_2].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="2_2"/>
-                                    <local:RenameableToggleButton Text="Config User 3" 
+                                                                  Tag="2_2" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=2_2}"/>
+                                    <local:RenameableToggleButton Text="{Binding ConfigsDictionary[2_3].ConfigName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                                   ToggleButton.Checked="RenameableToggleButton_Checked" 
                                                                   ToggleButton.Unchecked="RenameableToggleButton_Unchecked"
                                                                   OnApplyChanges = "RenameableToggleButton_OnApplyChanges"
-                                                                  Tag="2_3"/>
+                                                                  Tag="2_3" IsChecked="{Binding ConfigKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource stringEqConverter}, ConverterParameter=2_3}"/>
                                 </StackPanel>
                             </TabItem>
                         </TabControl>

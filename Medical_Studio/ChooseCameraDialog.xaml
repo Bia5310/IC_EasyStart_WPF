@@ -1,0 +1,26 @@
+﻿<Window x:Class="Medical_Studio.ChooseCameraDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Medical_Studio"
+        mc:Ignorable="d" WindowStyle="ToolWindow"
+        Style="{DynamicResource WindowStyle}"
+        Title="Выбор камеры" Height="450" Width="358.036"
+        WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ListView Name="list_cameras" Margin="8" Background="Transparent">
+            
+        </ListView>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center" Margin="5">
+            <Button Style="{DynamicResource ButtonStyle}" Width="90" Content="Выбрать" x:Name="btn_select" Margin="2"/>
+            <Button Style="{DynamicResource ButtonStyle}" Width="90" Content="Отмена" x:Name="btn_cancel" Margin="2"/>
+        </StackPanel>
+    </Grid>
+</Window>

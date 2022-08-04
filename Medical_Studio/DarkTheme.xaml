@@ -6,6 +6,7 @@
     <Color x:Key="MainFont">#FFFFFF</Color>
     <Color x:Key="YellowDark">#FFFFD556</Color>
     <Color x:Key="DarkBlue1Color">#FF1A89AA</Color>
+    <Color x:Key="DarkBlue3Color">#FF0A7491</Color>
     <Color x:Key="DarkBlue2Color">#FF133A46</Color>
     
     <SolidColorBrush x:Key="MainFontBrush" Color="{StaticResource MainFont}"/>
@@ -23,6 +24,7 @@
     <SolidColorBrush x:Key="BrushNUD_Signes" Color="White"/>
     <SolidColorBrush x:Key="BrushNUD_Borders" Color="White"/>
     <SolidColorBrush x:Key="BrushNUD_BackgroundStock" Color="{StaticResource DarkBlue1Color}"/>
+    <SolidColorBrush x:Key="BrushNUD_BackgroundMouseOver" Color="{StaticResource DarkBlue3Color}"/>
     <SolidColorBrush x:Key="BrushNUD_BackgroundSelected" Color="{StaticResource DarkBlue2Color}"/>
     <SolidColorBrush x:Key="BrushNUD_Foreground" Color="White"/>
     <SolidColorBrush x:Key="BrushTextBox_Foreground" Color="White"/>

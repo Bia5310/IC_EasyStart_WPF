@@ -285,10 +285,37 @@ namespace Medical_Studio
                 //Set Zoom Factor
                 SetLiveDisplayZoomFactor((float)mainViewModel.Scale);
             }
-            /*if(e.PropertyName == nameof(mainViewModel.ConfigKey))
+            if(e.PropertyName == nameof(mainViewModel.ConfigKey))
             {
-                mainViewModel.LoadCurrentCameraConfig();
-            }*/
+                //mainViewModel.LoadCurrentCameraConfig();
+                /*noEvents = true;
+
+                for(int i = 0; i < renameableButtonsConfigs.Count; i++)
+                {
+                    if((string)renameableButtonsConfigs[i].Tag == mainViewModel.ConfigKey)
+                    {
+                        renameableButtonsConfigs[i].IsChecked = true;
+                        if(stackPanelUserConfigs.Children.Contains(renameableButtonsConfigs[i]))
+                        {
+                            tabUser.IsSelected = true;
+                        }
+                        else if(stackPanelPhacoButtons.Children.Contains(renameableButtonsConfigs[i]))
+                        {
+                            tabPhaco.IsSelected = true;
+                        }
+                        else if(stackPanelVitreoButtons.Children.Contains(renameableButtonsConfigs[i]))
+                        {
+                            tabVitreo.IsSelected = true;
+                        }
+                    }
+                    else
+                    {
+                        renameableButtonsConfigs[i].IsChecked = false;
+                    }
+                }
+
+                noEvents = false;*/
+            }
         }
 
         private void SetLiveDisplayZoomFactor(float zoomFactor)
@@ -369,7 +396,34 @@ namespace Medical_Studio
 
         private void TryOpenCamera()
         {
-            mainViewModel.OpenCamera();
+            string lastDevice = Settings.Default.LastDevice;
+            var lastDevices = mainViewModel.FindLastConnectedCameraConfigs();
+            var devices = mainViewModel.ICImagingControl.Devices;
+
+            if (devices.Length == 1)
+            {
+                bool deviceInList = false;
+                for (int i = 0; i < lastDevices.Count; i++)
+                {
+                    if (devices[0].Name == lastDevices[i])
+                    {
+                        deviceInList = true;
+                        break;
+                    }
+                }
+                if(deviceInList)
+                {
+                    mainViewModel.OpenCamera(devices[0]);
+                }
+                else
+                {
+                    mainViewModel.ShowDevicePropsDialog();
+                }
+            }
+            else if(devices.Length > 1)
+            {
+                mainViewModel.ShowDevicePropsDialog();
+            }
         }
 
         private void WhenDeviceOpened()
@@ -406,7 +460,7 @@ namespace Medical_Studio
         private bool noEvents = false;
         public void Init_ListOf_CheckButtons()
         {
-            noEvents = true;
+            /*noEvents = true;
             RenameableToggleButton rtb = null;
             for (int i = 0; i < stackPanelPhacoButtons.Children.Count; i++)
             {
@@ -443,7 +497,7 @@ namespace Medical_Studio
                     tabUser.Focus();
                 }
             }
-            noEvents = false;
+            noEvents = false;*/
         }
 
         public double GetScalingFactor_ofMonitor()
@@ -482,10 +536,17 @@ namespace Medical_Studio
         {
             try
             {
-                mainViewModel.CloseDevice();
                 mainViewModel.SaveSettings();
             }
-            catch(Exception ex) { }
+            catch (Exception) { }
+            try
+            {
+                mainViewModel.CloseDevice();
+                
+            }
+            catch(Exception ex) { 
+            
+            }
         }
 
         private void Load_FlipState()
@@ -1182,20 +1243,20 @@ namespace Medical_Studio
 
                     //Timer_camera_checker.Start();
                     //WhenDeviceOpened();
+                    
+                    //Uncheck prvious
+                    for (int i = 0; i < renameableButtonsConfigs.Count; i++)
+                    {
+                        if (renameableButtonsConfigs[i] != toggleButton && renameableButtonsConfigs[i].toggleButon.IsChecked == true)
+                        {
+                            renameableButtonsConfigs[i].toggleButon.IsChecked = false;
+                        }
+                    }
                 }
                 catch(Exception exc)
                 {
                     FLog.Log("Ошибка при переключении конфигураций");
                 }
-
-            //Uncheck prvious
-            for (int i = 0; i < renameableButtonsConfigs.Count; i++)
-            {
-                if(renameableButtonsConfigs[i] != toggleButton && renameableButtonsConfigs[i].toggleButon.IsChecked == true)
-                {
-                    renameableButtonsConfigs[i].toggleButon.IsChecked = false;
-                }
-            }
         }
 
         private void RenameableToggleButton_Unchecked(object sender, RoutedEventArgs e)

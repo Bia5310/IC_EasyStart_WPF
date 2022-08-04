@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Bundle Name="BootstrapperMedicalStudio" Version="1.0.0.0" Manufacturer="Manufacturer" UpgradeCode="31c88b14-54b2-4520-884c-3351df5f9aaa">
+		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense" />
+
+		<Chain>
+			<!-- TODO: Define the list of chained packages. -->
+			<!-- <MsiPackage SourceFile="path\to\your.msi" /> -->
+      <MsiPackage SourceFile="..\WixSetupProject\Installs\MedicalStudioInstaller-2.8.8250.39999-Release-x64.msi"/>
+		</Chain>
+	</Bundle>
+</Wix>

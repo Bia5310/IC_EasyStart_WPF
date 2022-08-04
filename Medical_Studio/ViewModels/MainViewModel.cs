@@ -98,7 +98,9 @@ namespace Medical_Studio.ViewModels
                     {
                         if(device.Name == lostedDevice)
                         {
-                            OpenCamera();
+                            OpenCamera(lostedDevice);
+                            //icImagingControl.Device = lostedDevice;
+                            deviceLost = false;
                         }
                     }
                 }
@@ -473,21 +475,16 @@ namespace Medical_Studio.ViewModels
 
         public void PauseVideoCapturing(bool pause)
         {
-            if(DeviceValid)
-                if(videoSinkListener != null)
+            if (DeviceValid)
+            {
+                if (videoSinkListener != null)
                 {
                     videoSinkListener.Pause = pause;
-                    
+
                     videoOnPause = videoSinkListener.Pause;
                     OnPropertyChanged("VideoOnPause");
                 }
-                /*if(mediaStreamSink != null)
-                {
-                    mediaStreamSink.SinkModeRunning = !pause;
-
-                    videoOnPause = !mediaStreamSink.SinkModeRunning;
-                    OnPropertyChanged("VideoOnPause");
-                }*/
+            }
         }
 
         private readonly string codecsFileName = "codecSettings.bin";
@@ -548,6 +545,9 @@ namespace Medical_Studio.ViewModels
             get => configKey;
             set
             {
+                /*if (configKey == "")
+                    return;*/
+
                 configKey = value;
                 LoadCurrentCameraConfig();
                 OnPropertyChanged("ConfigKey");
@@ -598,10 +598,10 @@ namespace Medical_Studio.ViewModels
             Settings.Default.VideoPath = VideoFileInfo;
             Settings.Default.PhotoPath = PhotoFileInfo;
             
-            Settings.Default.AviCompressorName = aviCompressor?.Name ?? "";
-            Settings.Default.MediaContainerID = mediaStreamContainer?.ID ?? new Guid();
+            //Settings.Default.AviCompressorName = aviCompressor?.Name ?? "";
+            //Settings.Default.MediaContainerID = mediaStreamContainer?.ID ?? new Guid();
 
-            Settings.Default.LastConfigKey = configKey;
+            //Settings.Default.LastConfigKey = configKey;
 
             if(encoder != null)
             {
@@ -612,8 +612,8 @@ namespace Medical_Studio.ViewModels
 
             Settings.Default.Save();
 
-            if(icImagingControl.Device != null && icImagingControl.Device != "")
-                SaveConfigsDictionary(icImagingControl.Device);
+            if (icImagingControl.Device != null && icImagingControl.Device != "")
+                SaveCurrentCameraConfig();// SaveConfigsDictionary(icImagingControl.Device);
         }
 
         public bool LoadCurrentCameraConfig()
@@ -653,11 +653,35 @@ namespace Medical_Studio.ViewModels
             return true;
         }
 
+        public List<string> FindLastConnectedCameraConfigs()
+        {
+            List<string> cameraConfigs = new List<string>();
+
+            System.IO.DirectoryInfo dirInfo = new DirectoryInfo(CameraConfigsFolder);
+            if (!dirInfo.Exists)
+                return cameraConfigs;
+
+            var fileInfos = dirInfo.GetFiles();
+
+            for(int i = 0; i < fileInfos.Length; i++)
+            {
+                if (fileInfos[i].Extension.ToLower() == ".xml" && fileInfos[i].Name.StartsWith("Configs_"))
+                {
+                    string cameraName = fileInfos[i].Name.Substring(8, fileInfos[i].Name.Length - 12);
+                    cameraConfigs.Add(cameraName);
+                }
+            }
+
+            return cameraConfigs;
+        }
+
         public void SaveCurrentCameraConfig()
         {
             if (icImagingControl == null)
                 return;
             if (!DeviceValid)
+                return;
+            if(configKey == null || configKey == "")
                 return;
 
             bool wasLive = IsLive;
@@ -682,12 +706,14 @@ namespace Medical_Studio.ViewModels
         {
             try
             {
-                ConfigsDictionary = ConfigElement.LoadConfigsDictionary(String.Format(CameraConfigsFolder + "/" + ConfigElement.DictionaryFilePattern, cameraName));
+                ConfigsDictionary = ConfigElement.LoadConfigsDictionary(String.Format(CameraConfigsFolder + "/" + ConfigElement.DictionaryFilePattern, cameraName), out configKey);
             }
             catch(Exception)
             {
                 NewConfigsDictionary();
+                configKey = "0_0";
             }
+            OnPropertyChanged(nameof(ConfigKey));
         }
 
         private void NewConfigsDictionary()
@@ -700,27 +726,29 @@ namespace Medical_Studio.ViewModels
             get => icImagingControl?.DeviceValid ?? false;
         }
 
-        public bool OpenCamera()
+        public bool OpenCamera(string device)
         {
             if (icImagingControl.DeviceValid)
             {
                 CloseDevice();
             }
 
-            string lastDevice = Settings.Default.LastDevice;
-
             bool deviceInList = false;
             for(int i = 0; i < icImagingControl.Devices.Length; i++)
             {
-                if (icImagingControl.Devices[i].Name == lastDevice)
+                if (icImagingControl.Devices[i].Name == device)
+                {
                     deviceInList = true;
+                    break;
+                }
             }
 
             if(deviceInList)
             {
                 //поиск и загрузка всех пресетов камеры, затем загр. конкретный пресет
-                LoadConfigsDictionary(lastDevice);
-                ConfigKey = Settings.Default.LastConfigKey;                 //LoadCurrentCameraConfig();
+                LoadConfigsDictionary(device);
+                //ConfigKey = Settings.Default.LastConfigKey;                 //LoadCurrentCameraConfig();
+                //OnPropertyChanged(nameof(ConfigKey));
             }
 
             if (!DeviceValid || !deviceInList)
@@ -730,7 +758,10 @@ namespace Medical_Studio.ViewModels
 
             if(DeviceValid)
             {
+                Settings.Default.LastDevice = device;
+                Settings.Default.Save();
                 deviceLost = false;
+                CameraOpened();
                 StartLive();
             }
 
@@ -764,13 +795,14 @@ namespace Medical_Studio.ViewModels
         public void ShowDevicePropsDialog()
         {
             //bool wasLive = IsLive;
-
-            IsLive = false;
-            SaveCurrentCameraConfig();
+            //IsLive = false;
+            //SaveCurrentCameraConfig();
 
             string wasDevice = icImagingControl.Device;
 
-            icImagingControl.ShowDeviceSettingsDialog(WindowHandle);
+            CloseDevice();
+
+            var result = icImagingControl.ShowDeviceSettingsDialog(WindowHandle);
 
             if (DeviceValid)
             {
@@ -779,6 +811,7 @@ namespace Medical_Studio.ViewModels
                     LoadConfigsDictionary(icImagingControl.Device);
                     
                     configKey = "0_0";
+
                     if(!LoadCurrentCameraConfig())
                     {
                         SaveCurrentCameraConfig();
@@ -885,6 +918,7 @@ namespace Medical_Studio.ViewModels
 
             updatePropertiesTimer.Stop();
             DeinitCameraProperties();
+            deviceLost = false;
         }
 
         private bool deviceLost = false;
@@ -932,7 +966,7 @@ namespace Medical_Studio.ViewModels
 
         public void SaveConfigsDictionary(string cameraName)
         {
-            ConfigElement.SaveConfigsDictionary(ConfigsDictionary, String.Format(CameraConfigsFolder + "/" + ConfigElement.DictionaryFilePattern, cameraName));
+            ConfigElement.SaveConfigsDictionary(ConfigsDictionary, String.Format(CameraConfigsFolder + "/" + ConfigElement.DictionaryFilePattern, cameraName), configKey);
         }
         
         private void InitCameraProperties()

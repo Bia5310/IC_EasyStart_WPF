@@ -153,6 +153,9 @@
     <Compile Include="Capture\ISnapFrame.cs" />
     <Compile Include="Capture\MediaWriter.cs" />
     <Compile Include="Capture\SnapSinkListener.cs" />
+    <Compile Include="ChooseCameraDialog.xaml.cs">
+      <DependentUpon>ChooseCameraDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CodecSettings.xaml.cs">
       <DependentUpon>CodecSettings.xaml</DependentUpon>
     </Compile>
@@ -161,6 +164,7 @@
       <DependentUpon>ConfigureEncoder.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\ExposureLogConverter.cs" />
+    <Compile Include="Converters\KeyToPageSelectedConverter.cs" />
     <Compile Include="Converters\MultiConverterAnd.cs" />
     <Compile Include="Converters\MultiplyConverter.cs" />
     <Compile Include="Converters\BoolToRedColorConverter.cs" />
@@ -169,6 +173,7 @@
     <Compile Include="Converters\InverseBoolConverter.cs" />
     <Compile Include="Converters\PercentConverter.cs" />
     <Compile Include="Converters\RangeMultiConverter.cs" />
+    <Compile Include="Converters\StringEqualConverter.cs" />
     <Compile Include="HotKeyLib.cs" />
     <Compile Include="InfoWindow.xaml.cs">
       <DependentUpon>InfoWindow.xaml</DependentUpon>
@@ -189,6 +194,10 @@
     <Compile Include="Viewport\ViewportControl.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Viewport\ViewportDrawingVisual.cs" />
+    <Page Include="ChooseCameraDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CodecSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
