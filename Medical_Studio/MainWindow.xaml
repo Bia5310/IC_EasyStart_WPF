@@ -162,9 +162,11 @@
                                  Style="{DynamicResource TextBoxSytle}"
                                  TextChanged="TB_FIO_TextChanged"
                                  PreviewTextInput="TB_FIO_PreviewTextInput"
+                                 KeyDown="TextBox_KeyDown"
                                  Text="{Binding FIOString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                         <TextBlock Text="Дата" Margin="2"/>
                         <TextBox Tag="Введите дату" Margin="5 2 5 2" Padding="2" 
+                                 KeyDown="TextBox_KeyDown"
                                  Style="{DynamicResource TextBoxSytle}" x:Name="TB_CurrentDate" 
                                  TextChanged="TB_CurrentDate_TextChanged"
                                  PreviewTextInput="TB_CurrentDate_PreviewTextInput"
@@ -174,6 +176,7 @@
                                  TextChanged="TB_HistoryNumber_TextChanged"
                                  Tag="Введите № истории болезни"
                                  PreviewTextInput="TB_HistoryNumber_PreviewTextInput"
+                                 KeyDown="TextBox_KeyDown"
                                  Text="{Binding HistoryNumberString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                     </StackPanel>
                 </Expander>
@@ -568,7 +571,7 @@
             
         </Grid>
 
-        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Width="6" HorizontalAlignment="Center" Margin="0 2 0 2" 
+        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" Width="8" HorizontalAlignment="Center" Margin="0" 
                       Style="{DynamicResource SplitterStyle}"
                       x:Name="gridSplitter_left"/>
 

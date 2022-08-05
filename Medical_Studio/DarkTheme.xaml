@@ -7,8 +7,10 @@
     <Color x:Key="YellowDark">#FFFFD556</Color>
     <Color x:Key="DarkBlue1Color">#FF1A89AA</Color>
     <Color x:Key="DarkBlue3Color">#FF0A7491</Color>
-    <Color x:Key="DarkBlue2Color">#FF133A46</Color>
-    
+    <Color x:Key="DarkBlue2Color">#FF1B5060</Color>
+    <Color x:Key="DarkBlueSelectionColor">#FFFFD556</Color>
+
+    <SolidColorBrush x:Key="SelectionBrush" Color="{DynamicResource YellowDark}"/>
     <SolidColorBrush x:Key="MainFontBrush" Color="{StaticResource MainFont}"/>
     <SolidColorBrush x:Key="DarkBlue1Brush" Color="{StaticResource DarkBlue1Color}"/>
     <SolidColorBrush x:Key="DarkBlue2Brush" Color="{StaticResource DarkBlue2Color}"/>
@@ -539,6 +541,7 @@
 
     <Style x:Key="TextBoxSytle" TargetType="TextBox">
         <Style.Setters>
+            <Setter Property="SelectionBrush" Value="{DynamicResource SelectionBrush}"/>
             <Setter Property="Background" Value="{StaticResource DarkBlue1Brush}"/>
             <Setter Property="BorderBrush" Value="White"/>
             <Setter Property="Foreground" Value="White"/>
@@ -567,6 +570,9 @@
             </Setter>
         </Style.Setters>
         <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource BrushNUD_BackgroundMouseOver}"/>
+            </Trigger>
             <Trigger Property="IsFocused" Value="True">
                 <Setter Property="Background" Value="{StaticResource DarkBlue2Brush}"/>
             </Trigger>

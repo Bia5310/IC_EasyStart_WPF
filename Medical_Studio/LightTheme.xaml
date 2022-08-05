@@ -1,13 +1,15 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:Medical_Studio">
+                    xmlns:local="clr-namespace:Medical_Studio"
+                    xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit">
     <Style x:Key="WindowStyle" TargetType="Window">
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="WhiteSmoke"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="BorderBrush" Value="#419FD9"/>
     </Style>
 
     <SolidColorBrush x:Key="Brush_Borders" Color="Yellow"/>
+    <SolidColorBrush x:Key="SelectionBrush" Color="#9F9F9F"/>
 
     <Color x:Key="MainFont">#000000</Color>
     <SolidColorBrush x:Key="MainFontBrush" Color="{StaticResource MainFont}"/>
@@ -40,6 +42,7 @@
     <SolidColorBrush x:Key="SliderBrushFill" Color="{StaticResource DarkBlue2Color}"/>
     <SolidColorBrush x:Key="BrushButtonBorderStock" Color="Gray"/>
 
+    <SolidColorBrush x:Key="BrushNUD_BackgroundMouseOver" Color="#F7F7F7"/>
     <SolidColorBrush x:Key="DisabledForegroundBrush" Color="#888" />
     <SolidColorBrush x:Key="GlyphBrush" Color="#444" />
     <SolidColorBrush x:Key="NormalBrush" Color="#888" />
@@ -67,7 +70,7 @@
             <Setter Property="Background" Value="#FF4FA7DE"/>
         </Style.Setters>
     </Style>
-    
+
     <Style x:Key="CheckBoxSimpleStyle" TargetType="CheckBox">
         <Style.Setters>
             <Setter Property="Foreground" Value="Black"/>
@@ -136,7 +139,6 @@
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" TargetName="Border" Value="0.35"/>
                             </Trigger>
-
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -154,6 +156,7 @@
     <Style x:Key="TextBoxSytle" TargetType="TextBox">
         <Style.Setters>
             <Setter Property="Background" Value="WhiteSmoke"/>
+            <Setter Property="SelectionBrush" Value="{DynamicResource SelectionBrush}"/>
             <Setter Property="BorderBrush" Value="Gray"/>
             <Setter Property="Foreground" Value="Black"/>
             <Setter Property="Template">
@@ -181,6 +184,9 @@
             </Setter>
         </Style.Setters>
         <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#FAFAFA"/>
+            </Trigger>
             <Trigger Property="IsFocused" Value="True">
                 <Setter Property="Background" Value="White"/>
             </Trigger>

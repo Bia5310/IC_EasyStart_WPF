@@ -3,9 +3,9 @@
 
   <!-- Give product a unique ID per platform -->
   <?if $(var.Platform)=x64 ?>
-  <?define ProductCode = "{C5CA3BE7-FB18-43C0-88A6-AB9F27552633}" ?>
+  <?define ProductCode = "{4A51C1BF-1608-484B-B971-3AE130A29471}" ?>
   <?else?>
-  <?define ProductCode = "{BEBA2815-67DA-46D4-BD3D-0A11E6CF7845}" ?>
+  <?define ProductCode = "{D8EA48E5-8D8E-4180-A695-029A685CA282}" ?>
   <?endif?>
 
   <!-- Fixed upgrade Id -->
@@ -41,7 +41,7 @@
       EmbedCab="yes"/>
 
     <!-- Define main app icon -->
-    <Icon Id="icon.ico" SourceFile="..\Medical_Studio\MedicalStudioLogo_2.ico" />
+    <Icon Id="icon.ico" SourceFile="..\Medical_Studio\Icons\MedicalStudioLogo_2.ico" />
 
     <!-- Use the icon.ico icon for this installer (shows up in Add/Remove programs) -->
     <Property Id="ARPPRODUCTICON">icon.ico</Property>

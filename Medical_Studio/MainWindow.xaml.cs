@@ -420,7 +420,7 @@ namespace Medical_Studio
                     mainViewModel.ShowDevicePropsDialog();
                 }
             }
-            else if(devices.Length > 1)
+            else
             {
                 mainViewModel.ShowDevicePropsDialog();
             }
@@ -1539,6 +1539,20 @@ namespace Medical_Studio
                 InfoWindow info = new InfoWindow();
                 info.Owner = this;
                 info.ShowDialog();
+            }
+            catch (Exception) { }
+        }
+
+        private void TextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                TextBox tb = sender as TextBox;
+                if (e.Key == Key.Enter)
+                {
+                    
+                    tb.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+                }
             }
             catch (Exception) { }
         }

@@ -91,7 +91,8 @@
     <DefineConstants>X64</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>MedicalStudioLogo_2.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>4A6722F1739CE4238E5D118B98E217132910E401</ManifestCertificateThumbprint>
@@ -330,12 +331,6 @@
     <Resource Include="Icons\MedicalStudioLogo.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="MedicalStudioLogo.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="MedicalStudioLogo_2.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Icons\MedicalStudioLogo_2.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -352,9 +347,6 @@
     <Resource Include="Images\InfoIcon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="MedicalStudioLogo_Inst_1.ico" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">

@@ -8,6 +8,7 @@ using MediaFoundation;
 using System.Diagnostics;
 using static Medical_Studio.NativeFunctions;
 using System.Windows.Media.Imaging;
+using System.Runtime.InteropServices;
 
 namespace Medical_Studio.Capture
 {
@@ -210,6 +211,8 @@ namespace Medical_Studio.Capture
                 hr = sinkWriter.WriteSample(streamIndex, sample);
             }
 
+            Marshal.ReleaseComObject(sample);
+            
             inProcess = false;
         }
 
