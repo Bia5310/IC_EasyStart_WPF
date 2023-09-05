@@ -10,6 +10,7 @@
 
   <!-- Fixed upgrade Id -->
   <!--<?define UpgradeCode = "{80C1AB37-0469-4673-967F-C4E0FE68D353}" ?>-->
+  <!--<?define UpgradeCode = "{A97F80B4-24F1-422E-AC9D-475FC68152C5}" ?>-->
   <?define UpgradeCode = "{A97F80B4-24F1-422E-AC9D-475FC68152C5}" ?>
 
   <!-- Define main product -->
@@ -33,7 +34,7 @@
              />
 
     <!-- Downgrade error message -->
-    <MajorUpgrade AllowDowngrades="yes"/>
+    <MajorUpgrade AllowDowngrades="yes" />
     <!-- DowngradeErrorMessage="!(loc.DowngradeErrorMessage)" AllowSameVersionUpgrades="yes" AllowDowngrades="yes"-->
 
     <!-- Include .cab file into .msi file -->

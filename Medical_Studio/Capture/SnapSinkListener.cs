@@ -26,7 +26,7 @@ namespace Medical_Studio.Capture
                 imageSnaped = false;
                 
                 bitmapImage = frame.CreateBitmapCopy();
-
+                
                 imageSnaped = true;
             }
         }

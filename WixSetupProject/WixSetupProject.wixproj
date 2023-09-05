@@ -8,6 +8,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <OutputName>MedicalStudioInstaller-$(Configuration)-$(Platform)</OutputName>
     <OutputType>Package</OutputType>
+    <RunWixToolsOutOfProc Condition=" '$(PROCESSOR_ARCHITECTURE)'!='x86' ">true</RunWixToolsOutOfProc>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Platform)\$(Configuration)\</OutputPath>
@@ -57,7 +58,7 @@
       <DefineConstants>BuildVersion=%(AssemblyVersion.Version);BasePath=..\Medical_Studio\bin\$(Platform)\$(Configuration)</DefineConstants>
     </PropertyGroup>
     <!-- Harvest file components from publish folder -->
-    <HeatDirectory OutputFile="ComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="PublishedComponents" SuppressCom="true" Directory="..\Medical_Studio\bin\$(Platform)\$(Configuration)" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" />
+    <HeatDirectory RunAsSeparateProcess="$(RunWixToolsOutOfProc)" OutputFile="ComponentsGenerated.wxs" DirectoryRefId="INSTALLFOLDER" ComponentGroupName="PublishedComponents" SuppressCom="true" Directory="..\Medical_Studio\bin\$(Platform)\$(Configuration)" SuppressFragments="true" SuppressRegistry="true" SuppressRootDirectory="true" AutoGenerateGuids="false" GenerateGuidsNow="true" ToolPath="$(WixToolPath)" PreprocessorVariable="var.BasePath" />
   </Target>
   <Target Name="AfterBuild">
     <!-- Get assembly version -->
