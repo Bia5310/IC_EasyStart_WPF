@@ -16,7 +16,7 @@ using System.Management;
 
 namespace Medical_Studio.FootSwitch
 {
-    public enum Keys : int { None = 0, Alt = 56, P = 25 };
+    public enum Keys : int { None = 0, LAlt = 56, LCtrl = 29, P = 25, G = 34 };
 
     public enum ClickType : int { None = 0, Short = 1, Long = 2, DoubleShort = 3,
                                   LongShort = 4, ShortLong = 5, DoubleLong = 6 };
@@ -115,8 +115,8 @@ namespace Medical_Studio.FootSwitch
             get => keyPressed;
         }
 
-        private int sysKey = (int)Keys.Alt;
-        private int key = (int)Keys.P;
+        private int sysKey = (int)Keys.LCtrl;
+        private int key = (int)Keys.G;
 
         public int SysKey => sysKey;
         public int Key => key;
@@ -149,7 +149,7 @@ namespace Medical_Studio.FootSwitch
 
         private void KeyDown(GlobalKeyboardHookEventArgs e)
         {
-            if(e.KeyboardData.HardwareScanCode ==  (int)Keys.Alt)
+            if(e.KeyboardData.HardwareScanCode ==  (int)sysKey)
             {
                 if (!sysPressed)
                 {

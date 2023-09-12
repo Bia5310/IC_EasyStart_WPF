@@ -178,5 +178,17 @@ namespace Medical_Studio {
                 this["IsLightTheme"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool MuteSounds {
+            get {
+                return ((bool)(this["MuteSounds"]));
+            }
+            set {
+                this["MuteSounds"] = value;
+            }
+        }
     }
 }

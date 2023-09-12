@@ -122,6 +122,17 @@ namespace Medical_Studio.ViewModels
             catch (Exception) { }
         }
 
+        private bool muteSounds = false;
+        public bool MuteSounds
+        {
+            get => muteSounds;
+            set
+            {
+                muteSounds = value;
+                OnPropertyChanged(nameof(MuteSounds));
+            }
+        }
+
         private AviCompressor aviCompressor = null;
         public AviCompressor AviCompressor
         {
@@ -573,6 +584,7 @@ namespace Medical_Studio.ViewModels
             FIOString = Settings.Default.FIO;
 
             IsLightTheme = Settings.Default.IsLightTheme;
+            MuteSounds = Settings.Default.MuteSounds;
 
             if (Settings.Default.VideoPath != "")
                 VideoFileInfo = Settings.Default.VideoPath;
@@ -592,6 +604,7 @@ namespace Medical_Studio.ViewModels
             Settings.Default.Date = DateString;
             Settings.Default.HistoryNumber = HistoryNumberString;
             Settings.Default.FIO = FIOString;
+            Settings.Default.MuteSounds = MuteSounds;
 
             Settings.Default.IsLightTheme = IsLightTheme;
 

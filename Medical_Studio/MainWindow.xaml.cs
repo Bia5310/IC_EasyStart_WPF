@@ -24,6 +24,8 @@ using System.Runtime.ExceptionServices;
 using System.Windows.Interop;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Medical_Studio.FootSwitch;
+using System.Media;
 
 namespace Medical_Studio
 {
@@ -79,6 +81,14 @@ namespace Medical_Studio
 
         ViewModels.MainViewModel mainViewModel = null;
 
+        private FootSwitch.FootSwitch footSwitch = null;
+
+        private static SoundPlayer photoSoundPlayer = new SoundPlayer();
+        private static SoundPlayer videoStartSoundPlayer = new SoundPlayer();
+        private static SoundPlayer videoStopSoundPlayer = new SoundPlayer();
+        private static SoundPlayer pauseSoundPlayer = new SoundPlayer();
+        private static SoundPlayer continueSoundPlayer = new SoundPlayer();
+
         //Timers
         DispatcherTimer TimerForRenew = null;
         DispatcherTimer WhiteBalanceTimer = null;
@@ -110,6 +120,22 @@ namespace Medical_Studio
         IntPtr windowHandle = IntPtr.Zero;
 
         private GlobalKeyboardHook globalKeyboardHook = new GlobalKeyboardHook();
+
+        static MainWindow()
+        {
+            try
+            {
+                photoSoundPlayer.Stream = Properties.Resources.take_photo;
+                videoStartSoundPlayer.Stream = Properties.Resources.start_video;
+                videoStopSoundPlayer.Stream = Properties.Resources.stop_video;
+                pauseSoundPlayer.Stream = Properties.Resources.pause_toggle;
+                continueSoundPlayer.Stream = Properties.Resources.continueVideo;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка при загрузке звуков");
+            }
+        }
 
         public MainWindow()
         {
@@ -175,7 +201,7 @@ namespace Medical_Studio
             VideoPauseCommand.InputGestures.Add(new KeyGesture(Key.P, ModifierKeys.Alt));
             VideoStopCommand.InputGestures.Add(new KeyGesture(Key.S, ModifierKeys.Alt));
             TakePhotoCommand.InputGestures.Add(new KeyGesture(Key.I, ModifierKeys.Alt));
-
+            
             /*CommandBindings.Add(new CommandBinding(FullScreenRoutedCommand, FullScreenSwitchKey));
             CommandBindings.Add(new CommandBinding(QuiteRoutedCommand, QuiteKey));
             CommandBindings.Add(new CommandBinding(CRoutedCommand, CodecPropKey));
@@ -209,6 +235,40 @@ namespace Medical_Studio
             {
                 MessageBox.Show(ex.ToString());
             }
+
+            try
+            {
+                footSwitch = new FootSwitch.FootSwitch();
+                footSwitch.OnClickResult += FootSwitch_OnClickResult;
+            }
+            catch { }
+        }
+
+        private void FootSwitch_OnClickResult(ClickType clickType, DateTime clickTime)
+        {
+            try
+            {
+                if (clickType == ClickType.Short)
+                {
+                    commandTakePhotoMethod(null, null);
+                }
+                else if(clickType == ClickType.Long)
+                {
+                    if (mainViewModel.VideoCapturing)
+                        commandStopVideoMethod(null, null);
+                    else
+                        commandRecordVideoMethod(null, null);
+                }
+                else if(clickType == ClickType.DoubleShort)
+                {
+                    commandPauseVideoMethod(null, null);
+                }
+                else if(clickType == ClickType.DoubleLong)
+                {
+                    //commandStopVideoMethod(null, null);
+                }
+            }
+            catch { }
         }
 
         public enum Keys : int { 
@@ -780,6 +840,9 @@ namespace Medical_Studio
                     FillBehavior.Stop);
                 thicknessAnimation.AutoReverse = true;
                 border_host.BeginAnimation(Border.BorderThicknessProperty, thicknessAnimationUsingKeyFrames);
+
+                if(!mainViewModel.MuteSounds)
+                    photoSoundPlayer.Play();
             }
             catch(Exception ex)
             {
@@ -1496,8 +1559,12 @@ namespace Medical_Studio
                 if (mainViewModel.VideoCapturing)
                 {
                     mainViewModel.StopVideoCapturing();
+                    if (!mainViewModel.MuteSounds)
+                        videoStopSoundPlayer.Play();
                 }
                 mainViewModel.StartVideoCapturing();
+                if (!mainViewModel.MuteSounds)
+                    videoStartSoundPlayer.Play();
             }
             catch (Exception) { }
         }
@@ -1511,6 +1578,11 @@ namespace Medical_Studio
 
                 if (mainViewModel.VideoCapturing)
                 {
+                    if(!mainViewModel.MuteSounds)
+                        if(!mainViewModel.VideoOnPause)
+                            pauseSoundPlayer.Play();
+                        else
+                            continueSoundPlayer.Play();
                     mainViewModel.VideoOnPause = !mainViewModel.VideoOnPause;
                 }
             }
@@ -1527,6 +1599,8 @@ namespace Medical_Studio
                 if (mainViewModel.VideoCapturing)
                 {
                     mainViewModel.StopVideoCapturing();
+                    if (!mainViewModel.MuteSounds)
+                        videoStopSoundPlayer.Play();
                 }
             }
             catch (Exception) { }
@@ -1555,6 +1629,15 @@ namespace Medical_Studio
                 }
             }
             catch (Exception) { }
+        }
+
+        private void b_mute_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                mainViewModel.MuteSounds = !mainViewModel.MuteSounds;
+            }
+            catch { }
         }
 
         private void commandTakePhotoMethod(object sender, ExecutedRoutedEventArgs e)

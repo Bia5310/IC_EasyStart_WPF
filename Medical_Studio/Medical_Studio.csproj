@@ -178,7 +178,6 @@
     <Compile Include="Converters\StringEqualConverter.cs" />
     <Compile Include="FootSwitch\FootSwitch.cs" />
     <Compile Include="FootSwitch\HotKeyLib.cs" />
-    <Compile Include="HotKeyLib.cs" />
     <Compile Include="InfoWindow.xaml.cs">
       <DependentUpon>InfoWindow.xaml</DependentUpon>
     </Compile>
@@ -268,6 +267,7 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="FootSwitchConfig.cfg" />
     <None Include="Medical_Studio_1_TemporaryKey.pfx" />
     <None Include="Medical_Studio_TemporaryKey.pfx" />
     <None Include="packages.config" />
@@ -363,6 +363,17 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Sounds\take_photo.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Sounds\continueVideo.wav" />
+    <Resource Include="Images\SoundOffIcon.png" />
+    <Resource Include="Images\SoundOnIcon.png" />
+    <Content Include="Sounds\pause_toggle.wav" />
+    <Content Include="Sounds\start_video.wav" />
+    <Content Include="Sounds\stop_video.wav" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
